@@ -51,6 +51,25 @@ MIDI_NAMES = np.array([(sharp_name + "/" + flat_name) if sharp_name != flat_name
 
 MIDI_ALT_NAMES = np.array([name_to_alt_name(name) for name in MIDI_NAMES])
 
+def name_to_midi_id(name):
+    octave = -1
+    for c in name:
+        if c.isnumeric():
+            octave = int(c)
+    if octave == -1:
+        return NOTES[name]
+    
+    start = (octave + 1)*12
+    end = min(start + 12, 128)
+    
+    indices = np.where(np.char.rfind(a=MIDI_NAMES[start:end], sub=name) >= 0)[0]
+
+    if len(indices) == 0:
+        indices = np.where(np.char.rfind(a=MIDI_ALT_NAMES[start:end], sub=name) >= 0)[0]
+    if len(indices) == 0:
+        raise ValueError("The given name is not correct")
+    
+    return start + indices[0]
 
 def to_corrected_chroma_names(chroma_names):
     new_chroma_names = []   

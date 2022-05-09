@@ -22,6 +22,7 @@ def callback(sender, app_data, user_data):
     # Audio(waveform, rate=44100)
     Fs = 22050
     audio_data = music.synthesize(fs=Fs)
+    
     Audio(audio_data, rate=Fs, autoplay=True)
 
 
