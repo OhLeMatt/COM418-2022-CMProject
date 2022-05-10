@@ -22,8 +22,11 @@ def callback(sender, app_data, user_data):
     # Audio(waveform, rate=44100)
     Fs = 22050
     audio_data = music.synthesize(fs=Fs)
+
+    dpg.set_value("Text", "Playing: " + app_data['file_name'])
     
     Audio(audio_data, rate=Fs, autoplay=True)
+
 
 
 with dpg.file_dialog(directory_selector=False, show=False, callback=callback, id="file_dialog_id", height=300):
@@ -35,6 +38,7 @@ with dpg.file_dialog(directory_selector=False, show=False, callback=callback, id
 
 with dpg.window(label="Tutorial", width=800, height=600):
     dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog_id"))
+    dpg.add_text(label="Text", default_value="Hello", tag="Text")
 
 dpg.create_viewport(title='Custom Title', width=800, height=600)
 dpg.setup_dearpygui()

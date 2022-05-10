@@ -1,7 +1,4 @@
-from cv2 import split
-from matplotlib.cbook import flatten
 import numpy as np
-from pyrsistent import b
 
 
 MIDI_IDS = np.arange(128)
