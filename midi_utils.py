@@ -1,6 +1,5 @@
 import numpy as np
 
-
 MIDI_IDS = np.arange(128)
 
 def to_chroma(midi_id):
