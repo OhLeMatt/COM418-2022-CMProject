@@ -39,7 +39,8 @@ class InputMidi:
             sd.stop()
             self.playing = False
 
-inputMidi = InputMidi("/Users/manon/Downloads/EPFL/MA4/Computers & Music/COM418-2022-CMProject/MIDI_Files/KCP_Major_1.mid","/Users/manon/Downloads/EPFL/MA4/Computers & Music/COM418-2022-CMProject/MIDI_Files")
+#inputMidi = InputMidi("/Users/manon/Downloads/EPFL/MA4/Computers & Music/COM418-2022-CMProject/MIDI_Files/KCP_Major_1.mid","/Users/manon/Downloads/EPFL/MA4/Computers & Music/COM418-2022-CMProject/MIDI_Files")
+inputMidi = None
 
 dpg.create_context()
 
@@ -64,7 +65,8 @@ def callback(sender, app_data, user_data):
     
 
 def play_midi(sender, app_data, user_data):
-    inputMidi.play()
+    if inputMidi is not None:
+        inputMidi.play()
 
 def random_midi(sender, app_data, user_data):
     random_file = random.choice(midifiles)
