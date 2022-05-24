@@ -6,7 +6,7 @@ from os import listdir
 from os.path import isfile, join
 import random
 
-midi_path = "/Users/manon/Downloads/EPFL/MA4/Computers & Music/COM418-2022-CMProject/MIDI_Files"
+midi_path = "MIDI_Files"
 
 midifiles = [f for f in listdir(midi_path) if isfile(join(midi_path, f))]
 

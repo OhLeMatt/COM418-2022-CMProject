@@ -1,6 +1,11 @@
+from re import sub
+from matplotlib.style import available
 import numpy as np
-from scipy.fftpack import shift
+from scipy.fftpack import shift, ss_diff
+import pandas as pd
+from sklearn.preprocessing import scale
 import midi_utils as mu
+from utils import base_to_list
 
 def music_to_tonic_chroma(midi_ids):
     """Difficult and WIP heuristic to find the tonic. Needs accurate research
@@ -12,7 +17,7 @@ def music_to_tonic_chroma(midi_ids):
         int: tonic in chroma id notes (0 to 11)
     """
     notes, counts = np.unique(mu.to_chroma(midi_ids), return_counts=True)
-    print(counts)
+    
     return notes[counts.argmax()]
 
 def music_to_chroma_shifts(midi_ids, tonic_chroma):
@@ -22,11 +27,60 @@ def music_to_chroma_shifts(midi_ids, tonic_chroma):
         shifts = np.append(shifts, remainder)
     
     return shifts
-    
-    
 
+class ChromaBitmap:
+    
+    def __init__(self, sucessive_shifts=[]) -> None:
+        self.bitmap = 0
+        self.set(np.array(sucessive_shifts))
+        
+    def set(self, index) -> None:
+        self.bitmap |= np.sum(1 << (np.array(index) % 12))
+        
+    def set_map(self, other) -> None:
+        self.bitmap |= other
+        
+    def unset(self, index) -> None:
+        self.bitmap &= ~np.sum((1 << np.array(index)))
+        
+    def unset_map(self, other) -> None:
+        self.bitmap &= ~other
+    
+    def on(self, index) -> bool:
+        return (1 << np.array(index)) & self.bitmap != 0
+    
+    def off(self, index) -> bool:
+        return ~(1 << np.array(index)) & self.bitmap != 0
+    
+    def contains(self, other) -> bool:
+        return self.bitmap & other == other
+    
+    def is_contained(self, other) -> bool:
+        return self.bitmap & other == self.bitmap
+    
+    def union(self, other) -> bool:
+        return self.bitmap | other
+    
+    def inter(self, other) -> bool:
+        return self.bitmap & other
+    
+    def indices_on(self) -> list:
+        return mu.CHROMA_IDS[self.on(mu.CHROMA_IDS)]
+    
+    def indices_off(self) -> list:
+        return mu.CHROMA_IDS[self.off(mu.CHROMA_IDS)]
+    
+    def __str__(self):
+        return f"{self.bitmap:012b}"
+    
+    def __repr__(self):
+        return self.__str__()
+    
+    def __call__(self):
+        return self.bitmap
+    
 class Scale:
-    def __init__(self, tonic_chroma, shifts, name="Untitled"):
+    def __init__(self, shifts, tonic_chroma, name="Untitled"):
         self.tonic_chroma = mu.to_chroma(tonic_chroma)
         self.shifts = np.array(shifts)
         if len(self.shifts) != 0:
@@ -34,6 +88,7 @@ class Scale:
             self.chromas = mu.to_chroma(self.successive_shifts + self.tonic_chroma)
             self.names = mu.to_corrected_chroma_names(mu.CHROMA_NAMES[self.chromas])
         self.name = name
+        self.chromabitmap = ChromaBitmap(sucessive_shifts=self.chromas)
     
     @staticmethod
     def compute_successive_shifts(shifts):
@@ -62,12 +117,14 @@ class Scale:
     
     def __repr__(self):
         return self.name + " Scale in " + mu.CHROMA_NAMES[self.tonic_chroma]
+    
+        
 
 # DODECATONIC SCALES
 
 CHROMATIC_SHIFTS = np.ones(12, dtype=int) 
 def chromatic_scale():
-    return Scale(0, CHROMATIC_SHIFTS, "Chromatic")
+    return Scale(shifts=CHROMATIC_SHIFTS, tonic_chroma=0, name="Chromatic")
 
 # HEPTATONIC SCALES
 
@@ -99,7 +156,7 @@ def ditetrachordic_shifts(lower_tetra=Tetrachord.MAJOR, upper_tetra=Tetrachord.M
     return shifts + [separator] + Tetrachord.T5[upper_tetra]
 
 def ditetrachordic_scale(tonic_chroma, **kwargs):
-    return Scale(tonic_chroma, ditetrachordic_shifts(**kwargs), "Ditetrachordic")
+    return Scale(shifts=ditetrachordic_shifts(**kwargs), tonic_chroma=tonic_chroma, name="Ditetrachordic")
 
 class Mode:
     IONIAN = 0
@@ -113,6 +170,7 @@ class Mode:
     LOCRIAN = 6
     
     NAMES = ["Major", "Dorian", "Phrygian", "Lydian", "Mixolydian", "Natural Minor", "Locrian"]
+    MODES = [MAJOR, DORIAN, PHRYGIAN, LYDIAN, MIXOLYDIAN, MINOR, LOCRIAN]
     
 
 DIATONIC_SHIFTS = ditetrachordic_shifts(Tetrachord.MAJOR, Tetrachord.MAJOR)
@@ -129,29 +187,46 @@ def diatonic_shifts(mode):
     return np.roll(DIATONIC_SHIFTS, -mode)
 
 def diatonic_scale(tonic_chroma, mode=Mode.MAJOR):    
-    return Scale(tonic_chroma=tonic_chroma, shifts=diatonic_shifts(mode), name=Mode.NAMES[mode])
+    return Scale(shifts=diatonic_shifts(mode), tonic_chroma=tonic_chroma, name=Mode.NAMES[mode])
 
 def harmonic_scale(tonic_chroma, major=True):
-    return Scale(tonic_chroma=tonic_chroma, 
-                 shifts=HARMONIC_MAJOR_SHIFTS if major else HARMONIC_MINOR_SHIFTS,
+    return Scale(shifts=HARMONIC_MAJOR_SHIFTS if major else HARMONIC_MINOR_SHIFTS,
+                 tonic_chroma=tonic_chroma,
                  name="Harmonic " + ("Major" if major else "Minor"))
 
 def melodic_scale(tonic_chroma, major=True):
-    return Scale(tonic_chroma=tonic_chroma, 
-                 shifts=MELODIC_MAJOR_SHIFTS if major else MELODIC_MINOR_SHIFTS,
+    return Scale(shifts=MELODIC_MAJOR_SHIFTS if major else MELODIC_MINOR_SHIFTS,
+                 tonic_chroma=tonic_chroma, 
                  name="Melodic " + ("Major" if major else "Minor"))
 
 def gipsy_major_scale(tonic_chroma):
-    return Scale(tonic_chroma=tonic_chroma, shifts=GIPSY_MAJOR_SHIFTS, name="Gipsy Major")
+    return Scale(shifts=GIPSY_MAJOR_SHIFTS, tonic_chroma=tonic_chroma, name="Gipsy Major")
 
 def neapolitan_minor_scale(tonic_chroma):
-    return Scale(tonic_chroma=tonic_chroma, shifts=NEAPOLITAN_MINOR_SHIFTS, name="Neapolitan Major")
+    return Scale(shifts=NEAPOLITAN_MINOR_SHIFTS, tonic_chroma=tonic_chroma, name="Neapolitan Major")
 
 def altered_scale(tonic_chroma):
-    return Scale(tonic_chroma=tonic_chroma, shifts=ALTERED_SHIFTS, name="Altered")
+    return Scale(shifts=ALTERED_SHIFTS, tonic_chroma=tonic_chroma, name="Altered")
 
 # PENTATONIC SCALES
 
 # https://en.wikipedia.org/wiki/Pentatonic_scale
 
 # DERIVED SCALES
+
+# ALL SCALES
+
+SCALE_LIST = pd.read_csv("scale-list.csv") 
+SCALE_LIST.semitones = [base_to_list(x) for x in SCALE_LIST.semitones.tolist()]
+SCALE_LIST["scale_id"] = [ChromaBitmap(Scale.compute_successive_shifts(x)).bitmap for x in SCALE_LIST.semitones.tolist()]
+SCALE_LIST = SCALE_LIST.set_index("scale_id")
+
+def scale(tonic_chroma, scale_id):
+    scale_infos = SCALE_LIST.loc[scale_id].to_dict()
+    return Scale(shifts=scale_infos["semitones"], 
+                 tonic_chroma=tonic_chroma, 
+                 name=scale_infos["mode_name"]) 
+
+print(scale(0, 291))
+
+# https://plucknplay.github.io/en/scale-list.html

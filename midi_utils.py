@@ -32,6 +32,7 @@ NOTES = {"C": 0, "DO": 0,
           "A#": 10, "LA#": 10, "Bb": 10, "SIb": 10,
           "B": 11, "SI": 11}
 
+CHROMA_IDS = np.arange(12)
 CHROMA_SHARP_NAMES = np.array(["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"])
 CHROMA_FLAT_NAMES = np.array(["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"])
 CHROMA_NAMES = np.array([(sharp_name + "/" + flat_name) if sharp_name != flat_name else sharp_name 
