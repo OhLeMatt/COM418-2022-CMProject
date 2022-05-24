@@ -22,14 +22,18 @@ class InputMidi:
         self.Fs = 22050
         self.audio_data = music.synthesize(fs=self.Fs)
 
-    # def set_file(self, file_name, path):
-    #     self.file_name = file_name 
-    #     self.path = path
-    #     self.playing = False
+        self.channels = [i for i in range(0,16)]
 
-    #     music = PrettyMIDI(midi_file=file_name)
-    #     self.Fs = 22050
-    #     self.audio_data = music.synthesize(fs=self.Fs)
+
+    def add_channel(self, channel):
+        if channel not in self.channels: 
+            self.channels.append(channel)
+
+        
+    def remove_channel(self, channel):
+        if channel in self.channels: 
+            self.channels.remove(channel)
+
 
     def play(self):
         if not self.playing:
@@ -39,12 +43,11 @@ class InputMidi:
             sd.stop()
             self.playing = False
 
-#inputMidi = InputMidi("/Users/manon/Downloads/EPFL/MA4/Computers & Music/COM418-2022-CMProject/MIDI_Files/KCP_Major_1.mid","/Users/manon/Downloads/EPFL/MA4/Computers & Music/COM418-2022-CMProject/MIDI_Files")
 inputMidi = None
 
 dpg.create_context()
 
-def callback(sender, app_data, user_data):
+def select_midi(sender, app_data, user_data):
     #file_name = app_data['file_name']
 
     path = app_data['current_path']  # path to sound font file
@@ -78,27 +81,62 @@ def random_midi(sender, app_data, user_data):
     global inputMidi
     inputMidi = InputMidi(random_file, midi_path)
 
+def channel_selection(sender, app_data, user_data):
+    if inputMidi is not None:
+        if app_data:
+            inputMidi.add_channel(user_data)
+        else: 
+            inputMidi.remove_channel(user_data)
+
+        print("channels: " + str(inputMidi.channels))
 
 
-with dpg.file_dialog(directory_selector=False, show=False, callback=callback, id="file_dialog_id", height=300):
+with dpg.file_dialog(directory_selector=False, show=False, callback=select_midi, id="file_dialog_id", height=300):
     dpg.add_file_extension(".mid")
     dpg.add_file_extension("", color=(150, 255, 150, 255))
-    # dpg.add_file_extension("Source files (*.cpp *.h *.hpp){.cpp,.h,.hpp}", color=(0, 255, 255, 255))
-    # dpg.add_file_extension(".h", color=(255, 0, 255, 255), custom_text="[header]")
-    # dpg.add_file_extension(".py", color=(0, 255, 0, 255), custom_text="[Python]")
 
-with dpg.window(label="Midi Player", width=800, height=300):
-    dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog_id"))
-    dpg.add_button(label="Random", callback=random_midi)
+with dpg.window(label="Midi Player", width=800, height=200):
+    with dpg.group(horizontal=True):
+        dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog_id"))
+        dpg.add_button(label="Random", callback=random_midi)
     dpg.add_text(label="Text", default_value="No file selected", tag="Text")
     dpg.add_button(label="Play", callback=play_midi)
 
-# with dpg.window(label="Menu Box", width=800, height=300):
-#     list_choices = ['one', 'two', 'three', 'four']
+with dpg.window(label="Menu", width=800, height=200, pos=(0,200)):
+    with dpg.menu(label="Midi Channels"):
+        with dpg.table(header_row=False, borders_innerH=False, 
+                               borders_outerH=False, borders_innerV=False, borders_outerV=False):
+                    
+                    dpg.add_table_column()
+                    dpg.add_table_column()
+                    dpg.add_table_column()
+                    dpg.add_table_column()
 
-#     dpg.add_listbox(name = "Choose", items = list_choices)
-    # dpg.set_main_window_size(500,500)
-    # dpg.set_core_window
+                    
+                    with dpg.table_row():
+                        dpg.add_checkbox(label="0", callback=channel_selection, default_value=True, user_data=0)
+                        dpg.add_checkbox(label="1", callback=channel_selection, default_value=True, user_data=1)
+                        dpg.add_checkbox(label="2", callback=channel_selection, default_value=True, user_data=2)
+                        dpg.add_checkbox(label="3", callback=channel_selection, default_value=True, user_data=3)
+
+                    with dpg.table_row(): 
+                        dpg.add_checkbox(label="4", callback=channel_selection, default_value=True, user_data=4)
+                        dpg.add_checkbox(label="5", callback=channel_selection, default_value=True, user_data=5)
+                        dpg.add_checkbox(label="6", callback=channel_selection, default_value=True, user_data=6)
+                        dpg.add_checkbox(label="7", callback=channel_selection, default_value=True, user_data=7)
+
+                    with dpg.table_row(): 
+                        dpg.add_checkbox(label="8", callback=channel_selection, default_value=True, user_data=8)
+                        dpg.add_checkbox(label="9", callback=channel_selection, default_value=True, user_data=9)
+                        dpg.add_checkbox(label="10", callback=channel_selection, default_value=True, user_data=10)
+                        dpg.add_checkbox(label="11", callback=channel_selection, default_value=True, user_data=11)
+
+                    with dpg.table_row(): 
+                        dpg.add_checkbox(label="12", callback=channel_selection, default_value=True, user_data=12)
+                        dpg.add_checkbox(label="13", callback=channel_selection, default_value=True, user_data=13)
+                        dpg.add_checkbox(label="14", callback=channel_selection, default_value=True, user_data=14)
+                        dpg.add_checkbox(label="15", callback=channel_selection, default_value=True, user_data=15)
+
 
 
 dpg.create_viewport(title='Custom Title', width=800, height=600)
