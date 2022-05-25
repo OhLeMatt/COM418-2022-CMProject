@@ -1,0 +1,240 @@
+scale_id,scale_bits,note_count,tonic_position,dissonance_index,name,theory_name,alt_name,flatmost,sharpmost,aug_triads, dim_triads, maj_triads, min_triads,notation,notes_in_steps_of_fifths,rotation_id,circular_distance
+2398,100100011000,4,4,5.6667,C minor (#5) chord,,Chord Cm #12,Eb,G#,,,,Cm,1 3b 5 5# .,Eb-x-x-C-G-x-x-x-x-x-x-G#,31070,0
+2197,100010010101,5,1,2.6,Raga Mamata (India) Major 6th,Aerathitonic,,C,B,,,C, Em Am,1 3 5 6 7 .,C-G-x-A-E-B,22677,0
+2213,100010100101,5,1,2.8,Raga Hindol (India),Daritonic,,C,F#,,,, Am,1 3 4# 6 7 .,C-x-x-A-E-B-F#,22693,0
+2217,100010101001,5,1,3.6,,Kagitonic,,C,G#,C+,, E,,1 3 4# 5# 7 .,C-x-x-x-E-B-F#-x-G#,22697,0
+2225,100010110001,5,1,3.2,Raga Malashri (India) & Chinese,Gonitonic,,C,F#,,,C, Em,1 3 4# 5 7 .,C-G-x-x-E-B-F#,22705,0
+2346,100100101010,5,1,4.6,Raga Harikauns (India) (Sharps),,,C,A#,,,, D#m,1 2# 4# 5# 6# .,C-x-x-x-x-x-F#-x-G#-D#-A#,22826,0
+2353,100100110001,5,1,4.6,Raga Multani (India),Lycritonic,,C,D#, G+,, B,,1 2# 4# 5 7 .,C-G-x-x-x-B-F#-x-x-D#,22833,0
+2612,101000110100,5,1,2.8,Raga Shri Kalyan,,,C,F#,,, D,,1 2 4# 5 6 .,C-G-D-A-x-x-F#,23092,0
+2708,101010010100,5,1,2.0,Major Pentatonic,,"Chord C69 - Gong (China) Raga Bhopali, Mohanam, Deskar, Bilahari (India)",C,E,,,C, Am,1 2 3 5 6 .,C-G-D-A-E,23188,0
+3217,110010010001,5,1,3.6,,Molitonic,,C,C#,, C#dim,C, Em,1 1# 3 5 7 .,C-G-x-x-E-B-x-C#,23697,0
+3248,110010110000,5,1,5.9,Balinese Pentatonic (as 11/23458911/6 in 12edo),,,C,C#,, C#dim,C,,1 1# 3 4# 5 .,C-G-x-x-E-x-F#-C#,23728,0
+3872,111100100000,5,1,4.6,Blues Pentacluster,,,C,D#,,,,,1 1# 2 2# 4# .,C-x-D-x-x-x-F#-C#-x-D#,24352,0
+3904,111101000000,5,1,5.4,Blues PentaCluster 2b’s 1#,,,F,D#,,,,,1 1# 2 2# 4 .,F-C-x-D-x-x-x-x-C#-x-D#,24384,0
+3968,111110000000,5,1,4.6,Chromatic PentaMirror,,,C,D#,,,,,1 1# 2 2# 3 .,C-x-D-x-E-x-x-C#-x-D#,24448,0
+2249,100011001001,5,2,4.6,Romanian Bacovia,Kygitonic,,F,G#,C+,, E,,1 3 4 5# 7 .,F-C-x-x-x-E-B-x-x-G#,22833,5
+2258,100011010010,5,2,5.2,Mixolydian Pentatonic????,,,F,A#,,,C,,1 3 4 5 6# .,F-C-G-x-x-E-x-x-x-x-x-A#,23092,10
+2378,100101001010,5,2,6.2,Raga Malkauns,,"Blues Pentatonic Minor, Hard Japan descending 3#’s",F,A#,,,,,1 2# 4 5# 6# .,F-C-x-x-x-x-x-x-x-G#-D#-A#,23188,8
+2644,101001010100,5,2,2.0,"Ritusen Japan, Scottish Pentatonic (as Slendro example)",,Zhi (China) Raga Devakriya (India) Ujo (Korea),F,A,,, F, Dm,1 2 4 5 6 .,F-C-G-D-A,23188,5
+3520,110111000000,5,2,5.4,Spanish Pentacluster,,,F,D#,,,,,1 1# 2# 3 4 .,F-C-x-x-x-E-x-x-C#-x-D#,24000,0
+2378,100101001010,5,3,6.2,Raga Malkauns,,"Blues Pentatonic Minor, Hard Japan descending ",Bb,D#,,,,,1 2# 4 5# 7b .,Bb-F-C-x-x-x-x-x-x-x-G#-D#,23188,8
+2642,101001010010,5,3,2.0,"Egyptian , Suspended Pentatonic",,,Bb,D,,, Bb, Gm,1 2 4 5 7b .,Bb-F-C-G-D,23188,10
+2378,100101001010,5,4,4.8,Raga Malkauns,,"2b’s 1# Blues Pentatonic Minor, Hard Japan descending ",Eb,G#,,,,,1 3b 4 5# 7b .,Eb-Bb-F-C-x-x-x-x-x-x-x-G#,23188,8
+2378,100101001010,5,4,7.0,Raga Malkauns ,,"Blues Pentatonic Minor, Hard Japan descending ",Eb,A#,,,,,1 3b 4 5# 6# .,Eb-x-F-C-x-x-x-x-x-x-x-G#-x-A#,23188,8
+2388,100101010100,5,4,2.8,Minor 6th Added,,Minor Added Sixth Pentatonic,Eb,A,, Adim, F,Cm,1 3b 4 5 6 .,Eb-x-F-C-G-x-A,22826,9
+2401,100101100001,5,4,4.8,Blues #V (as 7/346/8 in 12edo),,,Eb,F#,,,,,1 3b 4 4# 7 .,Eb-x-F-C-x-x-x-x-B-F#,23728,11
+2836,101100010100,5,4,2.8,"Dorian Pentatonic, Kumoi Japan",,Akebono (Japan),Eb,A,, Adim,,Cm,1 2 3b 5 6 .,Eb-x-x-C-G-D-A,22693,3
+3904,111101000000,5,4,4.6,Blues PentaCluster 2b’s 1#,,,Eb,C#,,,,,1 1# 2 3b 4 .,Eb-x-F-C-x-D-x-x-x-x-C#,24384,0
+2249,100011001001,5,5,4.6,Romanian Bacovia,Kygitonic,,Ab,B, Ab+,,, Fm,1 3 4 6b 7 .,Ab-x-x-F-C-x-x-x-E-B,22833,5
+2378,100101001010,5,5,2.0,"Blues Pentatonic Minor, Hard Japan descending ",,"3b’s 
+Raga Malkauns 11/567891011/4 in 12edo)",Ab,C,,, Ab, Fm,1 3b 4 6b 7b .,Ab-Eb-Bb-F-C,23188,8
+2378,100101001010,5,5,5.6,Raga Malkauns ,,"Blues Pentatonic Minor, Hard Japan descending ",Ab,D#,,,, Fm,1 2# 4 6b 7b .,Ab-x-Bb-F-C-x-x-x-x-x-x-x-x-D#,23188,8
+2378,100101001010,5,5,6.3,Raga Malkauns ,,"Blues Pentatonic Minor, Hard Japan descending ",Ab,A#,,, Ab, Fm,1 3b 4 6b 6# .,Ab-Eb-x-F-C-x-x-x-x-x-x-x-x-x-A#,23188,8
+2648,101001011000,5,5,2.8,Han - kumoi (Japan),,,Ab,D,, Ddim,, Fm,1 2 4 5 6b .,Ab-x-x-F-C-G-D,22693,8
+2840,101100011000,5,5,3.2,Hirajoshi Japan,,,Ab,D,,, Ab,Cm,1 2 3b 5 6b .,Ab-Eb-x-x-C-G-D,22705,8
+3154,110001010010,5,6,2.8,"Kokin-Joshi, Soft Ascend Japan",,Miyakobushi (Japan),Db,G,, Gdim,, Bbm,1 2b 4 5 7b .,Db-x-x-Bb-F-C-G,22693,1
+3156,110001010100,5,6,3.6,Altered Pentatonic,,,Db,A, Db+,, F,,1 2b 4 5 6 .,Db-x-x-x-F-C-G-x-A,22697,1
+3160,110001011000,5,6,3.2,"Japanese, Sakura Pentatonic Soft Descend",,,Db,G,,, Db, Fm,1 2b 4 5 6b .,Db-Ab-x-x-F-C-G,22705,1
+3520,110111000000,5,6,4.2,Spanish Pentacluster,,,Db,E,,,,,1 2b 3b 3 4 .,Db-x-Eb-x-F-C-x-x-x-E,24000,0
+3520,110111000000,5,6,4.3,Spanish Pentacluster,,,Db,D#,,,,,1 2b 2# 3 4 .,Db-x-x-x-F-C-x-x-x-E-x-x-x-x-D#,24000,0
+3904,111101000000,5,6,3.2,Blues PentaCluster 3b’s,,,Db,D,,,,,1 2b 2 3b 4 .,Db-x-Eb-x-F-C-x-D,24384,0
+3170,110001100010,5,7,3.2,Iwato Japan,,,Gb,C,,, Gb, Bbm,1 2b 4 5b 7b .,Gb-Db-x-x-Bb-F-C,22705,6
+3872,111100100000,5,7,4.2,Blues Pentacluster,,,Gb,D,,Cdim,,,1 2b 2 3b 5b .,Gb-Db-x-Eb-x-x-C-x-D,24352,0
+3904,111101000000,5,7,6.2,Blues PentaCluster 2b’s 1#,,,Gb,C#,,Cdim,,,1 1# 2 3b 5b .,Gb-x-x-Eb-x-x-C-x-D-x-x-x-x-C#,24384,0
+2339,100100100011,5,8,3.6,Half Diminished plus b8,Ragitonic,,Cb,C, Cb+,Cdim, Cb, Ebm,1 3b 5b 7b 8b .,Cb-Gb-x-x-Eb-Bb-x-C,23697,11
+2401,100101100001,5,8,5.9,Blues#V (all b’s) 9/25678/4 in 12edo),,,Cb,C, Cb+,Cdim, Cb,,1 3b 4 5b 8b .,Cb-Gb-x-x-Eb-x-F-C,23728,11
+3520,110111000000,5,9,4.0,Spanish Pentacluster,,,Fb,C,,,,,1 2b 3b 4b 4 .,Fb-x-x-Db-x-Eb-x-F-C,24000,0
+2709,101010010101,6,1,2.3333,Lydian Hexatonic,Thaptimic,Chord CMaj769,C,B,,,C G, Em Am,1 2 3 5 6 7 .,C-G-D-A-E-B,27285,0
+2716,101010011100,6,1,3.3333,Major Bebop Hexatonic,,,C,G#,C+,,C, Am,1 2 3 5 5# 6 .,C-G-D-A-E-x-x-x-G#,27292,0
+2729,101010101001,6,1,3.5333,Eskimo Hexatonic 2 (North America),Aeragimic,,C,G#,C+, G#dim, E, Bm,1 2 3 4# 5# 7 .,C-x-D-x-E-B-F#-x-G#,27305,0
+2730,101010101010,6,1,4.6667,whole tone #’s in 12edo),,Raga Gopriya (India) Anhemitonic Hexatonic,C,A#,C+ D+,,,,1 2 3 4# 5# 6# .,C-x-D-x-E-x-F#-x-G#-x-A#,27306,0
+2732,101010101100,6,1,3.5333,Eskimo Hexatonic 2,,,C,G#,C+,, D, Am,1 2 3 4# 5# 6 .,C-x-D-A-E-x-F#-x-G#,27308,0
+2857,101100101001,6,1,4.6,Takemitsu Tree Line Mode1(3 #s from C),Stythimic,,C,D#,, G#dim, B, G#m Bm,1 2 2# 4# 5# 7 .,C-x-D-x-x-B-F#-x-G#-D#,27433,0
+2964,101110010100,6,1,3.6667,Major Blues (as 7/23/4 in 12edo),,Blues Dorian Hexatonic,C,D#,,,C, Am,1 2 2# 3 5 6 .,C-G-D-A-E-x-x-x-x-D#,27540,0
+3173,110001100101,6,2,4.0,,Zarimic,,F,C#, F+, F#dim, F, F#m,1 1# 4 4# 6 7 .,F-C-x-x-A-x-B-F#-C#,27749,0
+3276,110011001100,6,2,4.4667,Messiaen Truncated Mode 3  all #,,as 13/23478111213/6 in 12edo,F,G#,C+ F+,, F A, C#m Am,1 1# 3 4 5# 6 .,F-C-x-x-A-E-x-x-C#-G#,27852,0
+4032,111111000000,6,2,4.2,Chromatic HexaMirror all #,,,F,D#,,,,,1 1# 2 2# 3 4 .,F-C-x-D-x-E-x-x-C#-x-D#,28608,0
+2646,101001010110,6,3,2.3333,Mixolydian Hexatonic,,"Yosen (Japan). Raga Darbar, Narayani, Suposhini (India)",Bb,A,,, F Bb, Dm Gm,1 2 4 5 6 7b .,Bb-F-C-G-D-A,27285,10
+2730,101010101010,6,3,4.6667,"Whole-Tone, Anhemitonic Hexatonic (as whole tone in 12edo) Auxillary Augmented",,"Messiaen 1st Mode 
+Raga Gopriya (India) Anhemitonic Hexatonic",Bb,G#,C+ Bb+,,,,1 2 3 4# 5# 7b .,Bb-x-C-x-D-x-E-x-F#-x-G#,27306,0
+2417,100101110001,6,4,4.0,Blues Minor Maj7,Kanimic,,Eb,F#, Eb+,,,Cm,1 3b 4 4# 5 7 .,Eb-x-F-C-G-x-x-x-B-F#,27749,6
+2418,100101110010,6,4,3.6667,Blues Minor ( same as 7/23/7 in 12edo),,,Eb,F#,,, Eb,Cm,1 3b 4 4# 5 7b .,Eb-Bb-F-C-G-x-x-x-x-F#,27540,3
+2964,101110010100,6,4,3.0,Blues Dorian Hex (all b’s) as 9/6789/1 in 12edo),,Blues Dorian Hexatonic,Eb,E,, Adim,C,Cm Am,1 2 3b 3 5 6 .,Eb-x-x-C-G-D-A-E,27540,0
+3476,110110010100,6,4,4.2667,Blues Dorian Hexatonic,,,Eb,C#,, C#dim Adim,C A,Cm Am,1 1# 3b 3 5 6 .,Eb-x-x-C-G-x-A-E-x-x-C#,27433,1
+2457,100110011001,6,5,4.4667,"Augmented,  Messiaen Truncated Mode 3 2457Inverse",Ionythimic,genus tertium Raga Devamani,Ab,B, Eb+ Ab+,,C Ab,Cm Em,1 3b 3 5 6b 7 .,Ab-Eb-x-x-C-G-x-x-E-B,27852,3
+2457,100110011001,6,5,5.5333,"Augmented,  Messiaen Truncated Mode 3 2457Inverse",Ionythimic,genus tertium Raga Devamani,Ab,D#, G+ Ab+,,C, Em,1 2# 3 5 6b 7 .,Ab-x-x-x-C-G-x-x-E-B-x-x-x-D#,27852,3
+2730,101010101010,6,6,6.0,Whole tone alternate,,Raga Gopriya (India) Anhemitonic Hexatonic,Ab,A#, D+ Ab+,,,,1 2 3 4# 6b 6#  .,Ab-x-x-x-C-x-D-x-E-x-F#-x-x-x-A#,27306,0
+3476,110110010100,6,6,4.6,Blues Dorian Hexatonic,,,Db,E,, Adim,C,Cm Am,1 2b 3b 3 5 6 .,Db-x-Eb-x-x-C-G-x-A-E,27433,1
+3476,110110010100,6,6,4.6,Blues Dorian Hexatonic,,,Db,E,, C#dim,C A, Am,1 1# 2# 3 5 6 .,C-G-x-A-E-x-x-C#-x-D#,27433,1
+3476,110110010100,6,6,5.6667,Blues Dorian Hexatonic,,,Db,D#,,,C, Am,1 2b 2# 3 5 6 .,Db-x-x-x-x-C-G-x-A-E-x-x-x-x-D#,27433,1
+4032,111111000000,6,6,3.9333,Chromatic HexaMirror all b,,,Db,E,,,,,1 2b 2 3b 3 4 .,Db-x-Eb-x-F-C-x-D-x-E,28608,0
+2418,100101110010,6,7,3.0,Blues Minor (All b’s 9/6789/4 in 12edo),,,Gb,G,,Cdim, Eb,Cm Ebm,1 3b 4 5b 5 7b .,Gb-x-x-Eb-Bb-F-C G,27540,3
+2730,101010101010,6,7,4.6667,whole tone b’s in 12edo),,Raga Gopriya (India) Anhemitonic Hexatonic,Gb,E, Gb+ Ab+,,,,1 2 3 5b 6b 7b .,Gb-x-Ab-x-Bb-x-C-x-D-x-E,27306,0
+3238,110010100110,6,7,4.4,Prometheus Neapolitan,,,Gb,E,,, Gb, Am,1 2b 3 5b 6 7b .,Gb-x-x-x-Bb-F-C-x-x-A-E,27433,10
+2477,100110101101,7,1,3.7143,Aeolian 2# 4# #5,Mydian,,C,D#,C+, D#dim, E B, G#m Am,1 2# 3 4# 5# 6 7 .,C-x-x-A-E-B-F#-x-G#-D#,31149,0
+2483,100110110011,7,1,4.6667,Mela Rasikapriya (India),Aerynian,,C,A#, G+,,C B, D#m Em,1 2# 3 4# 5 6# 7 .,C-G-x-x-E-B-F#-x-x-D#-A#,31155,0
+2485,100110110101,7,1,3.7143,Lydian #2 Raga Kuksumakaram ,Aerorian,,C,D#, G+, D#dim,C B, Em Am,1 2# 3 4# 5 6 7 .,C-G-x-A-E-B-F#-x-x-D#,31157,0
+2731,101010101011,7,1,4.1905,Leading Whole-Tone,Thydian,,C,A#,C+ D+, G#dim, E, Bm,1 2 3 4# 5# 6# 7 .,C-x-D-x-E-B-F#-x-G#-x-A#,31403,0
+2733,101010101101,7,1,3.3333,"Lydian Augmented, Hindi #IV & #V",Bocrian,,C,G#,C+, G#dim, D E, Am Bm,1 2 3 4# 5# 6 7 .,C-x-D-A-E-B-F#-x-G#,31405,0
+2739,101010110011,7,1,4.0952,Mela Citrambari (India),Zanian,,C,A#, D+,,C G, Em Bm,1 2 3 4# 5 6# 7 .,C-G-D-x-E-B-F#-x-x-x-A#,31411,0
+2741,101010110101,7,1,2.6667,"Lydian, Kalyan F to E ascending naturals",Ionian,Ping (China)  Nis Garb.ri (Mesopotamian),C,F#,,,C D G, Em Am Bm,1 2 3 4# 5 6 7 .,C-G-D-A-E-B-F#,31413,0
+2745,101010111001,7,1,3.5238,Mela Latangi (India),Dolian,,C,G#,C+, G#dim,C E G, Em Bm,1 2 3 4# 5 5# 7 .,C-G-D-x-E-B-F#-x-G#,31417,0
+2748,101010111100,7,1,3.4286,Mela Kantamani (India),,,C,G#,C+,,C D, Am,1 2 3 4# 5 5# 6 .,C-G-D-A-E-x-F#-x-G#,31420,0
+2867,101100110011,7,1,4.4762,Mela Nitimati (India),Socrian,,C,A#, D+ G+,, G B, D#m Bm,1 2 2# 4# 5 6# 7 .,C-G-D-x-x-B-F#-x-x-D#-A#,31539,0
+2972,101110011100,7,1,4.0952,Chromatic Hypodorian,,,C,D#,C+,,C, Am,1 2 2# 3 5 5# 6 .,C-G-D-A-E-x-x-x-G#-D#,31644,0
+3243,110010101011,7,1,3.8095,"Enigmatic Ascending (#1,#4,#5,#6)",Staptian,as 15/23457891315/6 in 12edo,C,A#,C+, A#dim, E F#, C#m,1 1# 3 4# 5# 6# 7 .,C-x-x-x-E-B-F#-C#-G#-x-A#,31420,4
+3245,110010101101,7,1,3.2381,,Aeracrian,,C,G#,C+, F#dim, E A, C#m F#m Am,1 1# 3 4# 5# 6 7 .,C-x-x-A-E-B-F#-C#-G#,31917,0
+3253,110010110101,7,1,3.1429,Marva Thaat (India) (as Marva 11/23458/6 in 12 edo),Gonian,Marva Thaat (India),C,C#,, C#dim F#dim,C A, Em F#m Am,1 1# 3 4# 5 6 7 .,C-G-x-A-E-B-F#-C#,31925,0
+3260,110010111100,7,1,3.7143,Mela Dhavalambari (India),,,C,G#,C+, C#dim F#dim,C A, C#m F#m Am,1 1# 3 4# 5 5# 6 .,C-G-x-A-E-x-F#-C#-G#,31932,0
+3371,110100101011,7,1,3.8095,Enigmatic Minor (all #’s),Aeolylian,,C,A#,,, F# B, D#m G#m,1 1# 2# 4# 5# 6# 7 .,C-x-x-x-x-B-F#-C#-G#-D#-A#,31070,3
+3382,110100110110,7,1,4.7619,Todi bVII Mela Sadvidhamargini (India),,,C,A#,, D#dim F#dim, F#, D#m F#m,1 1# 2# 4# 5 6 6# .,C-G-x-A-x-x-F#-C#-x-D#-A#,32054,0
+3740,111010011100,7,1,3.6189999999999998,Chromatic Phrygian Inverse,,,C,G#,C+, C#dim,C A, C#m Am,1 1# 2 3 5 5# 6 .,C-G-D-A-E-x-x-C#-G#,32412,0
+3753,111010101001,7,1,3.4286,,Phraptian,,C,G#,C+, G#dim, E, C#m Bm,1 1# 2 3 4# 5# 7 .,C-x-D-x-E-B-F#-C#-G#,32425,0
+3756,111010101100,7,1,3.5238,Neapolitan Minor Mode (as 10/48910/11 in 12edo),,,C,G#,C+, F#dim, D A, C#m F#m Am,1 1# 2 3 4# 5# 6 .,C-x-D-A-E-x-F#-C#-G#,31411,2
+2507,100111001011,7,2,5.2381,Chromatic Phrygian,Ionyphian,,F,A#,C+,, E, G#m,1 2# 3 4 5# 6# 7 .,F-C-x-x-x-E-B-x-x-G#-D#-A#,31644,8
+2515,100111010011,7,2,5.2381,Chromatic Dorian Inverse Raga None (India),Stylian,,F,A#, G+,,C, Em,1 2# 3 4 5 6# 7 .,F-C-G-x-x-E-B-x-x-x-D#-A#,32412,3
+2517,100111010101,7,2,4.0952,"Houzam (Greece)   Raga Saildesakshi, Trishuli (India)",Ryphian,,F,D#, G+,,C F, Em Am,1 2# 3 4 5 6 7 .,F-C-G-x-A-E-B-x-x-x-D#,31411,5
+2518,100111010110,7,2,5.1429,Rock 'n Roll ( same as 7/6/4 in 12edo),,Raga Nandkauns (India),F,A#,,,C F, Am,1 2# 3 4 5 6 6# .,F-C-G-x-A-E-x-x-x-x-D#-A#,31190,0
+2521,100111011001,7,2,4.4762,Mela Gangeyabhusani (India),Barian,(Sengiach Greece),F,D#,C+ G+,,C E, Em G#m,1 2# 3 4 5 5# 7 .,F-C-G-x-x-E-B-x-x-G#-D#,31539,5
+2675,101001110011,7,2,4.6667,Chromatic Mixolydian Inverse,Gogian,,F,A#, D+, Bdim, G, Bm,1 2 4 4# 5 6# 7 .,F-C-G-D-x-x-B-F#-x-x-x-A#,32412,10
+2765,101011001101,7,2,3.7143,"Harmonic Major 2, Ionian #5",Banian,,F,G#,C+, G#dim Bdim, E F, Dm Am,1 2 3 4 5# 6 7 .,F-C-x-D-A-E-B-x-x-G#,31157,5
+2780,101011011100,7,2,3.5238,Major Bebop Heptatonic Mela Mararanjani (India),,,F,G#,C+,,C F, Dm Am,1 2 3 4 5 5# 6 .,F-C-G-D-A-E-x-x-x-G#,31917,8
+3182,110001101110,7,2,4.4286,"Gipsy Hexatonic, Raga Kalakanti",,,F,A#, F+, F#dim, F F#, F#m,1 1# 4 4# 5# 6 6# .,F-C-x-x-A-x-x-F#-C#-G#-x-A#,31854,0
+3275,110011001011,7,2,4.9524,"Enigmatic Descending (#1,#5,#6,#7)",Katadian,as 15/234789121315/6 in 12edo,F,A#,C+, A#dim, E, C#m,1 1# 3 4 5# 6# 7 .,F-C-x-x-x-E-B-x-C#-G#-x-A#,31932,4
+3676,111001011100,7,2,4.0952,Chromatic Dorian,,Raga Kanakambari (India),F,G#, F+,, F, Dm,1 1# 2 4 5 5# 6 .,F-C-G-D-A-x-x-x-C#-G#,31644,5
+3698,111001110010,7,2,4.6667,Chromatic Mixolydian,,,F,A#, D+,, F#,,1 1# 2 4 4# 5 6# .,F-C-G-D-x-x-x-F#-C#-x-x-A#,31644,10
+3700,111001110100,7,2,3.6189999999999998,Chromatic Hypophrygian Inverse,,,F,C#, F+, F#dim, D F, Dm F#m,1 1# 2 4 4# 5 6 .,F-C-G-D-A-x-x-F#-C#,32412,5
+4064,111111100000,7,2,4.5714,Chromatic HeptaMirror #’s,,,F,D#,,,,,1 1# 2 2# 3 4 4# .,F-C-x-D-x-E-x-F#-C#-x-D#,32736,0
+2486,100110110110,7,3,5.3333,Hungarian Major Raga Nasamani (India),,,Bb,D#,, D#dim Edim,C, Am,1 2# 3 4# 5 6 7b .,Bb-x-C-G-x-A-E-x-F#-x-x-D#,32054,9
+2510,100111001110,7,3,5.2381,Chromatic Hypodorian Inverse,,,Bb,D#,C+,, F, Am,1 2# 3 4 5# 6 7b .,Bb-F-C-x-x-A-E-x-x-x-G#-D#,32412,8
+2518,100111010110,7,3,4.381,Rock 'n Roll ( same as 7/6/4 in 12edo),,Raga Nandkauns (India),Bb,D#,, Edim,C F, Am,1 2# 3 4 5 6 7b .,Bb-F-C-G-x-A-E-x-x-x-x-D#,31190,0
+2742,101010110110,7,3,3.3333,"Lydian bVIIth, Overtone,  Hindi #IV & bVII",,Mela Vacaspati (India) Raga Bhusavati (India) Lydian Mixolydian. Bartok Scale,Bb,F#, Bb+, Edim,C D, Gm Am,1 2 3 4# 5 6 7b .,Bb-x-C-G-D-A-E-x-F#,31405,10
+2766,101011001110,7,3,4.0952,Mixolydian Augmented,,,Bb,G#,C+,, F Bb, Dm Am,1 2 3 4 5# 6 7b .,Bb-F-C-x-D-A-E-x-x-x-G#,31411,10
+2966,101110010110,7,3,4.1905,Minor Bebop Heptatonic (as 7/3/4 in 12edo),,,Bb,D#,, Edim,C, Gm Am,1 2 2# 3 5 6 7b .,Bb-x-C-G-D-A-E-x-x-x-x-D#,31925,3
+3698,111001110010,7,3,4.0952,Chromatic Mixolydian,,,Bb,C#, Bb+,, Bb, Gm,1 1# 2 4 4# 5 7b .,Bb-F-C-G-D-x-x-x-F#-C#,31644,10
+3762,111010110010,7,3,4.0,Chromatic Mixolydian,,,Bb,C#, Bb+, C#dim Edim,C, Gm,1 1# 2 3 4# 5 7b .,Bb-x-C-G-D-x-E-x-F#-C#,32434,0
+2419,100101110011,7,4,5.3333,Blues with Leading Tone,Paptian,,Eb,A#, Eb+,,,Cm,1 3b 4 4# 5 6# 7 .,Eb-x-F-C-G-x-x-x-B-F#-x-x-x-A#,31644,3
+2422,100101110110,7,4,3.7143,Blues Heptatonic,,,Eb,F#,, Adim, Eb F,Cm,1 3b 4 4# 5 6 7b .,Eb-Bb-F-C-G-x-A-x-x-F#,31094,0
+2518,100111010110,7,4,3.1429,Raga Nandkauns (India) (same as Rock 11/5891011/3 in 12 edo),,,Eb,E,, Edim Adim,C Eb F,Cm Am,1 3b 3 4 5 6 7b .,Eb-Bb-F-C-G-x-A-E,31190,0
+2869,101100110101,7,4,3.7143,Lydian Diminished,Phrothian,"Raga Dumyaraga, Madhuvanti, Ambika (India)",Eb,F#, Eb+, Adim, D G,Cm Bm,1 2 3b 4# 5 6 7 .,Eb-x-x-C-G-D-A-x-B-F#,31149,3
+2870,101100110110,7,4,3.7143,"Romanian, Gnossiennes",,"Ukrainian minor Raja, Dorian with a sharp fourth",Eb,F#, Bb+, Adim, D Eb,Cm Gm,1 2 3b 4# 5 6 7b .,Eb-Bb-x-C-G-D-A-x-x-F#,31157,3
+2901,101101010101,7,4,3.3333,Minor Melodic,Larian,Jazz Minor,Eb,B, Eb+, Adim Bdim, F G,Cm Dm,1 2 3b 4 5 6 7 .,Eb-x-F-C-G-D-A-x-B,31405,3
+2930,101101110010,7,4,3.5238,Blues Modified,,,Eb,F#, Bb+,, Eb Bb,Cm Gm,1 2 3b 4 4# 5 7b .,Eb-Bb-F-C-G-D-x-x-x-F#,31917,6
+2966,101110010110,7,4,3.1429,Minor Bebop (all b’s) 11/2891011/3 in 12edo),,,Eb,E,, Edim Adim,C Eb,Cm Gm Am,1 2 3b 3 5 6 7b .,Eb-Bb-x-C-G-D-A-E,31925,3
+2538,100111101010,7,5,4.381,Spanish Heptatonic ,,,Ab,F#, Ab+,, Ab, Fm,1 3b 3 4 4# 6b 7b .,Ab-Eb-Bb-F-C-x-x-x-E-x-F#,32425,4
+2746,101010111010,7,5,4.1905,"Lydian Minor, Stravinski Raga Ratipriya (India)",,,Ab,F#, Ab+ Bb+, Edim,C, Gm,1 2 3 4# 5 6b 7b .,Ab-x-Bb-x-C-G-D-x-E-x-F#,31403,8
+2777,101011011001,7,5,3.7143,"Harmonic Major 1, Ethiopian, Nat Bhairava",Bycrian,,Ab,B, Ab+, Ddim Bdim,C G, Em Fm,1 2 3 4 5 6b 7 .,Ab-x-x-F-C-G-D-x-E-B,31149,8
+2778,101011011010,7,5,3.3333,"Major Minor, Hindu bVI & bVII",,Mela Carukesi (India) Raga Tarangini (India),Ab,E, Ab+, Ddim Edim,C Bb, Fm Gm,1 2 3 4 5 6b 7b .,Ab-x-Bb-F-C-G-D-x-E,31405,8
+2873,101100111001,7,5,4.5714,Hungarian Minor,Docrian,"Maqam Nawa Athar (Arabia), Double Harmonic Minor, Niavent (Greece)",Ab,F#, Eb+,, G Ab,Cm Bm,1 2 3b 4# 5 6b 7 .,Ab-Eb-x-x-C-G-D-x-x-B-F#,31155,8
+2905,101101011001,7,5,3.7143,Harmonic Minor,Palian,,Ab,B, Eb+, Ddim Bdim, G Ab,Cm Fm,1 2 3b 4 5 6b 7 .,Ab-Eb-x-F-C-G-D-x-x-B,31157,8
+2970,101110011010,7,5,3.5238,Sabach (Greece),,,Ab,E, Ab+, Edim,C Eb Ab,Cm Gm,1 2 3b 3 5 6b 7b .,Ab-Eb-Bb-x-C-G-D-x-E,31417,8
+2970,101110011010,7,5,5.2857,Sabach (Greece),,,Ab,D#, Ab+, Edim,C, Gm,1 2 2# 3 5 6b 7b .,Ab-x-Bb-x-C-G-D-x-E-x-x-x-x-D#,31417,8
+2972,101110011100,7,5,3.6189999999999998,Chromatic Hypodorian,,,Ab,E, Ab+, Adim,C Ab,Cm Am,1 2 3b 3 5 6b 6 .,Ab-Eb-x-x-C-G-D-A-E,31644,0
+3182,110001101110,7,5,4.4286,"Gipsy Hexatonic, Raga Kalakanti",,,Ab,F#, F+, F#dim, F, Fm F#m,1 1# 4 4# 6b 6 7b .,Ab-x-Bb-F-C-x-x-A-x-x-F#-C#,31854,0
+3498,110110101010,7,5,5.4286,"Superlocrian, Diminished Whole-Tone",,,Ab,C#, Ab+,, Ab,,1 1# 3b 3 4# 6b 7b .,Ab-Eb-Bb-x-C-x-x-x-E-x-F#-C#,31405,4
+3243,110010101011,7,6,6.0,"Enigmatic Ascending (b2,#4,#5,#6)",Staptian,as 10/23410/1 in 12 edo,Db,A#,C+,, E,,1 2b 3 4# 5# 6# 7 .,Db-x-x-x-x-C-x-x-x-E-B-F#-x-G#-x-A#,31420,4
+3257,110010111001,7,6,5.2381,"Chromatic Hypolydian, Puravi bVI",Ionacrian,,Db,F#, Ab+,,C, Em,1 2b 3 4# 5 6b 7 .,Db-Ab-x-x-x-C-G-x-x-E-B-F#,31644,4
+3275,110011001011,7,6,6.1905,"Enigmatic Descending (b2,#5,#6,#7)",Katadian,as 11/345811/2 in 12edo,Db,A#,C+,, E,,1 2b 3 4 5# 6# 7 .,Db-x-x-x-F-C-x-x-x-E-B-x-x-G#-x-A#,31932,4
+3286,110011010110,7,6,3.7143,Harmonic Minor Inverse or Bhairav,,Maqam Hicaz (Arabia),Db,E, Db+, Edim Gdim,C F, Am Bbm,1 2b 3 4 5 6 7b .,Db-x-x-Bb-F-C-G-x-A-E,31149,1
+3289,110011011001,7,6,4.5714,Hungarian Folk or Byzantine Major Gypsy,Loptian,Bhairav Thaat (India) Mela Mayamalavagaula (India) Raga Paraj (India) Hitzazkiar (Greece),Db,B, Ab+,,C Db, Em Fm,1 2b 3 4 5 6b 7 .,Db-Ab-x-x-F-C-G-x-x-E-B,31155,1
+3290,110011011010,7,6,3.7143,"Phrygian Dominant, Dorico Flamenco, Avaha Raba, Spanish Folk, Jewish Major",,(India) Alhijaz (Arabia) Ahavh Rabbah (Israel) Hitzaz (Greece) Spanish Gypsy,Db,E, Ab+, Edim Gdim,C Db, Fm Bbm,1 2b 3 4 5 6b 7b .,Db-Ab-x-Bb-F-C-G-x-x-E,31157,1
+3371,110100101011,7,6,6.9524,Enigmatic Minor ( same as 7/7/8 in 12edo),Aeolylian,,Db,A#,,,,,1 2b 3b 4# 5# 6# 7 .,Db-x-Eb-x-x-C-x-x-x-x-B-F#-x-G#-x-A#,31070,3
+3385,110100111001,7,6,5.2381,"Chromatic Lydian Inverse, Todi bVI",Rothian,,Db,F#, Eb+,, Ab,Cm,1 2b 3b 4# 5 6b 7 .,Db-Ab-Eb-x-x-C-G-x-x-x-B-F#,32412,11
+3413,110101010101,7,6,4.1905,Neapolitan Major,Aeolynian,Mela Kokilapriya (India) Raga Kokilaravam (India),Db,B, Db+ Eb+, Adim, F,Cm,1 2b 3b 4 5 6 7 .,Db-x-Eb-x-F-C-G-x-A-x-B,31403,1
+3414,110101010110,7,6,3.3333,"Jazz Minor Inverse. Javanese,  Dorian bII & HIndi",,,Db,A, Db+, Gdim Adim, Eb F,Cm Bbm,1 2b 3b 4 5 6 7b .,Db-x-Eb-Bb-F-C-G-x-A,31405,1
+3417,110101011001,7,6,4.0952,Neapolitan Minor,Golian,Raga Dhunibinnashadjam (India) Maqam Shahnaz Kurdi (Arabia),Db,B, Eb+,, Db Ab,Cm Fm,1 2b 3b 4 5 6b 7 .,Db-Ab-Eb-x-F-C-G-x-x-x-B,31411,1
+3418,110101011010,7,6,2.6667,"Phrygian, Bhairavi  E to D asc. nats.(as 11/678910/4 in 12edo)",,"Ishartum (Sumerian), Ousak )Greece), Gregorian Scale 3",Db,G,, Gdim, Db Eb Ab,Cm Fm Bbm,1 2b 3b 4 5 6b 7b .,Db-Ab-Eb-Bb-F-C-G,31413,1
+3442,110101110010,7,6,4.1905,Blues Phrygian  (same as 7/3/7 in 12 edo),,,Db,F#,, Gdim, Eb,Cm Bbm,1 2b 3b 4 4# 5 7b .,Db-x-Eb-Bb-F-C-G-x-x-x-x-F#,31925,6
+2538,100111101010,7,7,6.0,Spanish Heptatonic ,,,Gb,D#, Ab+,,, Fm,1 2# 3 4 5b 6b 7b .,Gb-x-Ab-x-Bb-F-C-x-x-x-E-x-x-x-x-D#,32425,4
+2669,101001101101,7,7,5.4286,Nohkan (Japan),Gamian,,Gb,G#,, G#dim Bdim, F, Dm,1 2 4 5b 5# 6 7 .,Gb-x-x-x-x-F-C-x-D-A-x-B-x-x-G#,32054,11
+2794,101011101010,7,7,4.1905,Major Locrian,,,Gb,E, Gb+ Ab+, Ddim, Bb, Fm,1 2 3 4 5b 6b 7b .,Gb-x-Ab-x-Bb-F-C-x-D-x-E,31403,6
+2870,101100110110,7,7,3.8095,,,erroneous spelling of Romanian minor ?,Gb,A,, Adim, Eb,Cm Gm,1 2 3b b5 5 6 7b .,Gb-x-x-Eb-Bb-x-C-G-D-A,31157,3
+2922,101101101010,7,7,3.3333,"Minor Locrian, Hindi 3 flats and bV",,,Gb,D, Gb+,Cdim Ddim, Ab Bb, Ebm Fm,1 2 3b 4 5b 6b 7b .,Gb-x-Ab-Eb-Bb-F-C-x-D,31405,6
+3182,110001101110,7,7,3.8095,"Gipsy Hexatonic, Raga Kalakanti",,,Gb,A, Db+,, Db F Gb, Fm Bbm,1 2b 4 5b 6b 6 7b .,Gb-Db-Ab-x-Bb-F-C-x-x-A,31854,0
+3182,110001101110,7,7,5.7143,"Gipsy Hexatonic, Raga Kalakanti",,,Gb,G#, Db+,, F Gb, Bbm,1 2b 4 5b 5# 6 7b .,Gb-Db-x-x-Bb-F-C-x-x-A-x-x-x-x-G#,31854,0
+3301,110011100101,7,7,5.2381,Chromatic Lydian,Phrynian,,Gb,B, Db+,, F, Am,1 2b 3 4 5b 6 7 .,Gb-Db-x-x-x-F-C-x-x-A-E-B,31644,9
+3302,110011100110,7,7,4.5714,Oriental 1,,Tsinganikos (Greece). Raga Ahira Lalita (India),Gb,E, Db+,, F Gb, Am Bbm,1 2b 3 4 5b 6 7b .,Gb-Db-x-x-Bb-F-C-x-x-A-E,31155,6
+3305,110011101001,7,7,5.2381,"Chromatic Hypolydian Inverse, Persian",Epathian,,Gb,B, Ab+,, Db, Fm,1 2b 3 4 5b 6b 7 .,Gb-Db-Ab-x-x-F-C-x-x-x-E-B,32412,4
+3434,110101101010,7,7,2.6667,Locrian  - B to A Ascending naturals,,Qablitum (Sumerian),Gb,C,,Cdim, Db Gb Ab, Ebm Fm Bbm,1 2b 3b 4 5b 6b 7b .,Gb-Db-Ab-Eb-Bb-F-C,31413,6
+3442,110101110010,7,7,3.1429,Blues Phrygian 11/2891011/6 in 12edo),,,Gb,G,,Cdim Gdim, Eb Gb,Cm Ebm Bbm,1 2b 3b 4 5b 5 7b .,Gb-Db-x-Eb-Bb-F-C-G,31925,6
+3498,110110101010,7,7,5.0,"Superlocrian, Diminished Whole-Tone (as 8/28/9 in 12 edo)",,,Gb,D#, Ab+,, Gb,,1 2b 2# 3 5b 6b 7b .,Gb-Db-Ab-x-Bb-x-C-x-x-x-E-x-x-x-x-D#,31405,4
+2669,101001101101,7,8,4.7619,Nohkan (Japan),Gamian,,Cb,A,, Ddim Fdim, F, Dm Fm,1 2 4 5b 6b 6 8b .,Cb-Gb-x-Ab-x-x-F-C-x-D-A,32054,11
+3243,110010101011,7,8,4.5714,"Enigmatic Ascending (#1,#4,#5,#6)",Staptian,as 15/23457891315/6 in 12edo,Cb,E, Ab+,, Gb,,1 2b 3 5b 6b 7b 8b .,Cb-Gb-Db-Ab-x-Bb-x-C-x-x-x-E,31420,4
+3371,110100101011,7,8,3.0476,Enigmatic Minor (all b’s)  15/245789101315/6 in 12edo,Aeolylian,,Cb,C, Cb+,Cdim, Gb Ab Cb, Ebm Abm,1 2b 3b 5b 6b 7b 8b .,Cb-Gb-Db-Ab-Eb-Bb-x-C,31070,3
+3498,110110101010,7,9,3.3333,Lydian Augmented or Hindi 5 flats & bIV ,,Super Locrian 6 flats,Fb,C, Fb+,Cdim Bbdim, Gb Ab, Dbm Ebm,1 2b 3b 4b 5b 6b 7b .,Fb-x-Gb-Db-Ab-Eb-Bb-x-C,31405,4
+3387,110100111011,8,1,4.2857,Neveseri (Greece),Aeryptyllic,,C,A#, G+,, F# B, D#m G#m,1 1# 2# 4# 5 5# 6# 7 .,C-G-x-x-x-B-F#-C#-G#-D#-A#,36155,0
+3501,110110101101,8,1,3.4286,Magen Abot (Israel) all sharp,Katodyllic,,C,D#,C+, D#dim F#dim, E A B, C#m F#m G#m Am,1 1# 2# 3 4# 5# 6 7 .,C-x-x-A-E-B-F#-C#-G#-D#,36269,0
+3510,110110110110,8,1,5.0,Blues Diminished,,,C,A#,, C#dim D#dim F#dim A#dim,C F# A, D#m F#m Am,1 1# 2# 3 4# 5 6 6# .,C-G-x-A-E-x-F#-C#-x-D#-A#,36278,0
+3757,111010101101,8,1,3.3214,,Goptyllic,,C,G#,C+, F#dim G#dim, D E A, C#m F#m Am Bm,1 1# 2 3 4# 5# 6 7 .,C-x-D-A-E-B-F#-C#-G#,36525,0
+3763,111010110011,8,1,4.0357,,Modyllic,,C,A#, D+, C#dim A#dim,C F# G, Em Bm,1 1# 2 3 4# 5 6# 7 .,C-G-D-x-E-B-F#-C#-x-x-A#,36531,0
+3765,111010110101,8,1,3.0,,Aerycryllic,,C,C#,, C#dim F#dim,C D G A, Em F#m Am Bm,1 1# 2 3 4# 5 6 7 .,C-G-D-A-E-B-F#-C#,36533,0
+2519,100111010111,8,2,4.8214,,Dathyllic,,F,A#, G+,,C F, Em Am,1 2# 3 4 5 6 6# 7 .,F-C-G-x-A-E-B-x-x-x-D#-A#,35287,0
+2525,100111011101,8,2,4.3929,,Aeolaryllic,,F,D#,C+ G+,,C E F, Em G#m Am,1 2# 3 4 5 5# 6 7 .,F-C-G-x-A-E-B-x-x-G#-D#,35293,0
+2781,101011011101,8,2,3.4286,Major Bebop,Gycryllic,,F,G#,C+, G#dim Bdim,C E F G, Dm Em Am,1 2 3 4 5 5# 6 7 .,F-C-G-D-A-E-B-x-x-G#,36269,8
+2805,101011110101,8,2,3.0,Major Lydian Genus Diatonicum Veterum Correctum,Zylyllic,Ishikotsucho (Japan),F,F#,, Bdim,C D F G, Dm Em Am Bm,1 2 3 4 4# 5 6 7 .,F-C-G-D-A-E-B-F#,36533,5
+3693,111001101101,8,2,4.0,,Epaptyllic,,F,G#, F+, F#dim G#dim Bdim, D F, Dm F#m Bm,1 1# 2 4 4# 5# 6 7 .,F-C-x-D-A-x-B-F#-C#-G#,36461,0
+3929,111101011001,8,2,4.6786,Harmonic Neapolitan Minor 3#’s,Aeolothyllic,,F,D#, G+, G#dim Bdim, G, G#m,1 1# 2 2# 4 5 5# 7 .,F-C-G-D-x-x-B-x-C#-G#-D#,36531,1
+4080,111111110000,8,2,4.3929,Chromatic OctaMirror,,,F,D#,, C#dim,C,,1 1# 2 2# 3 4 4# 5 .,F-C-G-D-x-E-x-F#-C#-x-D#,36848,0
+2511,100111001111,8,3,4.9286,,Epyryllic,,Bb,D#,C+,, E F, G#m Am,1 2# 3 4 5# 6 7b 7 .,Bb-F-C-x-x-A-E-B-x-x-G#-D#,35279,0
+2743,101010110111,8,3,3.3214,Lydian Dominant + natural seventh,Staptyllic,Lydian with both natural and dominant 7th,Bb,F#, Bb+, Edim,C D, Gm Am,1 2 3 4# 5 6 7b 8 .,Bb-x-C-G-D-A-E-B-F#,36525,10
+2775,101011010111,8,3,3.0,Dominant Bebop,Godyllic,,Bb,B,, Edim Bdim,C F G Bb, Dm Em Gm Am,1 2 3 4 5 6 7b 7 .,Bb-F-C-G-D-A-E-B,36533,10
+3030,101111010110,8,3,4.0,Minor Bebop (as 7/0/4 in 12 edo),,,Bb,D#,, Edim,C F Bb, Dm Gm Am,1 2 2# 3 4 5 6 7b .,Bb-F-C-G-D-A-E-x-x-x-x-D#,36533,3
+2925,101101101101,8,4,4.5714,Auxillary Diminished,MajorDimin.,,Eb,G#,, G#dim Adim Bdim, D F, Dm Bm,1 2 3b 4 4# 5# 6 7 .,Eb-x-F-C-x-D-A-x-B-F#-x-G#,36278,2
+2934,101101110110,8,4,3.4286,Blues Octatonic,,,Eb,F#, Bb+, Adim, D Eb F Bb,Cm Dm Gm,1 2 3b 4 4# 5 6 7b .,Eb-Bb-F-C-G-D-A-x-x-F# ,36269,6
+3030,101111010110,8,4,3.0,Minor Bebop (As Minor Bebop 11/891011/3 in 12edo) ,,,Eb,E,, Edim Adim,C Eb F Bb,Cm Dm Gm Am,1 2 3b 3 4 5 6 7b .,Eb-Bb-F-C-G-D-A-E,36533,3
+3926,111101010110,8,4,3.75,Adonai Malakh (Israel) 2b 1#,,,Eb,C#, F+, Adim, Eb F Bb,Cm Dm Gm,1 1# 2 3b 4 5 6 7b     .,Eb-Bb-F-C-G-D-A-x-x-x-C#,36525,1
+2875,101100111011,8,5,4.3929,Minor Gypsy,Ganyllic,Minor Gypsy,Ab,F#, Eb+ Bb+,, Eb G Ab,Cm Gm Bm,1 2 3b 4# 5 6b 7b 7 .,Ab-Eb-Bb-x-C-G-D-x-x-B-F#,35293,3
+2907,101101011011,8,5,4.1429,Utility minor 14/38911121314/5 in 12edo),Mogyllic,Raga Suha (India) Gregorian Scale 4,Ab,B, Eb+, Ddim Bdim, Eb G Ab Bb,Cm Fm Gm,1 2 3b 4 5 6b 7b 7 .,Ab-Eb-Bb-F-C-G-D-x-x-B,36269,11
+2907,101101011011,8,5,5.2143,Utility Minor (as 9/89/5 9n 12edo),Mogyllic,Raga Suha (India) Gregorian Scale 4,Ab,A#, Eb+, Ddim Bdim, G Ab,Cm Fm,1 2 3b 4 5 6b 6# 7 .,Ab-Eb-x-F-C-G-D-x-x-B-x-x-x-x-A#,36269,11
+2937,101101111001,8,5,4.0357,Algerian,Aeolathyllic,,Ab,F#, Eb+, Ddim Bdim, G Ab,Cm Fm Bm,1 2 3b 4 4# 5 6b 7 .,Ab-Eb-x-F-C-G-D-x-x-B-F#,36461,6
+3897,111100111001,8,5,4.9286,Hungarian Minor b2,Locryllic,,Ab,C#, Eb+,, G Ab,Cm Bm,1 1# 2 3b 4# 5 6b 7 .,Ab-Eb-x-x-C-G-D-x-x-B-F#-C#,35279,3
+3929,111101011001,8,5,4.5357,Harmonic Neapolitan Minor 2b1#,Aeolothyllic,,Ab,C#, Eb+, Ddim Bdim, G Ab,Cm Fm,1 1# 2 3b 4 5 6b 7 .,Ab-Eb-x-F-C-G-D-x-x-B-x-C#,36531,1
+3387,110100111011,8,6,6.6786,Neveseri (Greece),Aeryptyllic,,Db,A#, Eb+,, Ab,Cm,1 2b 3b 4# 5 6b 6# 7 .,Db-Ab-Eb-x-x-C-G-x-x-x-B-F#-x-x-x-A#,36155,0
+3510,110110110110,8,6,4.5714,"Messiaen Mode 2, Auxillary Diminished Blues",,Mode 2 first transposition,Db,F#  , Db+, Gdim Adim, Eb F,Cm Bbm,1 2b 3b 4  4# 5 6 7b .,Db-x-Eb-Bb-x-C-G-x-A-E-x-F#,36278,0
+3510,110110110110,8,6,6.0,"Half-Diminished, Symmetric, Blues Dim. ",,,Db,D#,, D#dim Edim Gdim,C, Am,1 2b 2# 3 4# 5 6 7b .,Db-x-x-Bb-x-C-G-x-A-E-x-F#-x-x-D#,36278,0
+3546,110111011010,8,6,5.2143,"Phrygian Major,  Flamenco, Spanish Phrygian",,,Db,D#, Ab+, Edim Gdim,C Db, Fm Bbm,1 2b 2# 3 4 5 6b 7b .,Db-Ab-x-Bb-F-C-G-x-x-E-x-x-x-x-D#,36269,4
+3926,111101010110,8,6,3.3214,Adonai Malakh (Israel) 3b’s,,,Db,A, Db+, Gdim Adim, Eb F Bb,Cm Dm Gm Bbm,1 2b 2 3b 4 5 6 7b .,Db-x-Eb-Bb-F-C-G-D-A,36525,1
+2925,101101101101,8,7,6.0,Diminished,MajorDimin.,,Gb,G#,,Cdim G#dim Adim Bdim, F, Dm,1 2 3b 4 5b 5# 6 7 .,Gb-x-x-Eb-x-F-C-x-D-A-x-B-x-x-G#,36278,2
+3307,110011101011,8,7,4.8214,Enigmatic,Boptyllic,,Gb,B, Ab+,, Db Gb, Fm Bbm,1 2b 3 4 5b 6b 7b 7 .,Gb-Db-Ab-x-Bb-F-C-x-x-x-E-B,35287,1
+3307,110011101011,8,7,6.6786,Enigmatic ,Boptyllic,,Gb,A#, Ab+,, Db, Fm,1 2b 3 4 5b 6b 6# 7 .,Gb-Db-Ab-x-x-F-C-x-x-x-E-B-x-x-x-x-A#,35287,1
+3449,110101111001,8,7,4.3214,Half-Dimiished Bebop,Bacryllic,,Gb,B, Eb+,Cdim, Db Ab,Cm Fm,1 2b 3b 4 5b 5 6b 7 .,Gb-Db-Ab-Eb-x-F-C-G-x-x-x-B,35287,8
+3562,110111101010,8,7,3.75, Spanish 8 tones (all b’s) in 12edo),,,Gb,E, Ab+,Cdim, Db Gb Ab, Ebm Fm Bbm,1 2b 3b 3 4 5b 6b 7b .,Gb-Db-Ab-Eb-Bb-F-C-x-x-x-E,36525,4
+3562,110111101010,8,7,5.8214,Spanish 8 Tones (= 10/8910/7 in 12edo),,,Gb,D#, Ab+,, Db Gb, Fm Bbm,1 2b 2# 3 4 5b 6b 7b .,Gb-Db-Ab-x-Bb-F-C-x-x-x-E-x-x-x-x-D#,36525,4
+3929,111101011001,8,8,3.8214,Harmonic Neapolitan Minor 4b’s,Aeolothyllic,,Cb,D, Cb+, Ddim Fdim, Db Ab,Cm Fm Abm,1 2b 2 3b 4 5 6b 8b .,Cb-x-Db-Ab-Eb-x-F-C-G-D,36531,1
+3546,110111011010,8,9,3.4286,"Phrygian Major,  Flamenco, Spanish Phrygian",,,Fb,G, Fb+, Gdim Bbdim, Db Eb Ab,Cm Dbm Fm Bbm,1 2b 3b 4b 4 5 6b 7b .,Fb-x-x-Db-Ab-Eb-Bb-F-C-G,36269,4
+3562,110111101010,8,9,3.3214, Spanish 8 tones (all b’s) in 12edo) + Fb,,,Fb,C, Fb+,Cdim Bbdim, Db Gb Ab, Dbm Ebm Fm Bbm,1 2b 3b 4b 4 5b 6b 7b .,Fb-x-Gb-Db-Ab-Eb-Bb-F-C,36525,4
+3501,110110101101,8,10,3.4286,Magen Abot (Israel) all flat,Katodyllic,,Bbb,C, Fb+ Bbb+ Cb+,Cdim Ebdim, Fb Ab Bbb Cb, Dbm Gbm Abm,1 2b 3b 4b 5b 6b 7bb 8b .,Bbb-Fb-Cb-Gb-Db-Ab-Eb-x-x-C,36269,0
+3003,101110111011,9,1,4.3333,Messiaen Mode 3 Inverse (all #),Zydygic,one of 6 variations in 12edo,C,A#,C+ D+ G+, G#dim,C E G B, D#m Em G#m Bm,1 2 2# 3 4# 5 5# 6# 7 .,C-G-D-x-E-B-F#-x-G#-D#-A#,39867,0
+3647,111000111111,9,1,4.1111,,Eporygic,,C,A#, D+, F#dim G#dim, D F# G, F#m Bm,1 1# 2 4# 5 5# 6 6# 7 .,C-G-D-A-x-B-F#-C#-G#-x-A#,40511,0
+3773,111010111101,9,1,3.3333,,Sorygic,,C,G#,C+, C#dim F#dim G#dim,C D E G A, C#m Em F#m Am Bm,1 1# 2 3 4# 5 5# 6 7 .,C-G-D-A-E-B-F#-C#-G#,40637,0
+4013,111110101101,9,1,3.6111,,Dathygic,,C,D#,C+, D#dim F#dim G#dim, D E A B, C#m F#m G#m Am Bm,1 1# 2 2# 3 4# 5# 6 7 .,C-x-D-A-E-B-F#-C#-G#-D#,40877,0
+2807,101011110111,9,2,4.0,"Lydian Mixolydian Taishikicho, Ryo (Japan)",Zylygic,,F,A#, D+, Bdim,C D F G, Dm Em Am Bm,1 2 3 4 4# 5 6 6# 7 .,F-C-G-D-A-E-B-F#-x-x-x-A#,40637,10
+2813,101011111101,9,2,3.6111,,Zolygic,,F,G#,C+, G#dim Bdim,C D E F G, Dm Em Am Bm,1 2 3 4 4# 5 5# 6 7 .,F-C-G-D-A-E-B-F#-x-G#,39677,0
+3549,110111011101,9,2,4.3333,Genus Chromaticum (3#’s),Phronygic,,F,D#,C+ F+ G+, C#dim,C E F A, C#m Em G#m Am,1 1# 2# 3 4 5 5# 6 7 .,F-C-G-x-A-E-B-x-C#-G#-D#,39867,1
+3799,111011010111,9,2,4.1667,Chromatic Bebop,Aeralygic,,F,A#, F+, C#dim A#dim Bdim,C F G A, Dm Em Am,1 1# 2 3 4 5 6 6# 7 .,F-C-G-D-A-E-B-x-C#-x-x-A#,39677,5
+3805,111011011101,9,2,3.7222,Chromatic Permuted Diatonic Dorian,Moptygic,,F,G#,C+ F+, C#dim G#dim Bdim,C E F G A, C#m Dm Em Am,1 1# 2 3 4 5 5# 6 7 .,F-C-G-D-A-E-B-x-C#-G#,40669,0
+4088,111111111000,9,2,4.4444,Chromatic NonaMirror,,,F,D#,C+, C#dim,C, C#m,1 1# 2 2# 3 4 4# 5 5# .,F-C-G-D-x-E-x-F#-C#-G#-D#,40511,6
+2807,101011110111,9,3,3.3333,"Lydian Mixolydian Taishikicho, Ryo (Japan)",Zylygic,,Bb,F#, Bb+, Edim Bdim,C D F G Bb, Dm Em Gm Am Bm,1 2 3 4 4# 5 6 7b 7 .,Bb-F-C-G-D-A-E-B-F#,40637,10
+3038,101111011110,9,3,4.5,Houseini (Greece),,,Bb,D#,C+, Edim,C F Bb, Dm Gm Am,1 2 2# 3 4 5 5# 6 7b .,Bb-F-C-G-D-A-E-x-x-x-G#-D#,40637,8
+3062,101111110110,9,3,4.1667,Blues Enneatonic,,,Bb,D#, Bb+, D#dim Edim,C D F Bb, Dm Gm Am,1 2 2# 3 4 4# 5 6 7b .,Bb-F-C-G-D-A-E-x-F#-x-x-D#,39677,10
+2911,101101011111,9,4,5.1111,Full Minor (enharmonic b6 & b7),Katygic,,Eb,A#, Eb+, G#dim Adim Bdim, F G,Cm Dm,1 2 3b 4 5 5# 6 6# 7 .,Eb-x-F-C-G-D-A-x-B-x-x-G#-x-A#,39677,3
+2942,101101111110,9,4,4.3333,Kiourdi (Greece),,,Eb,G#, Bb+, Adim, D Eb F Bb,Cm Dm Gm,1 2 3b 4 4# 5 5# 6 7b .,Eb-Bb-F-C-G-D-A-x-x-F#-x-G#,40877,6
+3934,111101011110,9,4,4.5,"Chromatic Diatonic Dorian (#1,b3,#5,b7)",,as 8/0/6 in 12edo,Eb,G#, F+, Adim, Eb F Bb,Cm Dm Gm,1 1# 2 3b 4 5 5# 6 7b .,Eb-Bb-F-C-G-D-A-x-x-x-C#-G#,40637,1
+2911,101101011111,9,5,3.6111,Full Minor all flats,Katygic,,Ab,B, Eb+, Ddim Adim Bdim, Eb F G Ab Bb,Cm Dm Fm Gm,1 2 3b 4 5 6b 6 7b 7 .,Ab-Eb-Bb-F-C-G-D-A-x-B,39677,3
+3038,101111011110,9,5,3.3333,Houseini (Greece),,,Ab,E,, Adim,C F,Cm Dm Am,1 2 3b 3 4 5 b6 6 b7 .,Ab-Eb-Bb-F-C-G-D-A-E,40637,8
+3549,110111011101,9,6,3.9722,Genus Chromaticum,Phronygic,,Db,D#,C+ Db+ G+,,C E F, Em G#m Am,1 2b 2# 3 4 5 5# 6 7 .,Db-x-x-x-F-C-G-x-A-E-B-x-x-G#-D#,39867,1
+3799,111011010111,9,6,3.7222,Chromatic Bebop,Aeralygic,,Db,B, Db+, Edim Gdim Bdim,C F G Bb, Dm Em Gm Am Bbm,1 2b 2 3 4 5 6 7b 7 .,Db-x-x-Bb-F-C-G-D-A-E-B,39677,5
+3934,111101011110,9,6,3.3333,Chromatic Diatonic Dorian (all b),,as 11/8910/4 in 12edo,Db,A, Db+, Ddim Gdim Adim, Db Eb F Ab Bb,Cm Dm Fm Gm Bbm,1 2b 2 3b 4 5 6b 6 7b .,Db-Ab-Eb-Bb-F-C-G-D-A,40637,1
+3549,110111011101,9,10,4.3333,Genus Chromaticum (6b’s),Phronygic,,Bbb,G, Fb+ Bbb+ Cb+, Fdim, Db Fb Ab Bbb,Cm Dbm Fm Abm,1 2b 3b 4b 4 5 6b 7bb 8b .,Bbb-Fb-Cb-x-Db-Ab-Eb-x-F-C-G,39867,1
+3903,111100111111,10,1,4.1778,,Aeogyllian,,C,A#, D+ G+, D#dim F#dim G#dim, D F# G B, D#m F#m G#m Bm,1 1# 2 2# 4# 5 5# 6 6# 7 .,C-G-D-A-x-B-F#-C#-G#-D#-A#,44863,0
+4029,111110111101,10,1,3.6667,All except F and Bb - 4 and 7b,Aerycryllian,,C,D#,C+ G+, C#dim D#dim F#dim G#dim,C D E G A B, C#m Em F#m G#m Am Bm,1 1# 2 2# 3 4# 5 5# 6 7 .,C-G-D-A-E-B-F#-C#-G#-D#,44989,0
+3039,101111011111,10,2,4.1778,Major & Minor mixed,Godyllian,,F,D#,C+ G+, G#dim Bdim,C E F G, Dm Em G#m Am,1 2 2# 3 4 5 5# 6 6# 7 .,F-C-G-D-A-E-B-x-C#-G#-D#-A#,44989,8
+3063,101111110111,10,2,4.3778,Minor Pentatonic with Leading Tones,Solyllian,,F,A#, D+ G+, D#dim Bdim,C D F G B, Dm D#m Em Am Bm,1 2 2# 3 4 4# 5 6 6# 7 .,F-C-G-D-A-E-B-F#-x-x-D#-A#,44989,3
+3069,101111111101,10,2,4.0222,,Bacryllian,,F,D#,C+ G+, D#dim G#dim Bdim,C D E F G B, Dm Em G#m Am Bm,1 2 2# 3 4 4# 5 5# 6 7 .,F-C-G-D-A-E-B-F#-x-G#-D#,44029,0
+4092,111111111100,10,2,4.1778,Chromatic DecaMirror all except A# & B 6# 7,,,F,D#,C+ F+, C#dim D#dim F#dim,C D F A, C#m Dm F#m Am,1 1# 2 2# 3 4 4# 5 5# 6 .,F-C-G-D-A-E-x-F#-C#-G#-D#,44863,6
+4092,111111111100,10,2,4.1778,Chromatic DecaMirror all except Bb B 7b 7,,,Gb,E, Db+ Ab+,Cdim Ddim Adim,C Db F Ab,Cm Dm Fm Am,1 2b 2 3b 3 4 5b 5 6b 6 .,Gb-Db-Ab-Eb-x-F-C-G-D-A-E,44863,6
+4023,111110110111,10,6,4.5556,Pan Diminished Blues,Styptyllian,,Db,F#, Eb+ Bb+, Edim Gdim Adim,C D Eb G,Cm Em Gm Am Bm,1 2b 2 3b 3 4# 5 6 7b 7 .,Db-x-Eb-Bb-x-C-G-D-A-E-B-F#,44029,7
+4031,111110111111,11,1,4.0,All except F - 4,Godatic,,C,A#,C+ D+ G+, C#dim D#dim F#dim G#dim A#dim,C D E F# G A B, C#m D#m Em F#m G#m Am Bm,1 1# 2 2# 3 4# 5 5# 6 6# 7 .,C-G-D-A-E-B-F#-C#-G#-D#-A#,49087,0
+4094,111111111110,11,3,4.4909,Chromatic UndecaMirror - All except 7th all sharp Bb,,,Bb,D#,C+ F+ Bb+, C#dim D#dim Edim F#dim,C D F A Bb, C#m Dm F#m Gm Am,1 1# 2 2# 3 4 4# 5 5# 6 7b .,Bb-F-C-G-D-A-E-x-F#-C#-G#-D#,49087,6
+4095,111111111111,12,1,4.3333,Chromatic,Chromatic,,C,E#,C+ D+ G+ A+, C#dim D#dim E#dim F#dim G#dim A#dim,C C# D E F# G A B, C#m D#m Em F#m G#m Am A#m Bm,1 1# 2 2# 3 3# 4# 5 5# 6 6# 7 .,C-G-D-A-E-B-F#-C#-G#-D#-A#-E#,53247,0
