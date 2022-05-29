@@ -1,0 +1,212 @@
+scale_id,scale_bits,rotation_id,circular_distance,note_count,name
+2197,100010010101,22677,0,5,"Raga Mamata (India) Major 6th, Aerathitonic"
+2213,100010100101,22693,0,5,"Raga Hindol (India), Daritonic"
+3154,110001010010,22693,1,5,"Kokin-Joshi, Soft Ascend Japan, Miyakobushi (Japan)"
+2836,101100010100,22693,3,5,"Dorian Pentatonic, Kumoi Japan, Akebono (Japan)"
+2648,101001011000,22693,8,5,Han - kumoi (Japan)
+2217,100010101001,22697,0,5,Kagitonic
+3156,110001010100,22697,1,5,Altered Pentatonic
+2225,100010110001,22705,0,5,"Raga Malashri (India) & Chinese, Gonitonic"
+3160,110001011000,22705,1,5,"Japanese, Sakura Pentatonic Soft Descend"
+3170,110001100010,22705,6,5,Iwato Japan
+2840,101100011000,22705,8,5,Hirajoshi Japan
+2346,100100101010,22826,0,5,Raga Harikauns (India) (Sharps)
+2388,100101010100,22826,9,5,"Minor 6th Added, Minor Added Sixth Pentatonic"
+2353,100100110001,22833,0,5,"Raga Multani (India), Lycritonic"
+2249,100011001001,22833,5,5,"Romanian Bacovia, Kygitonic"
+2612,101000110100,23092,0,5,Raga Shri Kalyan
+2258,100011010010,23092,10,5,Mixolydian Pentatonic????
+2708,101010010100,23188,0,5,"Major Pentatonic, Chord C69 - Gong (China) Raga Bhopali, Mohanam, Deskar, Bilahari (India)"
+2644,101001010100,23188,5,5,"Ritusen Japan, Scottish Pentatonic (as Slendro example), Zhi (China) Raga Devakriya (India) Ujo (Korea)"
+2378,100101001010,23188,8,5,"Raga Malkauns, Blues Pentatonic Minor, Hard Japan descending 3#’s"
+2378,100101001010,23188,8,5,"Raga Malkauns, Blues Pentatonic Minor, Hard Japan descending "
+2378,100101001010,23188,8,5,"Raga Malkauns, 2b’s 1# Blues Pentatonic Minor, Hard Japan descending "
+2378,100101001010,23188,8,5,"Raga Malkauns , Blues Pentatonic Minor, Hard Japan descending "
+2378,100101001010,23188,8,5,"Blues Pentatonic Minor, Hard Japan descending , 3b’s 
+Raga Malkauns 11/567891011/4 in 12edo)"
+2642,101001010010,23188,10,5,"Egyptian , Suspended Pentatonic"
+3217,110010010001,23697,0,5,Molitonic
+2339,100100100011,23697,11,5,"Half Diminished plus b8, Ragitonic"
+3248,110010110000,23728,0,5,Balinese Pentatonic (as 11/23458911/6 in 12edo)
+2401,100101100001,23728,11,5,Blues #V (as 7/346/8 in 12edo)
+2401,100101100001,23728,11,5,Blues#V (all b’s) 9/25678/4 in 12edo)
+3520,110111000000,24000,0,5,Spanish Pentacluster
+3872,111100100000,24352,0,5,Blues Pentacluster
+3904,111101000000,24384,0,5,Blues PentaCluster 2b’s 1#
+3904,111101000000,24384,0,5,Blues PentaCluster 3b’s
+3968,111110000000,24448,0,5,Chromatic PentaMirror
+2709,101010010101,27285,0,6,"Lydian Hexatonic, Thaptimic, Chord CMaj769"
+2646,101001010110,27285,10,6,"Mixolydian Hexatonic, Yosen (Japan). Raga Darbar, Narayani, Suposhini (India)"
+2716,101010011100,27292,0,6,Major Bebop Hexatonic
+2729,101010101001,27305,0,6,"Eskimo Hexatonic 2 (North America), Aeragimic"
+2730,101010101010,27306,0,6,"whole tone #’s in 12edo), Raga Gopriya (India) Anhemitonic Hexatonic"
+2730,101010101010,27306,0,6,"Whole-Tone, Anhemitonic Hexatonic (as whole tone in 12edo) Auxillary Augmented, Messiaen 1st Mode 
+Raga Gopriya (India) Anhemitonic Hexatonic"
+2730,101010101010,27306,0,6,"Whole tone alternate, Raga Gopriya (India) Anhemitonic Hexatonic"
+2730,101010101010,27306,0,6,"whole tone b’s in 12edo), Raga Gopriya (India) Anhemitonic Hexatonic"
+2732,101010101100,27308,0,6,Eskimo Hexatonic 2
+2857,101100101001,27433,0,6,"Takemitsu Tree Line Mode1(3 #s from C), Stythimic"
+3476,110110010100,27433,1,6,Blues Dorian Hexatonic
+3238,110010100110,27433,10,6,Prometheus Neapolitan
+2964,101110010100,27540,0,6,"Major Blues (as 7/23/4 in 12edo), Blues Dorian Hexatonic"
+2964,101110010100,27540,0,6,"Blues Dorian Hex (all b’s) as 9/6789/1 in 12edo), Blues Dorian Hexatonic"
+2418,100101110010,27540,3,6,Blues Minor ( same as 7/23/7 in 12edo)
+2418,100101110010,27540,3,6,Blues Minor (All b’s 9/6789/4 in 12edo)
+3173,110001100101,27749,0,6,Zarimic
+2417,100101110001,27749,6,6,"Blues Minor Maj7, Kanimic"
+3276,110011001100,27852,0,6,"Messiaen Truncated Mode 3  all #, as 13/23478111213/6 in 12edo"
+2457,100110011001,27852,3,6,"Augmented,  Messiaen Truncated Mode 3 2457Inverse, Ionythimic, genus tertium Raga Devamani"
+4032,111111000000,28608,0,6,Chromatic HexaMirror all #
+4032,111111000000,28608,0,6,Chromatic HexaMirror all b
+2398,100100011000,31070,0,4,"C minor (#5) chord, Chord Cm #12"
+3371,110100101011,31070,3,7,"Enigmatic Minor (all #’s), Aeolylian"
+3371,110100101011,31070,3,7,"Enigmatic Minor ( same as 7/7/8 in 12edo), Aeolylian"
+3371,110100101011,31070,3,7,"Enigmatic Minor (all b’s)  15/245789101315/6 in 12edo, Aeolylian"
+2422,100101110110,31094,0,7,Blues Heptatonic
+2477,100110101101,31149,0,7,"Aeolian 2# 4# #5, Mydian"
+3286,110011010110,31149,1,7,"Harmonic Minor Inverse or Bhairav, Maqam Hicaz (Arabia)"
+2869,101100110101,31149,3,7,"Lydian Diminished, Phrothian, Raga Dumyaraga, Madhuvanti, Ambika (India)"
+2777,101011011001,31149,8,7,"Harmonic Major 1, Ethiopian, Nat Bhairava, Bycrian"
+2483,100110110011,31155,0,7,"Mela Rasikapriya (India), Aerynian"
+3289,110011011001,31155,1,7,"Hungarian Folk or Byzantine Major Gypsy, Loptian, Bhairav Thaat (India) Mela Mayamalavagaula (India) Raga Paraj (India) Hitzazkiar (Greece)"
+3302,110011100110,31155,6,7,"Oriental 1, Tsinganikos (Greece). Raga Ahira Lalita (India)"
+2873,101100111001,31155,8,7,"Hungarian Minor, Docrian, Maqam Nawa Athar (Arabia), Double Harmonic Minor, Niavent (Greece)"
+2485,100110110101,31157,0,7,"Lydian #2 Raga Kuksumakaram , Aerorian"
+3290,110011011010,31157,1,7,"Phrygian Dominant, Dorico Flamenco, Avaha Raba, Spanish Folk, Jewish Major, (India) Alhijaz (Arabia) Ahavh Rabbah (Israel) Hitzaz (Greece) Spanish Gypsy"
+2870,101100110110,31157,3,7,"Romanian, Gnossiennes, Ukrainian minor Raja, Dorian with a sharp fourth"
+2870,101100110110,31157,3,7,", erroneous spelling of Romanian minor ?"
+2765,101011001101,31157,5,7,"Harmonic Major 2, Ionian #5, Banian"
+2905,101101011001,31157,8,7,"Harmonic Minor, Palian"
+2518,100111010110,31190,0,7,"Rock 'n Roll ( same as 7/6/4 in 12edo), Raga Nandkauns (India)"
+2518,100111010110,31190,0,7,Raga Nandkauns (India) (same as Rock 11/5891011/3 in 12 edo)
+2731,101010101011,31403,0,7,"Leading Whole-Tone, Thydian"
+3413,110101010101,31403,1,7,"Neapolitan Major, Aeolynian, Mela Kokilapriya (India) Raga Kokilaravam (India)"
+2794,101011101010,31403,6,7,Major Locrian
+2746,101010111010,31403,8,7,"Lydian Minor, Stravinski Raga Ratipriya (India)"
+2733,101010101101,31405,0,7,"Lydian Augmented, Hindi #IV & #V, Bocrian"
+3414,110101010110,31405,1,7,"Jazz Minor Inverse. Javanese,  Dorian bII & HIndi"
+2901,101101010101,31405,3,7,"Minor Melodic, Larian, Jazz Minor"
+3498,110110101010,31405,4,7,"Superlocrian, Diminished Whole-Tone"
+3498,110110101010,31405,4,7,"Superlocrian, Diminished Whole-Tone (as 8/28/9 in 12 edo)"
+3498,110110101010,31405,4,7,"Lydian Augmented or Hindi 5 flats & bIV , Super Locrian 6 flats"
+2922,101101101010,31405,6,7,"Minor Locrian, Hindi 3 flats and bV"
+2778,101011011010,31405,8,7,"Major Minor, Hindu bVI & bVII, Mela Carukesi (India) Raga Tarangini (India)"
+2742,101010110110,31405,10,7,"Lydian bVIIth, Overtone,  Hindi #IV & bVII, Mela Vacaspati (India) Raga Bhusavati (India) Lydian Mixolydian. Bartok Scale"
+2739,101010110011,31411,0,7,"Mela Citrambari (India), Zanian"
+3417,110101011001,31411,1,7,"Neapolitan Minor, Golian, Raga Dhunibinnashadjam (India) Maqam Shahnaz Kurdi (Arabia)"
+3756,111010101100,31411,2,7,Neapolitan Minor Mode (as 10/48910/11 in 12edo)
+2517,100111010101,31411,5,7,"Houzam (Greece)   Raga Saildesakshi, Trishuli (India), Ryphian"
+2766,101011001110,31411,10,7,Mixolydian Augmented
+2741,101010110101,31413,0,7,"Lydian, Kalyan F to E ascending naturals, Ionian, Ping (China)  Nis Garb.ri (Mesopotamian)"
+3418,110101011010,31413,1,7,"Phrygian, Bhairavi  E to D asc. nats.(as 11/678910/4 in 12edo), Ishartum (Sumerian), Ousak )Greece), Gregorian Scale 3"
+3434,110101101010,31413,6,7,"Locrian  - B to A Ascending naturals, Qablitum (Sumerian)"
+2745,101010111001,31417,0,7,"Mela Latangi (India), Dolian"
+2970,101110011010,31417,8,7,Sabach (Greece)
+2748,101010111100,31420,0,7,Mela Kantamani (India)
+3243,110010101011,31420,4,7,"Enigmatic Ascending (#1,#4,#5,#6), Staptian, as 15/23457891315/6 in 12edo"
+3243,110010101011,31420,4,7,"Enigmatic Ascending (b2,#4,#5,#6), Staptian, as 10/23410/1 in 12 edo"
+2867,101100110011,31539,0,7,"Mela Nitimati (India), Socrian"
+2521,100111011001,31539,5,7,"Mela Gangeyabhusani (India), Barian, (Sengiach Greece)"
+2972,101110011100,31644,0,7,Chromatic Hypodorian
+2419,100101110011,31644,3,7,"Blues with Leading Tone, Paptian"
+3257,110010111001,31644,4,7,"Chromatic Hypolydian, Puravi bVI, Ionacrian"
+3676,111001011100,31644,5,7,"Chromatic Dorian, Raga Kanakambari (India)"
+2507,100111001011,31644,8,7,"Chromatic Phrygian, Ionyphian"
+3301,110011100101,31644,9,7,"Chromatic Lydian, Phrynian"
+3698,111001110010,31644,10,7,Chromatic Mixolydian
+3182,110001101110,31854,0,7,"Gipsy Hexatonic, Raga Kalakanti"
+3245,110010101101,31917,0,7,Aeracrian
+2930,101101110010,31917,6,7,Blues Modified
+2780,101011011100,31917,8,7,Major Bebop Heptatonic Mela Mararanjani (India)
+3253,110010110101,31925,0,7,"Marva Thaat (India) (as Marva 11/23458/6 in 12 edo), Gonian, Marva Thaat (India)"
+2966,101110010110,31925,3,7,Minor Bebop Heptatonic (as 7/3/4 in 12edo)
+2966,101110010110,31925,3,7,Minor Bebop (all b’s) 11/2891011/3 in 12edo)
+3442,110101110010,31925,6,7,Blues Phrygian  (same as 7/3/7 in 12 edo)
+3442,110101110010,31925,6,7,Blues Phrygian 11/2891011/6 in 12edo)
+3260,110010111100,31932,0,7,Mela Dhavalambari (India)
+3275,110011001011,31932,4,7,"Enigmatic Descending (#1,#5,#6,#7), Katadian, as 15/234789121315/6 in 12edo"
+3275,110011001011,31932,4,7,"Enigmatic Descending (b2,#5,#6,#7), Katadian, as 11/345811/2 in 12edo"
+3382,110100110110,32054,0,7,Todi bVII Mela Sadvidhamargini (India)
+2486,100110110110,32054,9,7,Hungarian Major Raga Nasamani (India)
+2669,101001101101,32054,11,7,"Nohkan (Japan), Gamian"
+3740,111010011100,32412,0,7,Chromatic Phrygian Inverse
+2515,100111010011,32412,3,7,"Chromatic Dorian Inverse Raga None (India), Stylian"
+3305,110011101001,32412,4,7,"Chromatic Hypolydian Inverse, Persian, Epathian"
+3700,111001110100,32412,5,7,Chromatic Hypophrygian Inverse
+2510,100111001110,32412,8,7,Chromatic Hypodorian Inverse
+2675,101001110011,32412,10,7,"Chromatic Mixolydian Inverse, Gogian"
+3385,110100111001,32412,11,7,"Chromatic Lydian Inverse, Todi bVI, Rothian"
+3753,111010101001,32425,0,7,Phraptian
+2538,100111101010,32425,4,7,Spanish Heptatonic 
+3762,111010110010,32434,0,7,Chromatic Mixolydian
+4064,111111100000,32736,0,7,Chromatic HeptaMirror #’s
+2511,100111001111,35279,0,8,Epyryllic
+3897,111100111001,35279,3,8,"Hungarian Minor b2, Locryllic"
+2519,100111010111,35287,0,8,Dathyllic
+3307,110011101011,35287,1,8,"Enigmatic, Boptyllic"
+3307,110011101011,35287,1,8,"Enigmatic , Boptyllic"
+3449,110101111001,35287,8,8,"Half-Dimiished Bebop, Bacryllic"
+2525,100111011101,35293,0,8,Aeolaryllic
+2875,101100111011,35293,3,8,"Minor Gypsy, Ganyllic, Minor Gypsy"
+3387,110100111011,36155,0,8,"Neveseri (Greece), Aeryptyllic"
+3501,110110101101,36269,0,8,"Magen Abot (Israel) all sharp, Katodyllic"
+3501,110110101101,36269,0,8,"Magen Abot (Israel) all flat, Katodyllic"
+3546,110111011010,36269,4,8,"Phrygian Major,  Flamenco, Spanish Phrygian"
+2934,101101110110,36269,6,8,Blues Octatonic
+2781,101011011101,36269,8,8,"Major Bebop, Gycryllic"
+2907,101101011011,36269,11,8,"Utility minor 14/38911121314/5 in 12edo), Mogyllic, Raga Suha (India) Gregorian Scale 4"
+2907,101101011011,36269,11,8,"Utility Minor (as 9/89/5 9n 12edo), Mogyllic, Raga Suha (India) Gregorian Scale 4"
+3510,110110110110,36278,0,8,Blues Diminished
+3510,110110110110,36278,0,8,"Messiaen Mode 2, Auxillary Diminished Blues, Mode 2 first transposition"
+3510,110110110110,36278,0,8,"Half-Diminished, Symmetric, Blues Dim. "
+2925,101101101101,36278,2,8,"Auxillary Diminished, MajorDimin."
+2925,101101101101,36278,2,8,"Diminished, MajorDimin."
+3693,111001101101,36461,0,8,Epaptyllic
+2937,101101111001,36461,6,8,"Algerian, Aeolathyllic"
+3757,111010101101,36525,0,8,Goptyllic
+3926,111101010110,36525,1,8,Adonai Malakh (Israel) 2b 1#
+3926,111101010110,36525,1,8,Adonai Malakh (Israel) 3b’s
+3562,110111101010,36525,4,8, Spanish 8 tones (all b’s) in 12edo)
+3562,110111101010,36525,4,8,Spanish 8 Tones (= 10/8910/7 in 12edo)
+3562,110111101010,36525,4,8, Spanish 8 tones (all b’s) in 12edo) + Fb
+2743,101010110111,36525,10,8,"Lydian Dominant + natural seventh, Staptyllic, Lydian with both natural and dominant 7th"
+3763,111010110011,36531,0,8,Modyllic
+3929,111101011001,36531,1,8,"Harmonic Neapolitan Minor 3#’s, Aeolothyllic"
+3929,111101011001,36531,1,8,"Harmonic Neapolitan Minor 2b1#, Aeolothyllic"
+3929,111101011001,36531,1,8,"Harmonic Neapolitan Minor 4b’s, Aeolothyllic"
+3765,111010110101,36533,0,8,Aerycryllic
+3030,101111010110,36533,3,8,Minor Bebop (as 7/0/4 in 12 edo)
+3030,101111010110,36533,3,8,Minor Bebop (As Minor Bebop 11/891011/3 in 12edo) 
+2805,101011110101,36533,5,8,"Major Lydian Genus Diatonicum Veterum Correctum, Zylyllic, Ishikotsucho (Japan)"
+2775,101011010111,36533,10,8,"Dominant Bebop, Godyllic"
+4080,111111110000,36848,0,8,Chromatic OctaMirror
+2813,101011111101,39677,0,9,Zolygic
+2911,101101011111,39677,3,9,"Full Minor (enharmonic b6 & b7), Katygic"
+2911,101101011111,39677,3,9,"Full Minor all flats, Katygic"
+3799,111011010111,39677,5,9,"Chromatic Bebop, Aeralygic"
+3062,101111110110,39677,10,9,Blues Enneatonic
+3003,101110111011,39867,0,9,"Messiaen Mode 3 Inverse (all #), Zydygic, one of 6 variations in 12edo"
+3549,110111011101,39867,1,9,"Genus Chromaticum (3#’s), Phronygic"
+3549,110111011101,39867,1,9,"Genus Chromaticum, Phronygic"
+3549,110111011101,39867,1,9,"Genus Chromaticum (6b’s), Phronygic"
+3647,111000111111,40511,0,9,Eporygic
+4088,111111111000,40511,6,9,Chromatic NonaMirror
+3773,111010111101,40637,0,9,Sorygic
+3934,111101011110,40637,1,9,"Chromatic Diatonic Dorian (#1,b3,#5,b7), as 8/0/6 in 12edo"
+3934,111101011110,40637,1,9,"Chromatic Diatonic Dorian (all b), as 11/8910/4 in 12edo"
+3038,101111011110,40637,8,9,Houseini (Greece)
+2807,101011110111,40637,10,9,"Lydian Mixolydian Taishikicho, Ryo (Japan), Zylygic"
+3805,111011011101,40669,0,9,"Chromatic Permuted Diatonic Dorian, Moptygic"
+4013,111110101101,40877,0,9,Dathygic
+2942,101101111110,40877,6,9,Kiourdi (Greece)
+3069,101111111101,44029,0,10,Bacryllian
+4023,111110110111,44029,7,10,"Pan Diminished Blues, Styptyllian"
+3903,111100111111,44863,0,10,Aeogyllian
+4092,111111111100,44863,6,10,Chromatic DecaMirror all except A# & B 6# 7
+4092,111111111100,44863,6,10,Chromatic DecaMirror all except Bb B 7b 7
+4029,111110111101,44989,0,10,"All except F and Bb - 4 and 7b, Aerycryllian"
+3063,101111110111,44989,3,10,"Minor Pentatonic with Leading Tones, Solyllian"
+3039,101111011111,44989,8,10,"Major & Minor mixed, Godyllian"
+4031,111110111111,49087,0,11,"All except F - 4, Godatic"
+4094,111111111110,49087,6,11,Chromatic UndecaMirror - All except 7th all sharp Bb
+4095,111111111111,53247,0,12,"Chromatic, Chromatic"
