@@ -10,6 +10,7 @@ midi_path = "MIDI_Files"
 
 midifiles = [f for f in listdir(midi_path) if isfile(join(midi_path, f))]
 
+plot_displayed = False
 
 class InputMidi: 
 
@@ -65,11 +66,24 @@ def select_midi(sender, app_data, user_data):
     inputMidi = InputMidi(midi_file, path)
 
     dpg.set_value("Text", "Playing: " + app_data['file_name'])
+    #dpg.set_value("MidiPlot", audio_data)
     
 
 def play_midi(sender, app_data, user_data):
     if inputMidi is not None:
         inputMidi.play()
+        if inputMidi.playing:
+            dpg.set_value("PlayButton", "Pause")
+        else:
+            dpg.set_value("PlayButton", "Play")
+
+        #dpg.add_simple_plot(label="Midi Plot", default_value=inputMidi.audio_data, parent="MidiPlayer")
+        if not plot_displayed: 
+            dpg.add_line_series(inputMidi.audio_data, [-1,0,1], label="Test", parent="y_axis")
+        #dpg.set_value("LineSerie", inputMidi.audio_data)
+
+
+        
 
 def random_midi(sender, app_data, user_data):
     random_file = random.choice(midifiles)
@@ -95,14 +109,23 @@ with dpg.file_dialog(directory_selector=False, show=False, callback=select_midi,
     dpg.add_file_extension(".mid")
     dpg.add_file_extension("", color=(150, 255, 150, 255))
 
-with dpg.window(label="Midi Player", width=800, height=200):
+with dpg.window(label="Midi Player", width=800, height=400, tag="MidiPlayer"):
     with dpg.group(horizontal=True):
         dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog_id"))
         dpg.add_button(label="Random", callback=random_midi)
     dpg.add_text(label="Text", default_value="No file selected", tag="Text")
-    dpg.add_button(label="Play", callback=play_midi)
+    dpg.add_button(label="Play", callback=play_midi, tag="PlayButton")
 
-with dpg.window(label="Menu", width=800, height=200, pos=(0,200)):
+    with dpg.plot(label="MidiPlot", height=200, width=800):
+        dpg.add_plot_legend()
+        dpg.add_plot_axis(dpg.mvXAxis, label="Time", tag="x_axis")
+        dpg.add_plot_axis(dpg.mvYAxis, label="Freq", tag="y_axis")
+        #dpg.add_line_series([], [-1,0,1], tag="LineSerie", parent="y_axis")
+        #dpg.add_simple_plot(label="Midi Plot", default_value=inputMidi.audio_data, parent="MidiPlayer")
+
+    
+
+with dpg.window(label="Menu", width=800, height=200, pos=(0,400)):
     with dpg.menu(label="Midi Channels"):
         with dpg.table(header_row=False, borders_innerH=False, 
                                borders_outerH=False, borders_innerV=False, borders_outerV=False):
