@@ -12,7 +12,7 @@ midifiles = [f for f in listdir(midi_path) if isfile(join(midi_path, f))]
 
 plot_displayed = False
 
-class InputMidi: 
+class Midi: 
 
     def __init__(self, file_name, path):
         self.file_name = file_name 
@@ -49,11 +49,9 @@ inputMidi = None
 dpg.create_context()
 
 def select_midi(sender, app_data, user_data):
-    #file_name = app_data['file_name']
 
     path = app_data['current_path']  # path to sound font file
     midi_file = app_data['file_path_name']
-    #m = mido.MidiFile(filename=file_name)
     print("Sender: ", sender)
     print("App Data: ", app_data)
     print("Filename: ", midi_file)
@@ -63,7 +61,7 @@ def select_midi(sender, app_data, user_data):
     audio_data = music.synthesize(fs=Fs)
 
     global inputMidi 
-    inputMidi = InputMidi(midi_file, path)
+    inputMidi = Midi(midi_file, path)
 
     dpg.set_value("Text", "Playing: " + app_data['file_name'])
     #dpg.set_value("MidiPlot", audio_data)
@@ -72,15 +70,9 @@ def select_midi(sender, app_data, user_data):
 def play_midi(sender, app_data, user_data):
     if inputMidi is not None:
         inputMidi.play()
-        if inputMidi.playing:
-            dpg.set_value("PlayButton", "Pause")
-        else:
-            dpg.set_value("PlayButton", "Play")
 
-        #dpg.add_simple_plot(label="Midi Plot", default_value=inputMidi.audio_data, parent="MidiPlayer")
         if not plot_displayed: 
             dpg.add_line_series(inputMidi.audio_data, [-1,0,1], label="Test", parent="y_axis")
-        #dpg.set_value("LineSerie", inputMidi.audio_data)
 
 
         
@@ -93,7 +85,7 @@ def random_midi(sender, app_data, user_data):
     random_file = midi_path + "/" + random_file
 
     global inputMidi
-    inputMidi = InputMidi(random_file, midi_path)
+    inputMidi = Midi(random_file, midi_path)
 
 def channel_selection(sender, app_data, user_data):
     if inputMidi is not None:
@@ -114,7 +106,7 @@ with dpg.window(label="Midi Player", width=800, height=400, tag="MidiPlayer"):
         dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog_id"))
         dpg.add_button(label="Random", callback=random_midi)
     dpg.add_text(label="Text", default_value="No file selected", tag="Text")
-    dpg.add_button(label="Play", callback=play_midi, tag="PlayButton")
+    dpg.add_button(label="Play/Pause", callback=play_midi, tag="PlayButton")
 
     with dpg.plot(label="MidiPlot", height=200, width=800):
         dpg.add_plot_legend()
