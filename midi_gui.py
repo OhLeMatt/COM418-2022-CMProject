@@ -74,7 +74,8 @@ def play_midi(sender, app_data, user_data):
         if not plot_displayed: 
             dpg.add_line_series(inputMidi.audio_data, [-1,0,1], label="Test", parent="y_axis")
 
-
+def _log(sender, app_data, user_data):
+    print(f"sender: {sender}, \t app_data: {app_data}, \t user_data: {user_data}")
         
 
 def random_midi(sender, app_data, user_data):
@@ -96,65 +97,85 @@ def channel_selection(sender, app_data, user_data):
 
         print("channels: " + str(inputMidi.channels))
 
+def set_w_threshold(sender, app_data, user_data):
+    print("threshold: " + str(app_data))
+
+def set_t_threshold(sender, app_data, user_data):
+    print("threshold: " + str(app_data))
+
+def set_scale(sender, app_data, user_data):
+    print("scale: " + str(app_data))
+
+def set_notecounts(sender, app_data, user_data):
+    print("note counts selected: " + str(user_data))
 
 with dpg.file_dialog(directory_selector=False, show=False, callback=select_midi, id="file_dialog_id", height=300):
     dpg.add_file_extension(".mid")
     dpg.add_file_extension("", color=(150, 255, 150, 255))
 
-with dpg.window(label="Midi Player", width=800, height=400, tag="MidiPlayer"):
-    with dpg.group(horizontal=True):
-        dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog_id"))
-        dpg.add_button(label="Random", callback=random_midi)
-    dpg.add_text(label="Text", default_value="No file selected", tag="Text")
-    dpg.add_button(label="Play/Pause", callback=play_midi, tag="PlayButton")
+with dpg.window(label="Improvisation Tool", width=1000, height=600, tag="MidiPlayer"):
+    with dpg.collapsing_header(label="Midi Player"):
+        with dpg.group(horizontal=True):
+            dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog_id"))
+            dpg.add_button(label="Random", callback=random_midi)
+        dpg.add_text(label="Text", default_value="No file selected", tag="Text")
+        dpg.add_button(label="Play/Pause", callback=play_midi, tag="PlayButton")
 
-    with dpg.plot(label="MidiPlot", height=200, width=800):
-        dpg.add_plot_legend()
-        dpg.add_plot_axis(dpg.mvXAxis, label="Time", tag="x_axis")
-        dpg.add_plot_axis(dpg.mvYAxis, label="Freq", tag="y_axis")
-        #dpg.add_line_series([], [-1,0,1], tag="LineSerie", parent="y_axis")
-        #dpg.add_simple_plot(label="Midi Plot", default_value=inputMidi.audio_data, parent="MidiPlayer")
+        with dpg.plot(label="MidiPlot", height=200, width=1000):
+            dpg.add_plot_legend()
+            dpg.add_plot_axis(dpg.mvXAxis, label="Time", tag="x_axis")
+            dpg.add_plot_axis(dpg.mvYAxis, label="Freq", tag="y_axis")
+            #dpg.add_line_series([], [-1,0,1], tag="LineSerie", parent="y_axis")
+            #dpg.add_simple_plot(label="Midi Plot", default_value=inputMidi.audio_data, parent="MidiPlayer")
 
-    
+    with dpg.collapsing_header(label="Midi Settings"):
+        with dpg.group(horizontal=True): 
+            dpg.add_text(label="label", default_value="Select Midi Channels: ")
+            dpg.add_checkbox(label="0", callback=channel_selection, default_value=True, user_data=0)
+            dpg.add_checkbox(label="1", callback=channel_selection, default_value=True, user_data=1)
+            dpg.add_checkbox(label="2", callback=channel_selection, default_value=True, user_data=2)
+            dpg.add_checkbox(label="3", callback=channel_selection, default_value=True, user_data=3)
+            dpg.add_checkbox(label="4", callback=channel_selection, default_value=True, user_data=4)
+            dpg.add_checkbox(label="5", callback=channel_selection, default_value=True, user_data=5)
+            dpg.add_checkbox(label="6", callback=channel_selection, default_value=True, user_data=6)
+            dpg.add_checkbox(label="7", callback=channel_selection, default_value=True, user_data=7)
+            dpg.add_checkbox(label="8", callback=channel_selection, default_value=True, user_data=8)
+            dpg.add_checkbox(label="9", callback=channel_selection, default_value=True, user_data=9)
+            dpg.add_checkbox(label="10", callback=channel_selection, default_value=True, user_data=10)
+            dpg.add_checkbox(label="11", callback=channel_selection, default_value=True, user_data=11)
+            dpg.add_checkbox(label="12", callback=channel_selection, default_value=True, user_data=12)
+            dpg.add_checkbox(label="13", callback=channel_selection, default_value=True, user_data=13)
+            dpg.add_checkbox(label="14", callback=channel_selection, default_value=True, user_data=14)
+            dpg.add_checkbox(label="15", callback=channel_selection, default_value=True, user_data=15)
 
-with dpg.window(label="Menu", width=800, height=200, pos=(0,400)):
-    with dpg.menu(label="Midi Channels"):
-        with dpg.table(header_row=False, borders_innerH=False, 
-                               borders_outerH=False, borders_innerV=False, borders_outerV=False):
-                    
-                    dpg.add_table_column()
-                    dpg.add_table_column()
-                    dpg.add_table_column()
-                    dpg.add_table_column()
+    with dpg.collapsing_header(label="Suggestion Settings"):
+        with dpg.group():
+            #dpg.add_combo(("AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK"), label="Scale", default_value="AAAA", callback=set_scale)
+            dpg.add_slider_float(label="Window Threshold", max_value=1.0, format="threshold = %.3f", callback=set_w_threshold)
+            dpg.add_slider_float(label="Total Threshold", max_value=1.0, format="threshold = %.3f", callback=set_t_threshold)
 
-                    
-                    with dpg.table_row():
-                        dpg.add_checkbox(label="0", callback=channel_selection, default_value=True, user_data=0)
-                        dpg.add_checkbox(label="1", callback=channel_selection, default_value=True, user_data=1)
-                        dpg.add_checkbox(label="2", callback=channel_selection, default_value=True, user_data=2)
-                        dpg.add_checkbox(label="3", callback=channel_selection, default_value=True, user_data=3)
+        with dpg.group(horizontal=True): 
+            dpg.add_text(label="label", default_value="Select amount of notes: ")
+            dpg.add_checkbox(label="5", callback=set_notecounts, default_value=True, user_data=5)
+            dpg.add_checkbox(label="6", callback=set_notecounts, default_value=True, user_data=6)
+            dpg.add_checkbox(label="7", callback=set_notecounts, default_value=True, user_data=7)
+            dpg.add_checkbox(label="8", callback=set_notecounts, default_value=True, user_data=8)
+            dpg.add_checkbox(label="9", callback=set_notecounts, default_value=True, user_data=9)
+            dpg.add_checkbox(label="10", callback=set_notecounts, default_value=True, user_data=10)
+            dpg.add_checkbox(label="11", callback=set_notecounts, default_value=True, user_data=11)
+            dpg.add_checkbox(label="12", callback=set_notecounts, default_value=True, user_data=12)
 
-                    with dpg.table_row(): 
-                        dpg.add_checkbox(label="4", callback=channel_selection, default_value=True, user_data=4)
-                        dpg.add_checkbox(label="5", callback=channel_selection, default_value=True, user_data=5)
-                        dpg.add_checkbox(label="6", callback=channel_selection, default_value=True, user_data=6)
-                        dpg.add_checkbox(label="7", callback=channel_selection, default_value=True, user_data=7)
-
-                    with dpg.table_row(): 
-                        dpg.add_checkbox(label="8", callback=channel_selection, default_value=True, user_data=8)
-                        dpg.add_checkbox(label="9", callback=channel_selection, default_value=True, user_data=9)
-                        dpg.add_checkbox(label="10", callback=channel_selection, default_value=True, user_data=10)
-                        dpg.add_checkbox(label="11", callback=channel_selection, default_value=True, user_data=11)
-
-                    with dpg.table_row(): 
-                        dpg.add_checkbox(label="12", callback=channel_selection, default_value=True, user_data=12)
-                        dpg.add_checkbox(label="13", callback=channel_selection, default_value=True, user_data=13)
-                        dpg.add_checkbox(label="14", callback=channel_selection, default_value=True, user_data=14)
-                        dpg.add_checkbox(label="15", callback=channel_selection, default_value=True, user_data=15)
+    with dpg.collapsing_header(label="Suggestion"):
+        with dpg.group(horizontal=True):
+            dpg.add_text(label="label", default_value="Suggested Scale: ")
+            dpg.add_text(label="label", default_value="None", tag="scale_suggestion_text")
+            dpg.add_text(label="label", default_value="       ")
+            dpg.add_text(label="label", default_value="Accuracy: ")
+            dpg.add_text(label="label", default_value="0", tag="suggestion accuracy")
+            dpg.add_text(label="label", default_value="%")
 
 
-
-dpg.create_viewport(title='Custom Title', width=800, height=600)
+dpg.create_viewport(title='Custom Title', width=1000, height=600)
 dpg.setup_dearpygui()
 dpg.show_viewport()
 dpg.start_dearpygui()
