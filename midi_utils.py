@@ -1,4 +1,6 @@
 import numpy as np
+import mido
+import pandas as pd
 
 MIDI_IDS = np.arange(128)
 
@@ -108,3 +110,50 @@ def closest_midi_freq(f):
 def harmonics_from_midi_id(midi_id, k=8, include_id=False):
     p = np.unique(to_midi_id(to_freq(midi_id) * np.arange(1, k+2)))
     return p[include_id | (p != midi_id)]
+
+def track_to_dataframe(track, event_style=False):
+    records = []
+    track_name = ""
+    current_time = 0
+    # Event style dataframe
+    if event_style:
+        for x in track:
+            new_dict = x.__dict__.copy()
+            if not x.is_meta():
+                #Swapping name for coherence
+                new_dict["time_diff"] = new_dict["time"] 
+                current_time += new_dict["time_diff"]
+                new_dict["time"] = current_time
+                new_dict["pressed"] = new_dict["type"] == "note_on"
+                new_dict["released"] = new_dict["type"] == "note_off"
+                records.append(new_dict)
+    else:
+        # Streaming style dataframe
+        pressed_notes = {}
+        id = 0
+        for x in track:
+            new_dict = x.__dict__.copy()
+            if new_dict["type"] == "track_name":
+                track_name = new_dict["name"]
+            else:
+                current_time += new_dict["time"]
+                new_dict["time"] = current_time
+                new_dict["time_release"] = None
+                new_dict["time_duration"] = None
+                new_dict["velocity_release"] = None
+                if new_dict["type"] == "note_off":
+                    former_pressed_note = pressed_notes[new_dict["note"]]
+                    if former_pressed_note is None:
+                        raise ValueError("The given track has a released note that was never pressed in the first place")
+                    pressed_record = records[former_pressed_note["id"]]
+                    pressed_record["time_release"] = current_time
+                    pressed_record["time_duration"] = current_time - pressed_record["time"]
+                    pressed_record["velocity_release"] = new_dict["velocity"]
+                    pressed_notes[new_dict["note"]] = None
+                elif new_dict["type"] == "note_on":
+                    pressed_notes[new_dict["note"]] = {"id": id}
+                    del new_dict["type"]
+                    records.append(new_dict)
+                    id += 1
+                                        
+    return pd.DataFrame(records)
