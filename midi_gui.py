@@ -22,6 +22,7 @@ class Midi:
         music = PrettyMIDI(midi_file=file_name)
         self.Fs = 22050
         self.audio_data = music.synthesize(fs=self.Fs)
+        self.x_values = range(0, len(self.audio_data))
 
         self.channels = [i for i in range(0,16)]
 
@@ -64,15 +65,22 @@ def select_midi(sender, app_data, user_data):
     inputMidi = Midi(midi_file, path)
 
     dpg.set_value("Text", "Playing: " + app_data['file_name'])
-    #dpg.set_value("MidiPlot", audio_data)
+    dpg.set_item_label("PlayButton", "Play")
     
 
 def play_midi(sender, app_data, user_data):
     if inputMidi is not None:
         inputMidi.play()
 
+        if inputMidi.playing:
+            dpg.set_item_label("PlayButton", "Stop")
+        else:
+            dpg.set_item_label("PlayButton", "Play")
+
+        global plot_displayed
         if not plot_displayed: 
-            dpg.add_line_series(inputMidi.audio_data, [-1,0,1], label="Test", parent="y_axis")
+            dpg.add_line_series(x=inputMidi.audio_data, y=[-1,0,1] ,label="Test", parent="y_axis")
+            plot_displayed = True
 
 def _log(sender, app_data, user_data):
     print(f"sender: {sender}, \t app_data: {app_data}, \t user_data: {user_data}")
@@ -82,6 +90,7 @@ def random_midi(sender, app_data, user_data):
     random_file = random.choice(midifiles)
 
     dpg.set_value("Text", "Playing: " + random_file)
+    dpg.set_item_label("PlayButton", "Play")
 
     random_file = midi_path + "/" + random_file
 
@@ -119,7 +128,7 @@ with dpg.window(label="Improvisation Tool", width=1000, height=600, tag="MidiPla
             dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog_id"))
             dpg.add_button(label="Random", callback=random_midi)
         dpg.add_text(label="Text", default_value="No file selected", tag="Text")
-        dpg.add_button(label="Play/Pause", callback=play_midi, tag="PlayButton")
+        dpg.add_button(label="Play", callback=play_midi, tag="PlayButton")
 
         with dpg.plot(label="MidiPlot", height=200, width=1000):
             dpg.add_plot_legend()
@@ -166,12 +175,18 @@ with dpg.window(label="Improvisation Tool", width=1000, height=600, tag="MidiPla
             dpg.add_checkbox(label="12", callback=set_notecounts, default_value=True, user_data=12)
 
     with dpg.collapsing_header(label="Suggestion"):
+        dpg.add_text(label="label", default_value="Suggested Scales: ")
         with dpg.group(horizontal=True):
-            dpg.add_text(label="label", default_value="Suggested Scale: ")
-            dpg.add_text(label="label", default_value="None", tag="scale_suggestion_text")
+            dpg.add_text(label="label", default_value="None", tag="scale_suggestion_text_0")
             dpg.add_text(label="label", default_value="       ")
             dpg.add_text(label="label", default_value="Accuracy: ")
-            dpg.add_text(label="label", default_value="0", tag="suggestion accuracy")
+            dpg.add_text(label="label", default_value="0", tag="suggestion accuracy_0")
+            dpg.add_text(label="label", default_value="%")
+        with dpg.group(horizontal=True):
+            dpg.add_text(label="label", default_value="Other", tag="scale_suggestion_text_1")
+            dpg.add_text(label="label", default_value="       ")
+            dpg.add_text(label="label", default_value="Accuracy: ")
+            dpg.add_text(label="label", default_value="23", tag="suggestion accuracy_1")
             dpg.add_text(label="label", default_value="%")
 
 
