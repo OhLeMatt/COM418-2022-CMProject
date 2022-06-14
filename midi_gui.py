@@ -3,6 +3,7 @@ import mido
 from pretty_midi import PrettyMIDI
 import sounddevice as sd
 import midi_utils as mu
+from midi_frame import MidiFrame, MidiTrackFrame
 from os import listdir
 from os.path import isfile, join
 import random
@@ -21,6 +22,7 @@ class Midi:
         self.playing = False
 
         music = PrettyMIDI(midi_file=file_name)
+        
         self.Fs = 22050
         self.audio_data = music.synthesize(fs=self.Fs)
         self.x_values = range(0, len(self.audio_data))
@@ -28,7 +30,9 @@ class Midi:
         self.channels = [i for i in range(0,16)]
 
         self.as_mido = mido.MidiFile(filename=self.file_name)
-        self.df = mu.track_to_dataframe(self.as_mido.tracks[1])
+        self.midiframe = MidiFrame(self.as_mido)
+        # HARDSCRIPTED FOR NOW
+        self.df = self.midiframe.track_frames[0].dataframe
 
 
     def add_channel(self, channel):

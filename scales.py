@@ -1,13 +1,6 @@
-from itertools import count
-from re import sub
-from cv2 import threshold
-from matplotlib.style import available
 import numpy as np
-from scipy.fftpack import shift, ss_diff
 import pandas as pd
-from sklearn.preprocessing import scale
 import midi_utils as mu
-from utils import base_to_list
 import pickle
 
 FOLDER = "scale_researches/"

@@ -1,4 +1,5 @@
 import mido
+import midi_utils as mu
 from copy import deepcopy
 
 class MidiTrackFrame:
@@ -12,6 +13,7 @@ class MidiTrackFrame:
         self.meta_count = 0
         self.typeset = set()
         self.track = track
+        self.dataframe = mu.track_to_dataframe(track)
         self.related_track_names = related_track_names
         
         for message in track:    
