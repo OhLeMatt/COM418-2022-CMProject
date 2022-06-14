@@ -2,6 +2,7 @@ import dearpygui.dearpygui as dpg
 import mido
 from pretty_midi import PrettyMIDI
 import sounddevice as sd
+import midi_utils as mu
 from os import listdir
 from os.path import isfile, join
 import random
@@ -25,6 +26,9 @@ class Midi:
         self.x_values = range(0, len(self.audio_data))
 
         self.channels = [i for i in range(0,16)]
+
+        self.as_mido = mido.MidiFile(filename=self.file_name)
+        self.df = mu.track_to_dataframe(self.as_mido.tracks[1])
 
 
     def add_channel(self, channel):
@@ -82,6 +86,15 @@ def play_midi(sender, app_data, user_data):
             dpg.add_line_series(x=inputMidi.audio_data, y=[-1,0,1] ,label="Test", parent="y_axis")
             plot_displayed = True
 
+            df_copy = inputMidi.df[["time", "note", "time_duration", "time_release"]]
+
+            # for i, x in df_copy.iterrows():
+            #     rect = patches.Rectangle((x.time, x.note - 0.5), width=x.time_duration, height=1, linewidth=0.2, edgecolor=(0,0,0), facecolor=cmap(x.note))
+            #     dpg.add_image_series(2, [300, 300], [400, 400], label="font atlas")
+
+            # plt.xlim(0, df_copy.time_release.max())
+            # plt.ylim(df_copy.note.min() - 3, df_copy.note.max() + 3)
+
 def _log(sender, app_data, user_data):
     print(f"sender: {sender}, \t app_data: {app_data}, \t user_data: {user_data}")
         
@@ -136,6 +149,17 @@ with dpg.window(label="Improvisation Tool", width=1000, height=600, tag="MidiPla
             dpg.add_plot_axis(dpg.mvYAxis, label="Freq", tag="y_axis")
             #dpg.add_line_series([], [-1,0,1], tag="LineSerie", parent="y_axis")
             #dpg.add_simple_plot(label="Midi Plot", default_value=inputMidi.audio_data, parent="MidiPlayer")
+
+        with dpg.plot(label="Image Plot", height=200, width=-1):
+            dpg.add_plot_legend()
+            xaxis = dpg.add_plot_axis(dpg.mvXAxis, label="imgx")
+            yaxis = dpg.add_plot_axis(dpg.mvYAxis, label="imgy")
+            # with dpg.plot_axis(dpg.mvYAxis, label="y axis"):
+            #     dpg.add_image_series(2, [300, 300], [400, 400], label="font atlas")
+            #     dpg.add_image_series("__demo_static_texture_2", [150, 150], [200, 200], label="static 2")
+            #     dpg.add_image_series("__demo_dynamic_texture_1", [-200, 100], [-100, 200], label="dynamic 1")
+            #     dpg.fit_axis_data(dpg.top_container_stack())
+            #dpg.fit_axis_data(xaxis)
 
     with dpg.collapsing_header(label="Midi Settings"):
         with dpg.group(horizontal=True): 
