@@ -1,8 +1,12 @@
 
+from cv2 import trace
 import mido
 import midi_utils as mu
 import numpy as np
+import pandas as pd
 import scales
+import os
+import tempfile
 
 class MidiTrackFrame:
 
@@ -12,6 +16,7 @@ class MidiTrackFrame:
                  tempos, 
                  time_signatures,
                  track_name=None, 
+                 compute_dataframe=True,
                  related_track_names=[]):
         self.name = track.name.strip() if track_name is None else track_name
         self.ticks_per_beat = ticks_per_beat
@@ -22,7 +27,10 @@ class MidiTrackFrame:
         self.meta_count = 0
         self.typeset = set()
         self.track = track
-        self.dataframe = mu.track_to_dataframe(track, ticks_per_beat, tempos, time_signatures)
+        
+        self.dataframe : pd.DataFrame = None #type:ignore
+        if compute_dataframe:
+            self.dataframe = mu.track_to_dataframe(track, ticks_per_beat, tempos, time_signatures)
         self.related_track_names = related_track_names
         
         for message in track:    
@@ -111,6 +119,9 @@ class MidiFrame:
         if info_type not in ("all", "filtered", "dispatched"):
             raise ValueError("info_type should be among 'all', 'filtered', 'dispatched")
         
+        self.midi_type = midofile.type
+        self.midi_clip = midofile.clip
+        self.midi_charset = midofile.charset
         self.info_type = info_type
         self.filename = midofile.filename
         self.midi_type = midofile.type
@@ -121,7 +132,8 @@ class MidiFrame:
         self.ticks_per_beat = midofile.ticks_per_beat
         self.length = midofile.length
         self.track_frames = []
-        self.playing_track_frame: MidiTrackFrame = None
+        self.playing_track_frame: MidiTrackFrame = None #type:ignore
+        self.playing_midi_file = tempfile.TemporaryFile()
         
         time = 0
         for message in mido.merge_tracks(midofile.tracks):
@@ -144,7 +156,8 @@ class MidiFrame:
                 mtf = MidiTrackFrame(t, 
                                      self.ticks_per_beat, 
                                      self.tempos, 
-                                     self.time_signatures)
+                                     self.time_signatures,
+                                     compute_dataframe=False)
                 self.track_frames.append(mtf)
                 if not mtf.meta_only:
                     self.music_track_count += 1
@@ -193,6 +206,22 @@ class MidiFrame:
                                                   self.time_signatures, 
                                                   "Playing Track")
 
+    def export_playing_track(self):
+        tracks = []
+        for track_frame in self.track_frames:
+            if track_frame.meta_only:
+                tracks.append(track_frame.track)
+        tracks.append(self.playing_track_frame.track)
+        
+        playing_midi = mido.MidiFile(type=self.midi_type, 
+                                     ticks_per_beat=self.ticks_per_beat, 
+                                     charset=self.midi_charset,
+                                     debug=False,
+                                     clip = self.midi_clip,
+                                     tracks=tracks)
+        playing_midi.save("MIDI_Files/tmp.mid")
+        
+
     def filter_track_frames(self,
                             only=False,
                             filter_irrelevant_meta_tracks=True):
@@ -226,9 +255,9 @@ class MidiFrame:
         
         channel_tracks = dict((channel, mido.MidiTrack()) for channel in channel_set)
         meta_track = mido.MidiTrack()
-            
+        
         for message in sorted_track:
-            if message.is_meta:
+            if message.is_meta and "track_name" not in message.__dict__ :
                 meta_track.append(message.copy())
             elif "channel" in message.__dict__:
                 channel_tracks[message.channel].append(message.copy())
@@ -244,6 +273,7 @@ class MidiFrame:
                                                     self.ticks_per_beat, 
                                                     self.tempos, 
                                                     self.time_signatures,
+                                                    compute_dataframe=False,
                                                     track_name="Meta"))
         
         related_track_names = [[] for _ in range(16)]
@@ -270,6 +300,7 @@ class MidiFrame:
                                                         tempos=self.tempos, 
                                                         time_signatures=self.time_signatures,
                                                         track_name=f"Channel {channel:02}",
+                                                        compute_dataframe=False,
                                                         related_track_names=related_track_names[channel]))
                 
         for track_frame in self.track_frames:

@@ -37,38 +37,42 @@ class Midi:
         self.path = path
         self.playing = False
 
-        music = PrettyMIDI(midi_file=file_name)
-        
-        self.Fs = 22050
-        self.audio_data = music.synthesize(fs=self.Fs)
-        self.x_values = range(0, len(self.audio_data))
-
         self.channels = [i for i in range(0,16)]
-
         self.as_mido = mido.MidiFile(filename=self.file_name)
         
         self.midiframe = MidiFrame(self.as_mido)
+
+        self.Fs = 22050
+        self.refresh_dataframe()
         
-        self.refresh_dataframe()       
 
     def refresh_dataframe(self):
         self.midiframe.make_playing_track_frame(self.channels)
         self.df = self.midiframe.playing_track_frame.dataframe
         
         #self.displayable = True if ('note' in self.df and self.df["time_duration"].iloc[1] is not None) else False
-        self.displayable = True if 'note' in self.df else False
+        # self.displayable = True if 'note' in self.df else False
+        self.displayable = True
         
-        if self.displayable: 
+        if self.displayable and len(self.df) > 0: 
             self.min_note = self.df['note'].min()
             self.max_note = self.df['note'].max()        
             self.length = self.df["ticks"].iloc[-1] + 5
             print("midi length: " + str(self.length))
+        self.midiframe.export_playing_track()
+        
+        # music = PrettyMIDI(midi_file=file_name)
+        music = PrettyMIDI(midi_file="MIDI_Files/tmp.mid")
+        was_playing = self.playing
+        self.stop()
+        self.audio_data = music.synthesize(fs=self.Fs)
+        if was_playing:
+            self.play()
 
     def add_channel(self, channel):
         if channel not in self.channels: 
             self.channels.append(channel)
             self.refresh_dataframe()
-
         
     def remove_channel(self, channel):
         if channel in self.channels: 
@@ -156,13 +160,14 @@ def display(sender, app_data, user_data):
                     
             plot_displayed = True
 
-            df_copy = inputMidi.df[["ticks", "note", "ticks_duration"]]
-
-            for i, x in df_copy.iterrows():
-                td = 0.2 if not x.ticks_duration else x.ticks_duration
-                dpg.add_image_series("Texture_C", [x.ticks, x.note - 0.5], [x.ticks + td, x.note + 0.5], label="C", parent="imgy")
-
-            dpg.fit_axis_data("imgx")
+            
+            if len(inputMidi.df) > 0:
+                df_copy = inputMidi.df[["ticks", "note", "ticks_duration"]]
+                for i, x in df_copy.iterrows():
+                    td = 0.2 if not x.ticks_duration else x.ticks_duration
+                    dpg.add_image_series("Texture_C", [x.ticks, x.note - 0.5], [x.ticks + td, x.note + 0.5], label="C", parent="imgy")
+                
+                dpg.fit_axis_data("imgx")
 
 # Get colour texture for each note (in progress)
 def get_note_colour(note):
@@ -191,7 +196,7 @@ def channel_selection(sender, app_data, user_data):
             inputMidi.add_channel(user_data)
         else: 
             inputMidi.remove_channel(user_data)
-
+        
         print("channels: " + str(inputMidi.channels))
 
 def set_w_threshold(sender, app_data, user_data):
@@ -220,8 +225,7 @@ with dpg.window(label="Improvisation Tool",
                 height=600, 
                 tag="primary_window",
                 no_title_bar=True, 
-                no_move=True, 
-                modal=True,):
+                no_move=True):
     with dpg.collapsing_header(label="Midi Player", default_open=True):
         with dpg.group(horizontal=True):
             dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog_id"))
