@@ -1,19 +1,28 @@
+
 import mido
 import midi_utils as mu
-from copy import deepcopy
+import numpy as np
+import scales
 
 class MidiTrackFrame:
 
-    def __init__(self, track: mido.MidiTrack, track_name=None, related_track_names=[]):
-        
+    def __init__(self, 
+                 track: mido.MidiTrack, 
+                 ticks_per_beat,
+                 tempos, 
+                 time_signatures,
+                 track_name=None, 
+                 related_track_names=[]):
         self.name = track.name.strip() if track_name is None else track_name
+        self.ticks_per_beat = ticks_per_beat
         self.meta_only =  True
         self.channel_count = {}
-        self.cc_count = {}
+        self.unique_channel = None
+        # self.cc_count = {}
         self.meta_count = 0
         self.typeset = set()
         self.track = track
-        self.dataframe = mu.track_to_dataframe(track)
+        self.dataframe = mu.track_to_dataframe(track, ticks_per_beat, tempos, time_signatures)
         self.related_track_names = related_track_names
         
         for message in track:    
@@ -27,10 +36,12 @@ class MidiTrackFrame:
                         self.channel_count[message.channel] = 0
                     self.channel_count[message.channel] += 1
                     
-                    if message.is_cc():
-                        if message.channel not in self.cc_count:
-                            self.cc_count[message.channel] = 0
-                        self.cc_count[message.channel] += 1
+                    # if message.is_cc():
+                    #     if message.channel not in self.cc_count:
+                    #         self.cc_count[message.channel] = 0
+                    #     self.cc_count[message.channel] += 1
+        if len(self.channel_count.keys()) == 1:
+            self.unique_channel = list(self.channel_count.keys())[0]
 
     def __repr__(self):
         rep = self.name
@@ -40,12 +51,11 @@ class MidiTrackFrame:
             rep += ":\n\tMessage count/channel: "
             for channel, count in sorted(self.channel_count.items(), key=lambda a: a[0]):
                 rep += f"{channel} ({count}), "
-            else:
-                rep = rep[:-2]
-            rep += "\n\tCC Message count/channel: "
-            for channel, count in sorted(self.cc_count.items(), key=lambda a: a[0]):
-                rep += f"{channel} ({count}), "
             rep = rep[:-2]
+            # rep += "\n\tCC Message count/channel: "
+            # for channel, count in sorted(self.cc_count.items(), key=lambda a: a[0]):
+            #     rep += f"{channel} ({count}), "
+            # rep = rep[:-2]
         
         rep += f"\n\tMeta Message count: {self.meta_count}"
         rep += f"\n\tUsed Message types: "
@@ -59,6 +69,38 @@ class MidiTrackFrame:
             rep = rep[:-2]
         return rep + "\n"
     
+    def get_sub_dataframe(self,
+                          start,
+                          end,
+                          metric="bartime"):
+        mask = (self.dataframe[metric] >= start) & (self.dataframe[metric] < end)
+        return self.dataframe[mask]
+    
+    def suggest_scale(self, 
+                      start,
+                      end,
+                      metric="bartime",
+                      weighted=False,
+                      **kwargs):
+        if start >= end:
+            raise ValueError("Argument start should be below end")
+        if metric not in ("ticks", "bartime"):
+            raise ValueError("Argument metric should be ")
+        weights = None
+        
+        mask = (self.dataframe[metric] >= start) & (self.dataframe[metric] < end)
+        found_scales = {}
+        if True in np.unique(mask):
+            if weighted:
+                weights = self.dataframe.custom_beat_weight[mask].to_numpy()
+            
+            found_scales = scales.suggest_scales(mu.to_chroma(self.dataframe.note[mask].to_numpy()), 
+                                weights=weights, 
+                                **kwargs)
+            
+        return found_scales
+
+
 class MidiFrame:
     
     def __init__(self, 
@@ -73,14 +115,36 @@ class MidiFrame:
         self.filename = midofile.filename
         self.midi_type = midofile.type
         self.track_count = len(midofile.tracks)
+        self.time_signatures = []
+        self.tempos = []
         self.music_track_count = 0
         self.ticks_per_beat = midofile.ticks_per_beat
         self.length = midofile.length
         self.track_frames = []
+        self.playing_track_frame: MidiTrackFrame = None
+        
+        time = 0
+        for message in mido.merge_tracks(midofile.tracks):
+            time += message.time
+            if message.is_meta:
+                if message.type == "set_tempo" \
+                    and (len(self.tempos) == 0 or self.tempos[-1].tempo != message.tempo):
+                    new_msg = message.copy()
+                    new_msg.time = time
+                    self.tempos.append(new_msg)
+                elif message.type == "time_signature" \
+                    and (len(self.time_signatures) == 0 \
+                        or not (self.time_signatures[-1].numerator == message.numerator and self.time_signatures[-1].denominator == message.denominator)):
+                    new_msg = message.copy()
+                    new_msg.time = time
+                    self.time_signatures.append(new_msg)
         
         if info_type in ("all", "filtered"):
             for t in midofile.tracks:
-                mtf = MidiTrackFrame(t)
+                mtf = MidiTrackFrame(t, 
+                                     self.ticks_per_beat, 
+                                     self.tempos, 
+                                     self.time_signatures)
                 self.track_frames.append(mtf)
                 if not mtf.meta_only:
                     self.music_track_count += 1
@@ -88,8 +152,10 @@ class MidiFrame:
                 self.filter_track_frames(**kwargs)
         else:
             self.dispatch_tracks_by_channel(midofile, **kwargs)
-
+        
         self.track_frames = sorted(self.track_frames, key=lambda a: a.name)
+        self.make_playing_track_frame(kwargs.get("channels", {0}), 
+                                      kwargs.get("only_unique_channel", False))
             
 
     def __repr__(self):
@@ -99,8 +165,33 @@ class MidiFrame:
             rep += f"{key_name}: {self.__dict__[k]}\n"
         for track_frame in self.track_frames:
             rep += track_frame.__repr__()
-        return rep
+        if len(self.time_signatures) > 0:
+            rep += f"\n\tTime signatures: "
+            for message in self.time_signatures:
+                rep += f"{message.numerator}/{message.denominator} ({message.time}), "
+            rep = rep[:-2]
         
+        if len(self.tempos) > 0:
+            rep += f"\n\tTempos: "
+            for message in self.tempos:
+                rep += f"{message.tempo} ({message.time}), "
+            rep = rep[:-2]
+        
+        return rep + "\n"
+        
+    def make_playing_track_frame(self, channels, only_unique_channel=False):
+        tracks = []
+        channels = set(channels)
+        for track_frame in self.track_frames:
+            if (only_unique_channel and track_frame.unique_channel in channels) \
+                    or (not only_unique_channel and not set(track_frame.channel_count.keys()).isdisjoint(channels)):
+                tracks.append(track_frame.track)
+        
+        self.playing_track_frame = MidiTrackFrame(mido.merge_tracks(tracks), 
+                                                  self.ticks_per_beat, 
+                                                  self.tempos, 
+                                                  self.time_signatures, 
+                                                  "Playing Track")
 
     def filter_track_frames(self,
                             only=False,
@@ -125,7 +216,7 @@ class MidiFrame:
         time = 0
         channel_set = set()
         sorted_track = mido.MidiTrack()
-        for message in midofile:
+        for message in mido.merge_tracks(midofile.tracks):
             timed_message = message.copy()
             time += message.time
             timed_message.time = time
@@ -142,9 +233,6 @@ class MidiFrame:
             elif "channel" in message.__dict__:
                 channel_tracks[message.channel].append(message.copy())
         
-
-        
-        
         if len(meta_track) > 0:
             previous_time = 0
             for message in meta_track:
@@ -152,7 +240,11 @@ class MidiFrame:
                 message.time = tmp_time - previous_time
                 previous_time = tmp_time
             
-            self.track_frames.append(MidiTrackFrame(meta_track, "Meta"))
+            self.track_frames.append(MidiTrackFrame(meta_track,
+                                                    self.ticks_per_beat, 
+                                                    self.tempos, 
+                                                    self.time_signatures,
+                                                    track_name="Meta"))
         
         related_track_names = [[] for _ in range(16)]
         for track in midofile.tracks:
@@ -173,9 +265,12 @@ class MidiFrame:
                     message.time = tmp_time - previous_time
                     previous_time = tmp_time
                 
-                self.track_frames.append(MidiTrackFrame(channel_track, 
-                                                        f"Channel {channel:02}",
-                                                        related_track_names[channel]))
+                self.track_frames.append(MidiTrackFrame(channel_track,
+                                                        ticks_per_beat=self.ticks_per_beat, 
+                                                        tempos=self.tempos, 
+                                                        time_signatures=self.time_signatures,
+                                                        track_name=f"Channel {channel:02}",
+                                                        related_track_names=related_track_names[channel]))
                 
         for track_frame in self.track_frames:
             if not track_frame.meta_only:

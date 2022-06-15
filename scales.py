@@ -52,40 +52,40 @@ def compute_semitones(semitone_intervals):
     return np.diff(np.append(semitone_intervals, 12))
 
 
-def compute_match(chromas, midi_ids):
-    midi_ids = np.array(midi_ids)
+def compute_match(scale_chromas, music_chromas, weights=None):
     
-    # Naive Version: Works for subscale, but not for superscale
-    # metric = 0
-    # for chroma, count in zip(*np.unique(mu.to_chroma(midi_ids), return_counts=True)):
-    #     if chroma in chromas:
-    #         metric += count
-    #     else:
-    #         metric -= count
-    # return metric/len(midi_ids)
-    
-    # V2
-    # chmap = dict((chromas[i], i) for i in range(len(chromas)))
-    # metric = np.array([0] * len(chromas))
-    # match_count = 0
-    # for chroma, count in zip(*np.unique(mu.to_chroma(midi_ids), return_counts=True)):
-    #     if chroma in chromas:
-    #         match_count += 1
-    #         metric[chmap[chroma]] += count
-    # return metric.mean()/len(midi_ids) * match_count
-    
-    #V2.1
-    metric = np.array([0] * 12)
-    match_count = 0
-    for chroma, count in zip(*np.unique(mu.to_chroma(midi_ids), return_counts=True)):
-        if chroma in chromas:
-            match_count += 1
-            metric[chroma] += count
-        else:
-            metric[chroma] -= count
-    return metric.sum() / len(chromas) * match_count / len(midi_ids)
-    
-    
+    if len(music_chromas) == 0:
+        return -1 
+    if weights is None:
+        metric = np.array([0] * 12)
+        match_count = 0
+        for music_chroma, count in zip(*np.unique(music_chromas, return_counts=True)):
+            if music_chroma in scale_chromas:
+                match_count += 1
+                metric[music_chroma] += count
+            else:
+                match_count -= 1
+                metric[music_chroma] -= count
+        # if match_count == 0:
+        #     return -1
+        max_match_diff = max(len(scale_chromas), 12 - len(scale_chromas))
+        return metric.sum() / len(music_chromas) * (1 - abs(match_count - len(scale_chromas))/max_match_diff)
+    else:
+        metric = np.array([0] * 12)
+        match_count = 0
+        
+        for music_chroma in np.unique(music_chromas):
+            weighted_count = weights[music_chromas == music_chroma].sum()
+            
+            if music_chroma in scale_chromas:
+                match_count += 1
+                metric[music_chroma] += weighted_count
+            else:
+                match_count -= 1
+                metric[music_chroma] -= weighted_count
+        max_match_diff = max(len(scale_chromas), 12 - len(scale_chromas))
+        return metric.sum() / weights.sum() * (1 - abs(match_count - len(scale_chromas))/max_match_diff)
+
 
 class ChromaBitmap:
     
@@ -183,9 +183,7 @@ class ChromaBitmap:
     def __call__(self):
         return self.bitmap
     
-    
-    
-    
+
 class GeneralScale:
     def __init__(self, semitones, name="Untitled"):
         self.semitones = np.array(semitones)
@@ -234,15 +232,18 @@ class GeneralScale:
     def from_semitones_intervals(semitone_intervals, name="Untitled"):
         return GeneralScale(semitones=compute_semitones(semitone_intervals), name=name) 
 
-    def suggest_tonic_chroma(self, midi_ids, return_match=False):
-        max = -1
+    def suggest_tonic_chroma(self, 
+                             music_chromas, 
+                             return_match=False,
+                             weights=None):
+        max = -1.01
         tonic_chroma = None
         for chroma in mu.CHROMA_IDS:
-            score = compute_match(mu.to_chroma(self.semitone_intervals + chroma), midi_ids)
+            score = compute_match(mu.to_chroma(self.semitone_intervals + chroma), music_chromas, weights)
             if score > max:
                 max = score
                 tonic_chroma = chroma
-                
+            
         if return_match:
             return tonic_chroma, max
         else:
@@ -253,6 +254,7 @@ class GeneralScale:
     
     def __hash__(self) -> int:
         return hash(self.scale_id)    
+    
     
 class Scale(GeneralScale):
     def __init__(self, semitones, tonic_chroma, name="Untitled"):
@@ -449,19 +451,19 @@ def create_general_scale_subset(note_counts=None,
         general_scale_subset = [scale for scale in general_scale_subset if scale.note_count in note_counts]    
     return general_scale_subset
     
-
-def suggest_scales(midi_ids, 
+def suggest_scales(music_chromas, 
                    threshold=0.99, 
                    normalize_scores=True,
                    tonic_chromas=mu.CHROMA_IDS,
-                   general_scale_subset=ALL_GENERAL_SCALES):
+                   general_scale_subset=ALL_GENERAL_SCALES,
+                   weights=None):
     
     if normalize_scores:
         results = {}
         min_score = 1
         max_score = -1
         for gs in general_scale_subset:
-            tonic_chroma, score = gs.suggest_tonic_chroma(midi_ids, return_match=True)
+            tonic_chroma, score = gs.suggest_tonic_chroma(music_chromas, return_match=True, weights=weights)
             results[gs.scale_in(tonic_chroma)] = score
             min_score = min(score, min_score)
             max_score = max(score, max_score)
@@ -479,13 +481,13 @@ def suggest_scales(midi_ids,
     else:
         results = {}
         for gs in general_scale_subset:
-            tonic_chroma, score = gs.suggest_tonic_chroma(midi_ids, return_match=True)  # type: ignore
+            tonic_chroma, score = gs.suggest_tonic_chroma(music_chromas, return_match=True)  # type: ignore
             if score > threshold and tonic_chroma in tonic_chromas:
                 results[gs.scale_in(tonic_chroma)] = score
         return results
+    
 
-
-def windowed_suggest_scales(midi_ids, 
+def windowed_suggest_scales(music_chromas, 
                             threshold=0.9, 
                             normalize_scores=True,
                             window_size=30, 
@@ -494,12 +496,11 @@ def windowed_suggest_scales(midi_ids,
     
     results = {}
     counts = {}
-    for i in range(window_size, len(midi_ids), window_size):
-        for scale, score in suggest_scales(midi_ids[i-40:i], 
+    for i in range(window_size, len(music_chromas), window_size):
+        for scale, score in suggest_scales(music_chromas[i-window_size:i], 
                                            threshold=window_threshold,
                                            normalize_scores=normalize_scores,
-                                           tonic_chromas=kwargs.get("tonic_chromas", mu.CHROMA_IDS), 
-                                           general_scale_subset=kwargs.get("general_scale_subset", ALL_GENERAL_SCALES)).items():
+                                           **kwargs).items():
             if scale not in results:
                 results[scale] = 0
                 counts [scale] = 0

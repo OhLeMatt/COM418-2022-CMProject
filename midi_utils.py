@@ -1,8 +1,10 @@
-from pickle import TRUE
+
 import numpy as np
 import mido
 import pandas as pd
-from copy import deepcopy
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+
 
 MIDI_IDS = np.arange(128)
 
@@ -113,49 +115,148 @@ def harmonics_from_midi_id(midi_id, k=8, include_id=False):
     p = np.unique(to_midi_id(to_freq(midi_id) * np.arange(1, k+2)))
     return p[include_id | (p != midi_id)]
 
-def track_to_dataframe(track, event_style=False):
+def track_to_dataframe(track: mido.MidiTrack, 
+                       ticks_per_beat,
+                       tempos=[], 
+                       time_signatures=[]):
     records = []
-    track_name = ""
-    current_time = 0
-    # Event style dataframe
-    if event_style:
-        for x in track:
-            new_dict = x.__dict__.copy()
-            if not x.is_meta():
-                #Swapping name for coherence
-                new_dict["time_diff"] = new_dict["time"] 
-                current_time += new_dict["time_diff"]
-                new_dict["time"] = current_time
-                new_dict["pressed"] = new_dict["type"] == "note_on"
-                new_dict["released"] = new_dict["type"] == "note_off"
-                records.append(new_dict)
-    else:
-        # Streaming style dataframe
-        pressed_notes = {}
-        id = 0
-        for x in track:
-            new_dict = x.__dict__.copy()
-            if new_dict["type"] == "track_name":
-                track_name = new_dict["name"]
+    current_ticks = 0
+    current_time = 0.0
+    
+    tempo_query = {
+        "idx": 0,
+        "next_tick": 0,
+        "current": 500000,
+        "time_cp": 0.0
+    }
+    
+    def iterate_over_tempos():
+        if tempo_query["idx"] < len(tempos) and current_ticks >= tempo_query["next_tick"]:
+            msg = tempos[tempo_query["idx"]]
+            tempo_query["bartime_cp"] = 0.0 if len(records) == 0 else records[-1]["time"]
+            tempo_query["next_tick"] = msg.time
+            tempo_query["current"] = msg.tempo
+            tempo_query["idx"] += 1
+    
+    timesig_query = {
+        "idx": 0,
+        "next_tick": 0,
+        "current": 1.0,
+        "bartime_cp": 0.0,
+        "updown_beats": get_updown_beats(4)
+    }
+    
+    def iterate_over_timesigs():
+        if timesig_query["idx"] < len(time_signatures) and current_ticks >= timesig_query["next_tick"]:
+            msg = time_signatures[timesig_query["idx"]]
+            timesig_query["next_tick"] = msg.time
+            timesig_query["bartime_cp"] = 0.0 if len(records) == 0 else records[-1]["bartime"]
+            timesig_query["idx"] += 1
+            timesig_query["current"] = msg.numerator/msg.denominator
+            timesig_query["updown_beats"] = get_updown_beats(msg.numerator)
+    
+    pressed_notes = {}
+    id = 0
+    print()
+    for x in track:
+        
+        iterate_over_tempos()
+        iterate_over_timesigs()
+        
+        new_dict = x.__dict__.copy()
+        new_dict["ticks"] = new_dict["time"]
+        
+        current_ticks += new_dict["ticks"]
+        
+        current_time += mido.tick2second(new_dict["ticks"],  ticks_per_beat, tempo_query["current"]) 
+        
+        if new_dict["type"] == "note_off" or new_dict["type"] == "note_on" and new_dict["velocity"] == 0:
+            former_pressed_note = pressed_notes[new_dict["note"]]
+            if former_pressed_note is None:
+                # raise ValueError("The given track has a released note that was never pressed in the first place")
+                # print("\rThe given track has a released note that was never pressed in the first place")
+                pass
             else:
-                current_time += new_dict["time"]
-                new_dict["time"] = current_time
-                new_dict["time_release"] = None
-                new_dict["time_duration"] = None
-                new_dict["velocity_release"] = None
-                if new_dict["type"] == "note_off":
-                    former_pressed_note = pressed_notes[new_dict["note"]]
-                    if former_pressed_note is None:
-                        raise ValueError("The given track has a released note that was never pressed in the first place")
-                    pressed_record = records[former_pressed_note["id"]]
-                    pressed_record["time_release"] = current_time
-                    pressed_record["time_duration"] = current_time - pressed_record["time"]
-                    pressed_record["velocity_release"] = new_dict["velocity"]
-                    pressed_notes[new_dict["note"]] = None
-                elif new_dict["type"] == "note_on":
-                    pressed_notes[new_dict["note"]] = {"id": id}
-                    del new_dict["type"]
-                    records.append(new_dict)
-                    id += 1
+                pressed_record = records[former_pressed_note["id"]]
+                pressed_record["ticks_duration"] = current_ticks - pressed_record["ticks"]
+                pressed_record["time_duration"] = current_time - pressed_record["time"]
+                pressed_record["velocity_release"] = new_dict["velocity"]
+                pressed_notes[new_dict["note"]] = None
+        elif new_dict["type"] == "note_on":
+            new_dict["ticks"] = current_ticks
+            new_dict["time"] = current_time
+            new_dict["bartime"] = timesig_query["bartime_cp"] + current_ticks / ticks_per_beat * timesig_query["current"]
+            onset = len(timesig_query["updown_beats"]) * (new_dict["bartime"] - int(new_dict["bartime"]))
+            new_dict["custom_beat_weight"] = timesig_query["updown_beats"][int(onset)]
+            new_dict["ticks_duration"] = None
+            new_dict["time_duration"] = None
+            new_dict["velocity_release"] = None
+            pressed_notes[new_dict["note"]] = {"id": id}
+            del new_dict["type"]
+            records.append(new_dict)
+            id += 1
                                         
     return pd.DataFrame(records)
+
+def get_updown_beats(num, normalized=True):
+    """Borrowed from Matthieu's Semester Project
+    
+        Returns a list of int describing the beat importance/level.
+        The process is completely arbitrary, don't refer to it. 
+        It's simply based on the prime number decomposition of the numerator of the timesig. 
+        Args:
+            timesig (str): The time signature giving us information on bar and beat information.
+                It is always represented always as a string because signature such as 4/4 exists and would be 
+                simplified by the Fraction module.
+        Returns:
+            list(int): List of n values (n being the numerator of the timesig), filled with weighted value
+                showing the beat importance. The lowest value will be 1 (any upbeat) and the highest depends on the complexity 
+                of the time signature (the first downbeat)
+    """
+    
+    results = []
+
+    n = int(num)
+    for _ in range(n):
+        results.append(0)
+    
+    results[0] = 1
+
+    i = 2
+    j = 1
+    while i * i <= n:
+        if n % i == 0:
+            n //= i
+            j *= i
+            for k in range(j):
+                results[k*n] += 1
+        else:
+            i += 1
+            
+    if n > 1:
+        j *= n
+        for k in range(j):
+            results[k] += 1
+    
+    if normalized:
+        for i in range(1,num):
+            results[i] /= results[0]
+        results[0] = 1.0
+    
+    return results
+
+def plot_music(scheduled_style_df: pd.DataFrame, 
+               chroma_plot=False,
+               ax=None, 
+               cmap=plt.get_cmap("gist_rainbow")):
+    if ax is None:
+        _, ax = plt.subplots()
+    
+    df_copy = scheduled_style_df[["ticks", "note", "ticks_duration"]]
+    if chroma_plot:
+        df_copy.loc[:, "note"] = to_chroma(df_copy["note"])
+    for i, x in df_copy.iterrows():
+        rect = patches.Rectangle((x.ticks, x.note - 0.5), width=x.ticks_duration, height=1, linewidth=0.2, edgecolor=(0,0,0), facecolor=cmap(x.note))
+        ax.add_patch(rect)
+    plt.xlim(df_copy.ticks.min() - 2, df_copy.ticks.max() + 2)
+    plt.ylim(df_copy.note.min() - 3, df_copy.note.max() + 3)
