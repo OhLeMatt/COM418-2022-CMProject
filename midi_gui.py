@@ -154,8 +154,8 @@ def display(sender, app_data, user_data):
 
         if not plot_displayed: 
             dpg.set_axis_limits("imgy", inputMidi.min_note - 1, inputMidi.max_note + 1)
-            dpg.set_axis_limits("imgx", 0, inputMidi.length)
-            dpg.set_axis_limits_auto("imgx")
+            # dpg.set_axis_limits("imgx", 0, inputMidi.length)
+            # dpg.set_axis_limits_auto("imgx")
         
             plot_displayed = True
 
@@ -164,6 +164,8 @@ def display(sender, app_data, user_data):
             for i, x in df_copy.iterrows():
                 td = 0.2 if not x.ticks_duration else x.ticks_duration
                 dpg.add_image_series("Texture_C", [x.ticks, x.note - 0.5], [x.ticks + td, x.note + 0.5], label="C", parent="imgy")
+
+            dpg.fit_axis_data("imgx")
 
 # Get colour texture for each note (in progress)
 def get_note_colour(note):
