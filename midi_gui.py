@@ -47,9 +47,10 @@ class Midi:
         self.as_mido = mido.MidiFile(filename=self.file_name)
         self.midiframe = MidiFrame(self.as_mido)
         # HARDSCRIPTED FOR NOW
-        self.df = self.midiframe.track_frames[0].dataframe
 
-        print(self.df)
+        self.refresh_dataframe()
+
+        # print(self.df)
 
         #self.displayable = True  if ('note' in self.df and self.df["time_duration"].iloc[1] is not None) else False
         self.displayable = True  if 'note' in self.df else False
@@ -57,18 +58,24 @@ class Midi:
         if self.displayable: 
             self.min_note = self.df['note'].min()
             self.max_note = self.df['note'].max()        
-            self.length = self.df["time_release"].iloc[-1] if self.df["time_release"].iloc[-1] is not None else self.df["time"].iloc[-1] + 5
+            self.length = self.df["ticks"].iloc[-1] + 5
             print("midi length: " + str(self.length))
 
+    def refresh_dataframe(self):
+        self.midiframe.make_playing_track_frame(self.channels)
+        self.df = self.midiframe.playing_track_frame.dataframe
+        
 
     def add_channel(self, channel):
         if channel not in self.channels: 
             self.channels.append(channel)
+            self.refresh_dataframe()
 
         
     def remove_channel(self, channel):
         if channel in self.channels: 
             self.channels.remove(channel)
+            self.refresh_dataframe()
 
 
     def play(self):
@@ -148,14 +155,15 @@ def display(sender, app_data, user_data):
         if not plot_displayed: 
             dpg.set_axis_limits("imgy", inputMidi.min_note - 1, inputMidi.max_note + 1)
             dpg.set_axis_limits("imgx", 0, inputMidi.length)
+            dpg.set_axis_limits_auto("imgx")
         
             plot_displayed = True
 
-            df_copy = inputMidi.df[["time", "note", "time_duration", "time_release"]]
+            df_copy = inputMidi.df[["ticks", "note", "ticks_duration"]]
 
             for i, x in df_copy.iterrows():
-                td = 0.2 if not x.time_duration else x.time_duration
-                dpg.add_image_series("Texture_C", [x.time, x.note - 0.5], [x.time + td, x.note + 0.5], label="C", parent="imgy")
+                td = 0.2 if not x.ticks_duration else x.ticks_duration
+                dpg.add_image_series("Texture_C", [x.ticks, x.note - 0.5], [x.ticks + td, x.note + 0.5], label="C", parent="imgy")
 
 # Get colour texture for each note (in progress)
 def get_note_colour(note):
@@ -208,7 +216,13 @@ with dpg.file_dialog(directory_selector=False, show=False, callback=select_file,
     dpg.add_file_extension(".mid")
     dpg.add_file_extension("", color=(150, 255, 150, 255))
 
-with dpg.window(label="Improvisation Tool", width=1000, height=600, tag="MidiPlayer"):
+with dpg.window(label="Improvisation Tool", 
+                width=1000, 
+                height=600, 
+                tag="primary_window",
+                no_title_bar=True, 
+                no_move=True, 
+                modal=True,):
     with dpg.collapsing_header(label="Midi Player"):
         with dpg.group(horizontal=True):
             dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog_id"))
@@ -220,7 +234,6 @@ with dpg.window(label="Improvisation Tool", width=1000, height=600, tag="MidiPla
             dpg.add_button(label="Display", callback=display, tag="DisplayButton")
 
         with dpg.plot(label="Midi Visualiser", height=200, width=-1):
-
             xaxis = dpg.add_plot_axis(dpg.mvXAxis, label="Time", tag="imgx")
             yaxis = dpg.add_plot_axis(dpg.mvYAxis, label="Note", tag="imgy")
 
@@ -260,6 +273,7 @@ with dpg.window(label="Improvisation Tool", width=1000, height=600, tag="MidiPla
 
 
 dpg.create_viewport(title='Improvisation Helper', width=1000, height=600)
+dpg.set_primary_window("primary_window", True)
 dpg.setup_dearpygui()
 dpg.show_viewport()
 dpg.start_dearpygui()
