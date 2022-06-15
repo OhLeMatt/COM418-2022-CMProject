@@ -18,16 +18,16 @@ inputMidi = None
 
 ## create static textures
 texture_c = []
-for i in range(10*10):
+for i in range(30*30):
     texture_c.append(255/255)
-    texture_c.append(0)
+    texture_c.append(255/255)
     texture_c.append(255/255)
     texture_c.append(255/255)
 
 dpg.create_context()
 
 dpg.add_texture_registry(label="Demo Texture Container", tag="__demo_texture_container")
-dpg.add_static_texture(10, 10, texture_c, parent="__demo_texture_container", tag="Texture_C", label="Texture_C")
+dpg.add_static_texture(30, 30, texture_c, parent="__demo_texture_container", tag="Texture_C", label="Texture_C")
 
 ###########################    Midi Class     ########################### 
 
@@ -163,7 +163,8 @@ def display(sender, app_data, user_data):
                 df_copy = inputMidi.df[["ticks", "note", "ticks_duration"]]
                 for i, x in df_copy.iterrows():
                     td = 0.2 if not x.ticks_duration else x.ticks_duration
-                    dpg.add_image_series("Texture_C", [x.ticks, x.note - 0.5], [x.ticks + td, x.note + 0.5], label="C", parent="imgy")
+                    tint = get_note_colour(x.note)
+                    dpg.add_image_series("Texture_C", [x.ticks, x.note - 0.5], [x.ticks + td, x.note + 0.5], label="C", parent="imgy", tint_color=tint)
                 
                 dpg.fit_axis_data("imgx")
 
@@ -172,21 +173,23 @@ def get_note_colour(note):
     mod_note = note % 12
 
     switcher = {
-        0: "zero", # C
-        1: "one",  # C#
-        2: "two",  # D
-        3: "zero", # D#
-        4: "one",  # E
-        5: "two",  # F
-        6: "zero", # F#
-        7: "one",  # G
-        8: "two",  # G#
-        9: "zero", # A 
-        10: "one", # A#
-        11: "two", # B
+        0: (255,0,0), # C
+        1: (255,127,0),  # C#
+        2: (255,255,0),  # D
+        3: (0,127,0), # D#
+        4: (0,255,0),  # E
+        5: (0,255,147),  # F
+        6: (0,255,255), # F#
+        7: (0,127,255),  # G
+        8: (0,0,255),  # G#
+        9: (127,0,255), # A 
+        10: (255,0,255), # A#
+        11: (255,0,127), # B
     }
 
-    return switcher.get(mod_note, "Texture_Default")
+
+
+    return switcher.get(mod_note, (255,255,255))
 
 def channel_selection(sender, app_data, user_data):
     if inputMidi is not None:
@@ -234,7 +237,9 @@ with dpg.window(label="Improvisation Tool",
             dpg.add_button(label="Play", callback=play_midi, tag="PlayButton")
             dpg.add_button(label="Display", callback=display, tag="DisplayButton")
 
-        with dpg.plot(label="Midi Visualiser", height=200, width=-1):
+
+
+        with dpg.plot(label="Midi Visualiser", height=300, width=-1):
             xaxis = dpg.add_plot_axis(dpg.mvXAxis, label="Time", tag="imgx")
             yaxis = dpg.add_plot_axis(dpg.mvYAxis, label="Note", tag="imgy")
 
