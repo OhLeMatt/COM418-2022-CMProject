@@ -1,3 +1,4 @@
+from email.policy import default
 import dearpygui.dearpygui as dpg
 import mido
 from pretty_midi import PrettyMIDI
@@ -15,6 +16,11 @@ midi_path = "MIDI_Files"
 midifiles = [f for f in listdir(midi_path) if isfile(join(midi_path, f))]
 plot_displayed = False
 inputMidi = None
+normalize = False
+weighted = True
+window = [0,100]
+win_position = 10000
+num_bars = 100 
 
 ## create static textures
 texture_c = []
@@ -44,6 +50,7 @@ class Midi:
 
         self.Fs = 22050
         self.refresh_dataframe()
+
         
 
     def refresh_dataframe(self):
@@ -59,6 +66,8 @@ class Midi:
             self.max_note = self.df['note'].max()        
             self.length = self.df["ticks"].iloc[-1] + 5
             print("midi length: " + str(self.length))
+            global window
+            window = [0, self.length]
         self.midiframe.export_playing_track()
         
         # music = PrettyMIDI(midi_file=file_name)
@@ -154,8 +163,9 @@ def display(sender, app_data, user_data):
 
         if not plot_displayed: 
             dpg.set_axis_limits("imgy", inputMidi.min_note - 1, inputMidi.max_note + 1)
-            # dpg.set_axis_limits("imgx", 0, inputMidi.length)
+            #dpg.set_axis_limits("imgx", 0, 100)
             # dpg.set_axis_limits_auto("imgx")
+            #dpg.set_axis_limits_auto("imgx")
                     
             plot_displayed = True
 
@@ -186,9 +196,6 @@ def get_note_colour(note):
         10: (255,0,255), # A#
         11: (255,0,127), # B
     }
-
-
-
     return switcher.get(mod_note, (255,255,255))
 
 def channel_selection(sender, app_data, user_data):
@@ -212,7 +219,42 @@ def set_scale(sender, app_data, user_data):
 def set_notecounts(sender, app_data, user_data):
     print("note counts selected: " + str(user_data))
 
+# def view_change(sender, app_data, user_data):
+#     dpg.set_axis_limits("imgx", app_data, app_data + 100)
 
+def set_normalize(sender, app_data, user_data):
+    normalize = app_data
+
+def set_weighted(sender, app_data, user_data):
+    weighted = app_data
+
+def show_window_select(sender, app_data, user_data):
+    dpg.add_drag_line(label="drag_window", color=[0, 164, 255, 50], tag="drag_window", parent="midiviz", default_value=win_position, thickness=num_bars)
+    print("Drag line:" + str(app_data))
+
+def apply_window(sender, app_data, user_data):
+    global win_position, window, num_bars
+    win_position = int(dpg.get_value("drag_window"))
+    dpg.delete_item("drag_window")
+
+    thicc = int(num_bars/2)
+    window = [win_position-thicc, win_position+thicc]
+    dpg.set_value("WindowText", "Window: " + str(window))
+
+def set_num_bars(sender, app_data, user_data):
+    global num_bars, win_position
+    if user_data:
+        num_bars = num_bars + 1
+    else:
+        num_bars = num_bars - 1
+
+    dpg.set_value("num_bars", num_bars)
+
+    win_position = int(dpg.get_value("drag_window"))
+    dpg.delete_item("drag_window")
+    dpg.add_drag_line(label="drag_window", color=[0, 164, 255, 50], tag="drag_window", parent="midiviz", default_value=win_position, thickness=num_bars)
+
+    
 
 ###########################    UI     ########################### 
 
@@ -239,9 +281,12 @@ with dpg.window(label="Improvisation Tool",
 
 
 
-        with dpg.plot(label="Midi Visualiser", height=300, width=-1):
+        with dpg.plot(label="Midi Visualiser", height=300, width=-1, tag="midiviz"):
             xaxis = dpg.add_plot_axis(dpg.mvXAxis, label="Time", tag="imgx")
             yaxis = dpg.add_plot_axis(dpg.mvYAxis, label="Note", tag="imgy")
+        
+        # max_len = 100 if inputMidi is None else inputMidi.length
+        # dpg.add_slider_int(label="ViewSlider", max_value=max_len, callback=view_change)
 
 
     with dpg.collapsing_header(label="Midi Settings"):
@@ -252,6 +297,18 @@ with dpg.window(label="Improvisation Tool",
 
 
     with dpg.collapsing_header(label="Suggestion Settings"):
+        with dpg.group(horizontal=True): 
+            dpg.add_checkbox(label="Normalize Accuracy", callback=set_normalize, default_value=False)
+            dpg.add_checkbox(label="Weighted", callback=set_weighted, default_value=False)
+        with dpg.group(horizontal=True): 
+            dpg.add_button(label="Choose Window", callback=show_window_select)
+            dpg.add_text("Bars: ")
+            dpg.add_button(arrow=True, direction=dpg.mvDir_Left, user_data=False, callback=set_num_bars)
+            dpg.add_text(str(num_bars), tag="num_bars")
+            dpg.add_button(arrow=True, direction=dpg.mvDir_Right, user_data=True, callback=set_num_bars)
+
+            dpg.add_button(label="Apply", callback=apply_window)
+            dpg.add_text(label="WindowText", default_value="", tag="WindowText")
         with dpg.group():
             dpg.add_slider_float(label="Window Threshold", max_value=1.0, format="threshold = %.3f", callback=set_w_threshold)
             dpg.add_slider_float(label="Total Threshold", max_value=1.0, format="threshold = %.3f", callback=set_t_threshold)
