@@ -14,6 +14,14 @@ midifiles = [f for f in listdir(midi_path) if isfile(join(midi_path, f))]
 
 plot_displayed = False
 
+## create static textures
+texture_data1 = []
+for i in range(100*100):
+    texture_data1.append(255/255)
+    texture_data1.append(0)
+    texture_data1.append(255/255)
+    texture_data1.append(255/255)
+
 class Midi: 
 
     def __init__(self, file_name, path):
@@ -34,6 +42,11 @@ class Midi:
         # HARDSCRIPTED FOR NOW
         self.df = self.midiframe.track_frames[0].dataframe
 
+        self.min_note = self.df['note'].min()
+        self.max_note = self.df['note'].max()
+
+        self.length = self.df["time_release"].iloc[-1]
+
 
     def add_channel(self, channel):
         if channel not in self.channels: 
@@ -50,14 +63,28 @@ class Midi:
             sd.play(self.audio_data, self.Fs)
             self.playing = True
         else: 
+            print("Already playing")
+
+    def stop(self):
+        if self.playing:
             sd.stop()
             self.playing = False
+        else: 
+            print("Not playing")
 
 inputMidi = None
 
 dpg.create_context()
 
+dpg.add_texture_registry(label="Demo Texture Container", tag="__demo_texture_container")
+dpg.add_static_texture(10, 10, texture_data1, parent="__demo_texture_container", tag="__demo_static_texture_1", label="Static Texture 1")
+
+
 def select_midi(sender, app_data, user_data):
+    global inputMidi 
+
+    if inputMidi is not None: 
+        inputMidi.stop()
 
     path = app_data['current_path']  # path to sound font file
     midi_file = app_data['file_path_name']
@@ -69,7 +96,6 @@ def select_midi(sender, app_data, user_data):
     Fs = 22050
     audio_data = music.synthesize(fs=Fs)
 
-    global inputMidi 
     inputMidi = Midi(midi_file, path)
 
     dpg.set_value("Text", "Playing: " + app_data['file_name'])
@@ -87,31 +113,39 @@ def play_midi(sender, app_data, user_data):
 
         global plot_displayed
         if not plot_displayed: 
-            dpg.add_line_series(x=inputMidi.audio_data, y=[-1,0,1] ,label="Test", parent="y_axis")
+            dpg.set_axis_limits("imgy", inputMidi.min_note - 1, inputMidi.max_note + 1)
+            dpg.set_axis_limits("imgx", 0, inputMidi.length)
+
+        
             plot_displayed = True
 
             df_copy = inputMidi.df[["time", "note", "time_duration", "time_release"]]
 
-            # for i, x in df_copy.iterrows():
-            #     rect = patches.Rectangle((x.time, x.note - 0.5), width=x.time_duration, height=1, linewidth=0.2, edgecolor=(0,0,0), facecolor=cmap(x.note))
-            #     dpg.add_image_series(2, [300, 300], [400, 400], label="font atlas")
+            for i, x in df_copy.iterrows():
+                td = 1 if not x.time_duration else x.time_duration
+                dpg.add_image_series("__demo_static_texture_1", [x.time, x.note - 0.5], [x.time + x.time_duration, x.note + 0.5], label="static 1", parent="imgy")
+  
 
-            # plt.xlim(0, df_copy.time_release.max())
-            # plt.ylim(df_copy.note.min() - 3, df_copy.note.max() + 3)
+
 
 def _log(sender, app_data, user_data):
     print(f"sender: {sender}, \t app_data: {app_data}, \t user_data: {user_data}")
         
 
 def random_midi(sender, app_data, user_data):
+    global inputMidi
+
+    if inputMidi is not None: 
+        inputMidi.stop()
+
     random_file = random.choice(midifiles)
+    #random_file = "KCP_Major_1.mid"
 
     dpg.set_value("Text", "Playing: " + random_file)
     dpg.set_item_label("PlayButton", "Play")
 
     random_file = midi_path + "/" + random_file
 
-    global inputMidi
     inputMidi = Midi(random_file, midi_path)
 
 def channel_selection(sender, app_data, user_data):
@@ -147,20 +181,23 @@ with dpg.window(label="Improvisation Tool", width=1000, height=600, tag="MidiPla
         dpg.add_text(label="Text", default_value="No file selected", tag="Text")
         dpg.add_button(label="Play", callback=play_midi, tag="PlayButton")
 
-        with dpg.plot(label="MidiPlot", height=200, width=1000):
-            dpg.add_plot_legend()
-            dpg.add_plot_axis(dpg.mvXAxis, label="Time", tag="x_axis")
-            dpg.add_plot_axis(dpg.mvYAxis, label="Freq", tag="y_axis")
-            #dpg.add_line_series([], [-1,0,1], tag="LineSerie", parent="y_axis")
-            #dpg.add_simple_plot(label="Midi Plot", default_value=inputMidi.audio_data, parent="MidiPlayer")
+        # with dpg.plot(label="MidiPlot", height=200, width=1000):
+        #     dpg.add_plot_legend()
+        #     dpg.add_plot_axis(dpg.mvXAxis, label="Time", tag="x_axis")
+        #     dpg.add_plot_axis(dpg.mvYAxis, label="Freq", tag="y_axis")
+        #     #dpg.add_line_series([], [-1,0,1], tag="LineSerie", parent="y_axis")
+        #     #dpg.add_simple_plot(label="Midi Plot", default_value=inputMidi.audio_data, parent="MidiPlayer")
 
-        with dpg.plot(label="Image Plot", height=200, width=-1):
-            dpg.add_plot_legend()
-            xaxis = dpg.add_plot_axis(dpg.mvXAxis, label="imgx")
-            yaxis = dpg.add_plot_axis(dpg.mvYAxis, label="imgy")
-            # with dpg.plot_axis(dpg.mvYAxis, label="y axis"):
+        with dpg.plot(label="Midi Visualiser", height=200, width=-1):
+            #dpg.add_plot_legend()
+
+
+            xaxis = dpg.add_plot_axis(dpg.mvXAxis, label="Time", tag="imgx")
+            yaxis = dpg.add_plot_axis(dpg.mvYAxis, label="Note", tag="imgy")
+
+            #with dpg.plot_axis(dpg.mvYAxis, label="y axis"):
             #     dpg.add_image_series(2, [300, 300], [400, 400], label="font atlas")
-            #     dpg.add_image_series("__demo_static_texture_2", [150, 150], [200, 200], label="static 2")
+            #     dpg.add_image_series("__demo_static_texture_1", [150, 150], [160, 160], label="static 1")
             #     dpg.add_image_series("__demo_dynamic_texture_1", [-200, 100], [-100, 200], label="dynamic 1")
             #     dpg.fit_axis_data(dpg.top_container_stack())
             #dpg.fit_axis_data(xaxis)
