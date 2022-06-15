@@ -1,4 +1,4 @@
-
+import numpy as np
 
 def base_to_list(n, base=10):
     result = []
@@ -15,3 +15,5 @@ def list_to_str(l):
         l += str(l)
     return l
     
+def stereo_sound(left, right, left_volume=1.0, right_volume=1.0):
+    return np.column_stack([left*left_volume, right*right_volume])

@@ -10,12 +10,11 @@ import sounddevice as sd
 import numpy as np
 import midi_utils as mu
 import time
+from utils import stereo_sound
 
 
 # def fade(start_fade, end_fade, sample_count, )
 
-def stereo_sound(left, right, left_volume=1.0, right_volume=1.0):
-    return np.column_stack([left*left_volume, right*right_volume])
 
 MAX_SAMPLE_COUNT = 4096
 DEFAUT_SF = MAX_SAMPLE_COUNT * 8

@@ -4,6 +4,8 @@ from pretty_midi import PrettyMIDI
 import sounddevice as sd
 import midi_utils as mu
 from midi_frame import MidiFrame, MidiTrackFrame
+from midi_player import MidiPlayer
+import scales
 from os import listdir
 from os.path import isfile, join
 import random
@@ -36,7 +38,8 @@ class Midi:
         self.file_name = file_name 
         self.path = path
         self.playing = False
-
+        self.cursor = 0.0
+        
         self.channels = [i for i in range(0,16)]
         self.as_mido = mido.MidiFile(filename=self.file_name)
         
@@ -85,9 +88,10 @@ class Midi:
             self.playing = True
         else:
             self.stop()
-
+            
     def stop(self):
         if self.playing:
+            self.cursor = 0
             sd.stop()
             self.playing = False
         else: 
@@ -122,7 +126,8 @@ def load_midi(midi_file, path, name):
     if inputMidi is not None: 
         inputMidi.stop()
 
-    inputMidi = Midi(midi_file, path)
+    # inputMidi = Midi(midi_file, path)
+    inputMidi = MidiPlayer(midi_file, path)
 
     dpg.set_value("PlayText", "Selected: " + name)
     #dpg.set_item_label("PlayButton", "Play")
@@ -135,15 +140,20 @@ def load_midi(midi_file, path, name):
 
 def play_midi(sender, app_data, user_data):
     if inputMidi is not None:
-        inputMidi.play()
-        
-        if inputMidi.playing:
-            dpg.set_item_label("PlayButton", "Stop")
+        # user_data is either playpause at True, stop at False
+        if user_data:
+            if inputMidi.playing:
+                inputMidi.pause()
+                dpg.set_item_label("PlayButton", "Play")
+            else:
+                inputMidi.play()
+                dpg.set_item_label("PlayButton", "Pause")
         else:
-            dpg.set_item_label("PlayButton", "Play")
+            if inputMidi.playing:
+                inputMidi.stop()
+                dpg.set_item_label("PlayButton", "Play")
             
 
-        
 def display(sender, app_data, user_data):
     if inputMidi is not None and inputMidi.displayable:
         global plot_displayed
@@ -206,10 +216,17 @@ def set_t_threshold(sender, app_data, user_data):
 def set_scale(sender, app_data, user_data):
     print("scale: " + str(app_data))
 
+
+NOTE_COUNTS = set(i for i in range(5,13))
+GENERAL_SCALE_SUBSET = scales.create_general_scale_subset(NOTE_COUNTS)
+
 def set_notecounts(sender, app_data, user_data):
-    print("note counts selected: " + str(user_data))
-
-
+    if app_data:
+        NOTE_COUNTS.add(user_data)
+    else:
+        NOTE_COUNTS.remove(user_data)
+    GENERAL_SCALE_SUBSET = scales.create_general_scale_subset(NOTE_COUNTS)
+    print(f"note counts selected: {NOTE_COUNTS} | number of general scales: {len(GENERAL_SCALE_SUBSET)}")
 
 ###########################    UI     ########################### 
 
@@ -231,7 +248,8 @@ with dpg.window(label="Improvisation Tool",
         dpg.add_text(label="PlayText", default_value="No file selected", tag="PlayText")
         dpg.add_text(label="WarningText", default_value="", tag="WarningText")
         with dpg.group(horizontal=True):
-            dpg.add_button(label="Play", callback=play_midi, tag="PlayButton")
+            dpg.add_button(label="Play", callback=play_midi, tag="PlayButton", user_data=True)
+            dpg.add_button(label="Stop", callback=play_midi, tag="StopButton", user_data=False)
             dpg.add_button(label="Display", callback=display, tag="DisplayButton")
 
         with dpg.plot(label="Midi Visualiser", height=200, width=-1):
