@@ -213,11 +213,11 @@ class MidiFrame:
                 tracks.append(track_frame.track)
         tracks.append(self.playing_track_frame.track)
         
-        playing_midi = mido.MidiFile(type=self.midi_type, 
+        playing_midi = mido.MidiFile(type=0 if len(tracks) == 1 else min(1, self.midi_type), 
                                      ticks_per_beat=self.ticks_per_beat, 
                                      charset=self.midi_charset,
                                      debug=False,
-                                     clip = self.midi_clip,
+                                     clip =self.midi_clip,
                                      tracks=tracks)
         playing_midi.save("MIDI_Files/tmp.mid")
         

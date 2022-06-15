@@ -79,12 +79,11 @@ class Midi:
             self.channels.remove(channel)
             self.refresh_dataframe()
 
-
     def play(self):
         if not self.playing:
             sd.play(self.audio_data, self.Fs)
             self.playing = True
-        else: 
+        else:
             self.stop()
 
     def stop(self):
@@ -160,7 +159,6 @@ def display(sender, app_data, user_data):
                     
             plot_displayed = True
 
-            
             if len(inputMidi.df) > 0:
                 df_copy = inputMidi.df[["ticks", "note", "ticks_duration"]]
                 for i, x in df_copy.iterrows():
