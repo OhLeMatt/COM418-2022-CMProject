@@ -42,10 +42,15 @@ class Midi:
         # HARDSCRIPTED FOR NOW
         self.df = self.midiframe.track_frames[0].dataframe
 
-        self.min_note = self.df['note'].min()
-        self.max_note = self.df['note'].max()
+        print(self.df)
 
-        self.length = self.df["time_release"].iloc[-1]
+        self.displayable = True  if ('note' in self.df and self.df["time_duration"].iloc[1] is not None) else False
+
+        if self.displayable: 
+            self.min_note = self.df['note'].min()
+            self.max_note = self.df['note'].max()        
+            self.length = self.df["time_release"].iloc[-1] if self.df["time_release"].iloc[-1] is not None else self.df["time"].iloc[-1] + self.df["time_duration"].iloc[-1]
+            print("midi length: " + str(self.length))
 
 
     def add_channel(self, channel):
@@ -63,7 +68,7 @@ class Midi:
             sd.play(self.audio_data, self.Fs)
             self.playing = True
         else: 
-            print("Already playing")
+            self.stop()
 
     def stop(self):
         if self.playing:
@@ -98,24 +103,37 @@ def select_midi(sender, app_data, user_data):
 
     inputMidi = Midi(midi_file, path)
 
-    dpg.set_value("Text", "Playing: " + app_data['file_name'])
+    dpg.set_value("PlayText", "Selected: " + app_data['file_name'])
     dpg.set_item_label("PlayButton", "Play")
+
+    if not inputMidi.displayable:
+        dpg.set_value("WarningText", "Warning: this midi file is not displayable")
+    else:
+        dpg.set_value("WarningText", "")
     
 
 def play_midi(sender, app_data, user_data):
     if inputMidi is not None:
         inputMidi.play()
-
+        
         if inputMidi.playing:
             dpg.set_item_label("PlayButton", "Stop")
         else:
             dpg.set_item_label("PlayButton", "Play")
+            
 
+        
+def display(sender, app_data, user_data):
+    if inputMidi is not None and inputMidi.displayable:
         global plot_displayed
+
+        if plot_displayed:
+            dpg.delete_item("imgy", children_only=True)
+            plot_displayed = False
+
         if not plot_displayed: 
             dpg.set_axis_limits("imgy", inputMidi.min_note - 1, inputMidi.max_note + 1)
             dpg.set_axis_limits("imgx", 0, inputMidi.length)
-
         
             plot_displayed = True
 
@@ -124,7 +142,7 @@ def play_midi(sender, app_data, user_data):
             for i, x in df_copy.iterrows():
                 td = 1 if not x.time_duration else x.time_duration
                 dpg.add_image_series("__demo_static_texture_1", [x.time, x.note - 0.5], [x.time + x.time_duration, x.note + 0.5], label="static 1", parent="imgy")
-  
+
 
 
 
@@ -141,12 +159,18 @@ def random_midi(sender, app_data, user_data):
     random_file = random.choice(midifiles)
     #random_file = "KCP_Major_1.mid"
 
-    dpg.set_value("Text", "Playing: " + random_file)
+    dpg.set_value("PlayText", "Selected: " + random_file)
     dpg.set_item_label("PlayButton", "Play")
 
     random_file = midi_path + "/" + random_file
 
     inputMidi = Midi(random_file, midi_path)
+
+    if not inputMidi.displayable:
+        dpg.set_value("WarningText", "Warning: this midi file is not displayable")
+    else:
+        dpg.set_value("WarningText", "")
+
 
 def channel_selection(sender, app_data, user_data):
     if inputMidi is not None:
@@ -178,8 +202,11 @@ with dpg.window(label="Improvisation Tool", width=1000, height=600, tag="MidiPla
         with dpg.group(horizontal=True):
             dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog_id"))
             dpg.add_button(label="Random", callback=random_midi)
-        dpg.add_text(label="Text", default_value="No file selected", tag="Text")
-        dpg.add_button(label="Play", callback=play_midi, tag="PlayButton")
+        dpg.add_text(label="PlayText", default_value="No file selected", tag="PlayText")
+        dpg.add_text(label="WarningText", default_value="", tag="WarningText")
+        with dpg.group(horizontal=True):
+            dpg.add_button(label="Play", callback=play_midi, tag="PlayButton")
+            dpg.add_button(label="Display", callback=display, tag="DisplayButton")
 
         # with dpg.plot(label="MidiPlot", height=200, width=1000):
         #     dpg.add_plot_legend()
@@ -189,18 +216,10 @@ with dpg.window(label="Improvisation Tool", width=1000, height=600, tag="MidiPla
         #     #dpg.add_simple_plot(label="Midi Plot", default_value=inputMidi.audio_data, parent="MidiPlayer")
 
         with dpg.plot(label="Midi Visualiser", height=200, width=-1):
-            #dpg.add_plot_legend()
-
 
             xaxis = dpg.add_plot_axis(dpg.mvXAxis, label="Time", tag="imgx")
             yaxis = dpg.add_plot_axis(dpg.mvYAxis, label="Note", tag="imgy")
 
-            #with dpg.plot_axis(dpg.mvYAxis, label="y axis"):
-            #     dpg.add_image_series(2, [300, 300], [400, 400], label="font atlas")
-            #     dpg.add_image_series("__demo_static_texture_1", [150, 150], [160, 160], label="static 1")
-            #     dpg.add_image_series("__demo_dynamic_texture_1", [-200, 100], [-100, 200], label="dynamic 1")
-            #     dpg.fit_axis_data(dpg.top_container_stack())
-            #dpg.fit_axis_data(xaxis)
 
     with dpg.collapsing_header(label="Midi Settings"):
         with dpg.group(horizontal=True): 
