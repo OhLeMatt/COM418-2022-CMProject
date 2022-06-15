@@ -161,8 +161,9 @@ def display(sender, app_data, user_data):
             for i, x in df_copy.iterrows():
                 td = 0.2 if not x.ticks_duration else x.ticks_duration
                 dpg.add_image_series("Texture_C", [x.ticks, x.note - 0.5], [x.ticks + td, x.note + 0.5], label="C", parent="imgy")
+
             dpg.fit_axis_data("imgx")
-            
+
 # Get colour texture for each note (in progress)
 def get_note_colour(note):
     mod_note = note % 12
