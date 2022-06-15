@@ -1,5 +1,4 @@
 
-from cv2 import trace
 import mido
 import midi_utils as mu
 import numpy as np
