@@ -7,6 +7,7 @@ from midi_frame import MidiFrame, MidiTrackFrame
 from os import listdir
 from os.path import isfile, join
 import random
+import time
 
 ###########################    Init Variables     ########################### 
 
@@ -45,26 +46,23 @@ class Midi:
         self.channels = [i for i in range(0,16)]
 
         self.as_mido = mido.MidiFile(filename=self.file_name)
+        
         self.midiframe = MidiFrame(self.as_mido)
-        # HARDSCRIPTED FOR NOW
-
-        self.refresh_dataframe()
-
-        # print(self.df)
-
-        #self.displayable = True  if ('note' in self.df and self.df["time_duration"].iloc[1] is not None) else False
-        self.displayable = True  if 'note' in self.df else False
-
-        if self.displayable: 
-            self.min_note = self.df['note'].min()
-            self.max_note = self.df['note'].max()        
-            self.length = self.df["ticks"].iloc[-1] + 5
-            print("midi length: " + str(self.length))
+        
+        self.refresh_dataframe()       
 
     def refresh_dataframe(self):
         self.midiframe.make_playing_track_frame(self.channels)
         self.df = self.midiframe.playing_track_frame.dataframe
         
+        #self.displayable = True if ('note' in self.df and self.df["time_duration"].iloc[1] is not None) else False
+        self.displayable = True if 'note' in self.df else False
+        
+        if self.displayable: 
+            self.min_note = self.df['note'].min()
+            self.max_note = self.df['note'].max()        
+            self.length = self.df["ticks"].iloc[-1] + 5
+            print("midi length: " + str(self.length))
 
     def add_channel(self, channel):
         if channel not in self.channels: 
@@ -93,13 +91,12 @@ class Midi:
             print("Not playing")
 
 
-
 ###########################    Callback functions     ########################### 
 
 def _log(sender, app_data, user_data):
     print(f"sender: {sender}, \t app_data: {app_data}, \t user_data: {user_data}")
         
-
+        
 def random_midi(sender, app_data, user_data):
     midi_name = random.choice(midifiles)
     random_file = midi_path + "/" + midi_name
@@ -154,9 +151,9 @@ def display(sender, app_data, user_data):
 
         if not plot_displayed: 
             dpg.set_axis_limits("imgy", inputMidi.min_note - 1, inputMidi.max_note + 1)
-            dpg.set_axis_limits("imgx", 0, inputMidi.length)
-            dpg.set_axis_limits_auto("imgx")
-        
+            # dpg.set_axis_limits("imgx", 0, inputMidi.length)
+            # dpg.set_axis_limits_auto("imgx")
+                    
             plot_displayed = True
 
             df_copy = inputMidi.df[["ticks", "note", "ticks_duration"]]
@@ -164,7 +161,8 @@ def display(sender, app_data, user_data):
             for i, x in df_copy.iterrows():
                 td = 0.2 if not x.ticks_duration else x.ticks_duration
                 dpg.add_image_series("Texture_C", [x.ticks, x.note - 0.5], [x.ticks + td, x.note + 0.5], label="C", parent="imgy")
-
+            dpg.fit_axis_data("imgx")
+            
 # Get colour texture for each note (in progress)
 def get_note_colour(note):
     mod_note = note % 12
@@ -223,7 +221,7 @@ with dpg.window(label="Improvisation Tool",
                 no_title_bar=True, 
                 no_move=True, 
                 modal=True,):
-    with dpg.collapsing_header(label="Midi Player"):
+    with dpg.collapsing_header(label="Midi Player", default_open=True):
         with dpg.group(horizontal=True):
             dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog_id"))
             dpg.add_button(label="Random", callback=random_midi)
