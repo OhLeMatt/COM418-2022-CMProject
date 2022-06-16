@@ -1,4 +1,5 @@
 
+from turtle import update
 import mido
 import midi_utils as mu
 import scales
@@ -86,35 +87,53 @@ class MidiPlayer:
         if was_playing:
             self.play()
             
-    def update_cursor(self, cursor, call_listeners=False):
-        if cursor != self.cursor["idx"]:
-            if cursor < 0:
-                cursor = 0
+    def update_cursor(self, cursor, metric="idx", call_listeners=False):
+        if cursor <= 0:
+            for k in self.cursor:
+                self.cursor[k] = 0
+        elif metric == "idx" and cursor != self.cursor["idx"]:
             self.cursor["idx"] = cursor
+            
             self.cursor["time"] = self.cursor["idx"]/self.Fs
+            self.cursor["ticks"] = self.midiframe.converters["time"].to_ticks(self.cursor["time"])
+            self.cursor["bartime"] = self.midiframe.converters["bartime"].to_bartime(self.cursor["ticks"])
+        elif metric == "ticks" and cursor != self.cursor["ticks"]:
+            self.cursor["ticks"] = cursor
             
-            if cursor == 0:
-                self.cursor["ticks"] = 0
-                self.cursor["bartime"] = 0
-            else:
-                self.cursor["ticks"] = self.midiframe.converters["time"].to_ticks(self.cursor["time"])
-                self.cursor["bartime"] = self.midiframe.converters["bartime"].to_bartime(self.cursor["ticks"])
+            self.cursor["bartime"] = self.midiframe.converters["bartime"].to_bartime(self.cursor["ticks"])
+            self.cursor["time"] = self.midiframe.converters["time"].to_time(self.cursor["ticks"])
+            self.cursor["idx"] = int(self.cursor["time"] * self.Fs)
+        elif metric == "time" and cursor != self.cursor["time"]:
+            self.cursor["time"] = cursor
+
+            self.cursor["idx"] = int(self.cursor["time"] * self.Fs)
+            self.cursor["ticks"] = self.midiframe.converters["time"].to_ticks(self.cursor["time"])
+            self.cursor["bartime"] = self.midiframe.converters["bartime"].to_bartime(self.cursor["ticks"])
+        elif metric == "bartime" and cursor != self.cursor["bartime"]:
+            self.cursor["bartime"] = cursor
             
-            if call_listeners:
-                for callback in self.on_cursor_change_listeners:
-                    callback(self)
-        
-        
+            self.cursor["ticks"] = self.midiframe.converters["bartime"].to_ticks(self.cursor["bartime"])
+            self.cursor["time"] = self.midiframe.converters["time"].to_time(self.cursor["ticks"])
+            self.cursor["idx"] = int(self.cursor["time"] * self.Fs)
+            
+        if call_listeners:
+            for callback in self.on_cursor_change_listeners:
+                callback(self)
+    
         # print(self.df.iloc[self.df_cursor])
     def add_channel(self, channel):
         if channel not in self.channels: 
             self.channels.append(channel)
             self.refresh_dataframe()
+            return True
+        return False
         
     def remove_channel(self, channel):
         if channel in self.channels: 
             self.channels.remove(channel)
             self.refresh_dataframe()
+            return True
+        return False
 
     def play(self):
         if not self.playing:
