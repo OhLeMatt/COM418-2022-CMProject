@@ -11,14 +11,12 @@ class MidiTrackFrame:
 
     def __init__(self, 
                  track: mido.MidiTrack, 
-                 ticks_per_beat,
-                 tempos, 
-                 time_signatures,
+                 converters,
                  track_name=None, 
                  compute_dataframe=True,
                  related_track_names=[]):
         self.name = track.name.strip() if track_name is None else track_name
-        self.ticks_per_beat = ticks_per_beat
+        
         self.meta_only =  True
         self.channel_count = {}
         self.unique_channel = None
@@ -26,11 +24,9 @@ class MidiTrackFrame:
         self.meta_count = 0
         self.typeset = set()
         self.track = track
+        self.related_track_names = related_track_names
         
         self.dataframe : pd.DataFrame = None #type:ignore
-        if compute_dataframe:
-            self.dataframe = mu.track_to_dataframe(track, ticks_per_beat, tempos, time_signatures)
-        self.related_track_names = related_track_names
         
         for message in track:    
             self.typeset.add(message.type)
@@ -49,6 +45,11 @@ class MidiTrackFrame:
                     #     self.cc_count[message.channel] += 1
         if len(self.channel_count.keys()) == 1:
             self.unique_channel = list(self.channel_count.keys())[0]
+            
+        if compute_dataframe:
+            self.dataframe = mu.track_to_dataframe(track, 
+                                                   converters["time"],
+                                                   converters["bartime"])
 
     def __repr__(self):
         rep = self.name
@@ -99,7 +100,7 @@ class MidiTrackFrame:
         found_scales = {}
         if True in np.unique(mask):
             if weighted:
-                weights = self.dataframe.custom_beat_weight[mask].to_numpy()
+                weights = self.dataframe.weight[mask].to_numpy()
             
             found_scales = scales.suggest_scales(mu.to_chroma(self.dataframe.note[mask].to_numpy()), 
                                 weights=weights, 
@@ -123,10 +124,8 @@ class MidiFrame:
         self.midi_charset = midofile.charset
         self.info_type = info_type
         self.filename = midofile.filename
-        self.midi_type = midofile.type
         self.track_count = len(midofile.tracks)
-        self.time_signatures = []
-        self.tempos = []
+        self.converters = {}
         self.music_track_count = 0
         self.ticks_per_beat = midofile.ticks_per_beat
         self.length = midofile.length
@@ -134,28 +133,44 @@ class MidiFrame:
         self.playing_track_frame: MidiTrackFrame = None #type:ignore
         self.playing_midi_file = tempfile.TemporaryFile()
         
-        time = 0
+        ticks = 0
+        tempos = []
+        timesigs = []
+        last_tempo_ticks = 0
+        last_timesig_ticks = 0
         for message in mido.merge_tracks(midofile.tracks):
-            time += message.time
+            ticks += message.time
             if message.is_meta:
                 if message.type == "set_tempo" \
-                    and (len(self.tempos) == 0 or self.tempos[-1].tempo != message.tempo):
+                    and (len(tempos) == 0 or tempos[-1].tempo != message.tempo):
                     new_msg = message.copy()
-                    new_msg.time = time
-                    self.tempos.append(new_msg)
+                    if len(tempos) > 0 and last_tempo_ticks == ticks:
+                        new_msg.time = tempos[-1].time
+                        tempos[-1] = new_msg
+                    else:
+                        new_msg.time = ticks - last_tempo_ticks
+                        tempos.append(new_msg)
+                    last_tempo_ticks = ticks
                 elif message.type == "time_signature" \
-                    and (len(self.time_signatures) == 0 \
-                        or not (self.time_signatures[-1].numerator == message.numerator and self.time_signatures[-1].denominator == message.denominator)):
+                    and (len(timesigs) == 0 \
+                        or not (timesigs[-1].numerator == message.numerator and timesigs[-1].denominator == message.denominator)):
                     new_msg = message.copy()
-                    new_msg.time = time
-                    self.time_signatures.append(new_msg)
+                    if len(timesigs) > 0 and last_timesig_ticks == ticks:
+                        new_msg.time = tempos[-1].time
+                        timesigs[-1] = new_msg
+                    else:
+                        new_msg.time = ticks - last_timesig_ticks
+                        timesigs.append(new_msg)
+                    last_timesig_ticks = ticks
+        self.converters["time"] = mu.TicksTimeConverter(tempos_with_ticks=tempos, 
+                                                        ticks_per_beat=self.ticks_per_beat)
+        self.converters["bartime"] = mu.TicksBartimeConverter(timesigs_with_ticks=timesigs, 
+                                                              ticks_per_beat=self.ticks_per_beat)
         
         if info_type in ("all", "filtered"):
             for t in midofile.tracks:
                 mtf = MidiTrackFrame(t, 
-                                     self.ticks_per_beat, 
-                                     self.tempos, 
-                                     self.time_signatures,
+                                     converters=self.converters,
                                      compute_dataframe=False)
                 self.track_frames.append(mtf)
                 if not mtf.meta_only:
@@ -166,9 +181,8 @@ class MidiFrame:
             self.dispatch_tracks_by_channel(midofile, **kwargs)
         
         self.track_frames = sorted(self.track_frames, key=lambda a: a.name)
-        self.make_playing_track_frame(kwargs.get("channels", {0}), 
-                                      kwargs.get("only_unique_channel", False))
-            
+        
+        
 
     def __repr__(self):
         rep = ""
@@ -177,16 +191,16 @@ class MidiFrame:
             rep += f"{key_name}: {self.__dict__[k]}\n"
         for track_frame in self.track_frames:
             rep += track_frame.__repr__()
-        if len(self.time_signatures) > 0:
+        if self.converters["bartime"].event_count > 0:
             rep += f"\n\tTime signatures: "
-            for message in self.time_signatures:
-                rep += f"{message.numerator}/{message.denominator} ({message.time}), "
+            for event in self.converters["bartime"].events:
+                rep += "{}/{} ({}), ".format(event[0][0], event[0][1], event[2])
             rep = rep[:-2]
         
-        if len(self.tempos) > 0:
+        if self.converters["time"].event_count > 0:
             rep += f"\n\tTempos: "
-            for message in self.tempos:
-                rep += f"{message.tempo} ({message.time}), "
+            for event in self.converters["time"].events:
+                rep += "{} ({}), ".format(event[0], event[2])
             rep = rep[:-2]
         
         return rep + "\n"
@@ -200,10 +214,8 @@ class MidiFrame:
                 tracks.append(track_frame.track)
         
         self.playing_track_frame = MidiTrackFrame(mido.merge_tracks(tracks), 
-                                                  self.ticks_per_beat, 
-                                                  self.tempos, 
-                                                  self.time_signatures, 
-                                                  "Playing Track")
+                                                  converters=self.converters,
+                                                  track_name="Playing Track")
 
     def export_playing_track(self):
         tracks = []
@@ -212,7 +224,7 @@ class MidiFrame:
                 tracks.append(track_frame.track)
         tracks.append(self.playing_track_frame.track)
         
-        playing_midi = mido.MidiFile(type=0 if len(tracks) == 1 else min(1, self.midi_type), 
+        playing_midi = mido.MidiFile(type=0 if len(tracks) == 1 else max(1, self.midi_type), 
                                      ticks_per_beat=self.ticks_per_beat, 
                                      charset=self.midi_charset,
                                      debug=False,
@@ -269,9 +281,7 @@ class MidiFrame:
                 previous_time = tmp_time
             
             self.track_frames.append(MidiTrackFrame(meta_track,
-                                                    self.ticks_per_beat, 
-                                                    self.tempos, 
-                                                    self.time_signatures,
+                                                    converters=self.converters,
                                                     compute_dataframe=False,
                                                     track_name="Meta"))
         
@@ -295,9 +305,7 @@ class MidiFrame:
                     previous_time = tmp_time
                 
                 self.track_frames.append(MidiTrackFrame(channel_track,
-                                                        ticks_per_beat=self.ticks_per_beat, 
-                                                        tempos=self.tempos, 
-                                                        time_signatures=self.time_signatures,
+                                                        converters=self.converters,
                                                         track_name=f"Channel {channel:02}",
                                                         compute_dataframe=False,
                                                         related_track_names=related_track_names[channel]))

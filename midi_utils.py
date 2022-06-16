@@ -1,10 +1,11 @@
 
+from zlib import DEF_BUF_SIZE
 import numpy as np
 import mido
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-
+from temporal_converters import TicksBartimeConverter, TicksTimeConverter
 
 MIDI_IDS = np.arange(128)
 
@@ -115,60 +116,23 @@ def harmonics_from_midi_id(midi_id, k=8, include_id=False):
     p = np.unique(to_midi_id(to_freq(midi_id) * np.arange(1, k+2)))
     return p[include_id | (p != midi_id)]
 
+
+
 def track_to_dataframe(track: mido.MidiTrack, 
-                       ticks_per_beat,
-                       tempos=[], 
-                       time_signatures=[]):
+                       time_conv: TicksTimeConverter,
+                       bartime_conv: TicksBartimeConverter):
     records = []
     current_ticks = 0
-    current_time = 0.0
-    
-    tempo_query = {
-        "idx": 0,
-        "next_tick": 0,
-        "current": 500000,
-        "time_cp": 0.0
-    }
-    
-    def iterate_over_tempos():
-        if tempo_query["idx"] < len(tempos) and current_ticks >= tempo_query["next_tick"]:
-            msg = tempos[tempo_query["idx"]]
-            tempo_query["bartime_cp"] = 0.0 if len(records) == 0 else records[-1]["time"]
-            tempo_query["next_tick"] = msg.time
-            tempo_query["current"] = msg.tempo
-            tempo_query["idx"] += 1
-    
-    timesig_query = {
-        "idx": 0,
-        "next_tick": 0,
-        "current": 1.0,
-        "bartime_cp": 0.0,
-        "updown_beats": get_updown_beats(4)
-    }
-    
-    def iterate_over_timesigs():
-        if timesig_query["idx"] < len(time_signatures) and current_ticks >= timesig_query["next_tick"]:
-            msg = time_signatures[timesig_query["idx"]]
-            timesig_query["next_tick"] = msg.time
-            timesig_query["bartime_cp"] = 0.0 if len(records) == 0 else records[-1]["bartime"]
-            timesig_query["idx"] += 1
-            timesig_query["current"] = msg.numerator/msg.denominator
-            timesig_query["updown_beats"] = get_updown_beats(msg.numerator)
     
     pressed_notes = {}
     id = 0
-    print()
+    
     for x in track:
-        
-        iterate_over_tempos()
-        iterate_over_timesigs()
-        
         new_dict = x.__dict__.copy()
         new_dict["ticks"] = new_dict["time"]
+        del new_dict["time"]
         
         current_ticks += new_dict["ticks"]
-        
-        current_time += mido.tick2second(new_dict["ticks"],  ticks_per_beat, tempo_query["current"]) 
         
         if new_dict["type"] == "note_off" or new_dict["type"] == "note_on" and new_dict["velocity"] == 0:
             former_pressed_note = pressed_notes[new_dict["note"]]
@@ -178,25 +142,46 @@ def track_to_dataframe(track: mido.MidiTrack,
                 pass
             else:
                 pressed_record = records[former_pressed_note["id"]]
-                pressed_record["ticks_duration"] = current_ticks - pressed_record["ticks"]
-                pressed_record["time_duration"] = current_time - pressed_record["time"]
+                pressed_record["ticks_release"] = current_ticks
                 pressed_record["velocity_release"] = new_dict["velocity"]
                 pressed_notes[new_dict["note"]] = None
         elif new_dict["type"] == "note_on":
             new_dict["ticks"] = current_ticks
-            new_dict["time"] = current_time
-            new_dict["bartime"] = timesig_query["bartime_cp"] + current_ticks / ticks_per_beat * timesig_query["current"]
-            onset = len(timesig_query["updown_beats"]) * (new_dict["bartime"] - int(new_dict["bartime"]))
-            new_dict["custom_beat_weight"] = timesig_query["updown_beats"][int(onset)]
-            new_dict["ticks_duration"] = None
-            new_dict["time_duration"] = None
+            new_dict["ticks_release"] = None
             new_dict["velocity_release"] = None
             pressed_notes[new_dict["note"]] = {"id": id}
             del new_dict["type"]
             records.append(new_dict)
             id += 1
-                                        
-    return pd.DataFrame(records)
+    
+    df = pd.DataFrame(records)
+    if len(df) > 0:
+        df = df.dropna(subset=["ticks_release"]).reset_index()
+        
+        df["time"] = time_conv.to_time(df["ticks"])
+        df["time_release"] = df["time"]
+        df["bartime"] = bartime_conv.to_bartime(df["ticks"])
+        df["bartime_release"] = df["bartime"]
+        mapping = np.argsort(df["ticks_release"])
+        
+        df["time_release"].iloc[mapping] =  time_conv.to_time(df["ticks_release"][mapping])
+        df["bartime_release"].iloc[mapping] = bartime_conv.to_bartime(df["ticks_release"][mapping])
+        df["onset"] = df["bartime"] - np.floor(df["bartime"])
+        
+        weights = []
+        last_timesig = bartime_conv.events[0][0]
+        updown_beats = get_updown_beats(last_timesig[0])
+        for row in df[["ticks", "onset"]].itertuples():
+            timesig = bartime_conv.to_timesig(row.ticks)
+            if timesig != last_timesig:
+                updown_beats = get_updown_beats(timesig[0])
+                last_timesig = timesig
+            
+            weights.append(updown_beats[int(row.onset * len(updown_beats))])
+        
+        df["weight"] = weights
+    
+    return df
 
 def get_updown_beats(num, normalized=True):
     """Borrowed from Matthieu's Semester Project
@@ -245,18 +230,30 @@ def get_updown_beats(num, normalized=True):
     
     return results
 
-def plot_music(scheduled_style_df: pd.DataFrame, 
+def plot_music(track_df: pd.DataFrame, 
                chroma_plot=False,
+               metric="ticks",
                ax=None, 
                cmap=plt.get_cmap("gist_rainbow")):
     if ax is None:
         _, ax = plt.subplots()
     
-    df_copy = scheduled_style_df[["ticks", "note", "ticks_duration"]]
+    metric_release = metric + "_release"
+    
+    df_copy = track_df[[metric, "note", metric_release]]
     if chroma_plot:
         df_copy.loc[:, "note"] = to_chroma(df_copy["note"])
     for i, x in df_copy.iterrows():
-        rect = patches.Rectangle((x.ticks, x.note - 0.5), width=x.ticks_duration, height=1, linewidth=0.2, edgecolor=(0,0,0), facecolor=cmap(x.note))
+        rect = patches.Rectangle((x[metric], x.note - 0.5), 
+                                 width=x[metric_release] - x[metric], 
+                                 height=1, 
+                                 linewidth=0.2, 
+                                 edgecolor=(0,0,0), 
+                                 facecolor=cmap(x.note))
         ax.add_patch(rect)
-    plt.xlim(df_copy.ticks.min() - 2, df_copy.ticks.max() + 2)
+    
+    plt.xlim(df_copy[metric].min() - 1, df_copy[metric_release].max() + 1)
     plt.ylim(df_copy.note.min() - 3, df_copy.note.max() + 3)
+    
+
+#   

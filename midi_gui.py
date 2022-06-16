@@ -1,8 +1,5 @@
+
 import dearpygui.dearpygui as dpg
-import mido
-from pretty_midi import PrettyMIDI
-import sounddevice as sd
-import midi_utils as mu
 from midi_frame import MidiFrame, MidiTrackFrame
 from midi_player import MidiPlayer
 import scales
@@ -11,92 +8,32 @@ from os.path import isfile, join
 import random
 import time
 
+
 ###########################    Init Variables     ########################### 
 
 midi_path = "MIDI_Files"
 midifiles = [f for f in listdir(midi_path) if isfile(join(midi_path, f))]
 plot_displayed = False
 inputMidi = None
+normalize = False
+weighted = True
+metric = "ticks"
+window = [0,100]
+win_position = 10000
+num_bars = 100 
 
 ## create static textures
 texture_c = []
-for i in range(10*10):
+for i in range(30*30):
     texture_c.append(255/255)
-    texture_c.append(0)
+    texture_c.append(255/255)
     texture_c.append(255/255)
     texture_c.append(255/255)
 
 dpg.create_context()
 
 dpg.add_texture_registry(label="Demo Texture Container", tag="__demo_texture_container")
-dpg.add_static_texture(10, 10, texture_c, parent="__demo_texture_container", tag="Texture_C", label="Texture_C")
-
-###########################    Midi Class     ########################### 
-
-class Midi: 
-    def __init__(self, file_name, path):
-        self.file_name = file_name 
-        self.path = path
-        self.playing = False
-        self.cursor = 0.0
-        
-        self.channels = [i for i in range(0,16)]
-        self.as_mido = mido.MidiFile(filename=self.file_name)
-        
-        self.midiframe = MidiFrame(self.as_mido)
-
-        self.Fs = 22050
-        self.refresh_dataframe()
-        
-
-    def refresh_dataframe(self):
-        self.midiframe.make_playing_track_frame(self.channels)
-        self.df = self.midiframe.playing_track_frame.dataframe
-        
-        #self.displayable = True if ('note' in self.df and self.df["time_duration"].iloc[1] is not None) else False
-        # self.displayable = True if 'note' in self.df else False
-        self.displayable = True
-        
-        if self.displayable and len(self.df) > 0: 
-            self.min_note = self.df['note'].min()
-            self.max_note = self.df['note'].max()        
-            self.length = self.df["ticks"].iloc[-1] + 5
-            print("midi length: " + str(self.length))
-        self.midiframe.export_playing_track()
-        
-        # music = PrettyMIDI(midi_file=file_name)
-        music = PrettyMIDI(midi_file="MIDI_Files/tmp.mid")
-        was_playing = self.playing
-        self.stop()
-        self.audio_data = music.synthesize(fs=self.Fs)
-        if was_playing:
-            self.play()
-
-    def add_channel(self, channel):
-        if channel not in self.channels: 
-            self.channels.append(channel)
-            self.refresh_dataframe()
-        
-    def remove_channel(self, channel):
-        if channel in self.channels: 
-            self.channels.remove(channel)
-            self.refresh_dataframe()
-
-    def play(self):
-        if not self.playing:
-            sd.play(self.audio_data, self.Fs)
-            self.playing = True
-        else:
-            self.stop()
-            
-    def stop(self):
-        if self.playing:
-            self.cursor = 0
-            sd.stop()
-            self.playing = False
-        else: 
-            print("Not playing")
-
+dpg.add_static_texture(30, 30, texture_c, parent="__demo_texture_container", tag="Texture_C", label="Texture_C")
 
 ###########################    Callback functions     ########################### 
 
@@ -109,7 +46,6 @@ def random_midi(sender, app_data, user_data):
     random_file = midi_path + "/" + midi_name
 
     load_midi(random_file, midi_path, midi_name)
-
 
 def select_file(sender, app_data, user_data):
     path = app_data['current_path']  # path to sound font file
@@ -126,8 +62,10 @@ def load_midi(midi_file, path, name):
     if inputMidi is not None: 
         inputMidi.stop()
 
-    # inputMidi = Midi(midi_file, path)
     inputMidi = MidiPlayer(midi_file, path)
+    def update_ui_cursor_callback(midiplayer: MidiPlayer):
+        dpg.set_value("ui_cursor", midiplayer.cursor[metric])
+    inputMidi.on_cursor_change_listeners.add(update_ui_cursor_callback)
 
     dpg.set_value("PlayText", "Selected: " + name)
     #dpg.set_item_label("PlayButton", "Play")
@@ -149,9 +87,8 @@ def play_midi(sender, app_data, user_data):
                 inputMidi.play()
                 dpg.set_item_label("PlayButton", "Pause")
         else:
-            if inputMidi.playing:
-                inputMidi.stop()
-                dpg.set_item_label("PlayButton", "Play")
+            inputMidi.stop()
+            dpg.set_item_label("PlayButton", "Play")
             
 
 def display(sender, app_data, user_data):
@@ -164,16 +101,18 @@ def display(sender, app_data, user_data):
 
         if not plot_displayed: 
             dpg.set_axis_limits("imgy", inputMidi.min_note - 1, inputMidi.max_note + 1)
-            # dpg.set_axis_limits("imgx", 0, inputMidi.length)
+            #dpg.set_axis_limits("imgx", 0, 100)
             # dpg.set_axis_limits_auto("imgx")
+            #dpg.set_axis_limits_auto("imgx")
                     
             plot_displayed = True
-
             if len(inputMidi.df) > 0:
-                df_copy = inputMidi.df[["ticks", "note", "ticks_duration"]]
+                metric_release = metric + "_release"
+                df_copy = inputMidi.df[[metric, "note", metric_release]]
                 for i, x in df_copy.iterrows():
-                    td = 0.2 if not x.ticks_duration else x.ticks_duration
-                    dpg.add_image_series("Texture_C", [x.ticks, x.note - 0.5], [x.ticks + td, x.note + 0.5], label="C", parent="imgy")
+                    
+                    tint = get_note_colour(x.note)
+                    dpg.add_image_series("Texture_C", [x[metric], x.note - 0.5], [x[metric_release], x.note + 0.5], label="C", parent="imgy", tint_color=tint)
                 
                 dpg.fit_axis_data("imgx")
 
@@ -182,21 +121,20 @@ def get_note_colour(note):
     mod_note = note % 12
 
     switcher = {
-        0: "zero", # C
-        1: "one",  # C#
-        2: "two",  # D
-        3: "zero", # D#
-        4: "one",  # E
-        5: "two",  # F
-        6: "zero", # F#
-        7: "one",  # G
-        8: "two",  # G#
-        9: "zero", # A 
-        10: "one", # A#
-        11: "two", # B
+        0: (255,0,0), # C
+        1: (255,127,0),  # C#
+        2: (255,255,0),  # D
+        3: (0,127,0), # D#
+        4: (0,255,0),  # E
+        5: (0,255,147),  # F
+        6: (0,255,255), # F#
+        7: (0,127,255),  # G
+        8: (0,0,255),  # G#
+        9: (127,0,255), # A 
+        10: (255,0,255), # A#
+        11: (255,0,127), # B
     }
-
-    return switcher.get(mod_note, "Texture_Default")
+    return switcher.get(mod_note, (255,255,255))
 
 def channel_selection(sender, app_data, user_data):
     if inputMidi is not None:
@@ -217,6 +155,11 @@ def set_scale(sender, app_data, user_data):
     print("scale: " + str(app_data))
 
 
+def ui_cursor_change(sender, app_data, user_data):
+    if inputMidi is not None:
+        idx_cursor = int(inputMidi.midiframe.converters["time"].to_time(dpg.get_value(sender)) * inputMidi.Fs)
+        inputMidi.update_cursor(idx_cursor)
+
 NOTE_COUNTS = set(i for i in range(5,13))
 GENERAL_SCALE_SUBSET = scales.create_general_scale_subset(NOTE_COUNTS)
 
@@ -227,6 +170,31 @@ def set_notecounts(sender, app_data, user_data):
         NOTE_COUNTS.remove(user_data)
     GENERAL_SCALE_SUBSET = scales.create_general_scale_subset(NOTE_COUNTS)
     print(f"note counts selected: {NOTE_COUNTS} | number of general scales: {len(GENERAL_SCALE_SUBSET)}")
+    print("note counts selected: " + str(user_data))
+
+# def view_change(sender, app_data, user_data):
+#     dpg.set_axis_limits("imgx", app_data, app_data + 100)
+
+def set_normalize(sender, app_data, user_data):
+    normalize = app_data
+
+def set_weighted(sender, app_data, user_data):
+    weighted = app_data
+
+def set_num_bars(sender, app_data, user_data):
+    global num_bars, win_position
+    if user_data:
+        num_bars = num_bars + 1
+    else:
+        num_bars = num_bars - 1
+
+    dpg.set_value("num_bars", num_bars)
+
+    win_position = int(dpg.get_value("drag_window"))
+    dpg.delete_item("drag_window")
+    dpg.add_drag_line(label="drag_window", color=[0, 164, 255, 50], tag="drag_window", parent="midiviz", default_value=win_position, thickness=num_bars)
+
+    
 
 ###########################    UI     ########################### 
 
@@ -241,6 +209,7 @@ with dpg.window(label="Improvisation Tool",
                 tag="primary_window",
                 no_title_bar=True, 
                 no_move=True):
+    
     with dpg.collapsing_header(label="Midi Player", default_open=True):
         with dpg.group(horizontal=True):
             dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog_id"))
@@ -252,9 +221,21 @@ with dpg.window(label="Improvisation Tool",
             dpg.add_button(label="Stop", callback=play_midi, tag="StopButton", user_data=False)
             dpg.add_button(label="Display", callback=display, tag="DisplayButton")
 
-        with dpg.plot(label="Midi Visualiser", height=200, width=-1):
+        with dpg.plot(label="Midi Visualiser", height=300, width=-1, tag="midiviz"):
             xaxis = dpg.add_plot_axis(dpg.mvXAxis, label="Time", tag="imgx")
             yaxis = dpg.add_plot_axis(dpg.mvYAxis, label="Note", tag="imgy")
+            dpg.add_drag_line(label="ui_cursor", 
+                                color=[100, 164, 255, 200], 
+                                tag="ui_cursor", 
+                                parent="midiviz", 
+                                default_value=0, 
+                                thickness=1,
+                                callback=ui_cursor_change)
+            
+
+        
+        # max_len = 100 if inputMidi is None else inputMidi.length
+        # dpg.add_slider_int(label="ViewSlider", max_value=max_len, callback=view_change)
 
 
     with dpg.collapsing_header(label="Midi Settings"):
@@ -265,6 +246,18 @@ with dpg.window(label="Improvisation Tool",
 
 
     with dpg.collapsing_header(label="Suggestion Settings"):
+        with dpg.group(horizontal=True): 
+            dpg.add_checkbox(label="Normalize Accuracy", callback=set_normalize, default_value=False)
+            dpg.add_checkbox(label="Weighted", callback=set_weighted, default_value=False)
+        with dpg.group(horizontal=True): 
+            # dpg.add_button(label="Choose Window", callback=show_window_select)
+            dpg.add_text("Bars: ")
+            dpg.add_button(arrow=True, direction=dpg.mvDir_Left, user_data=False, callback=set_num_bars)
+            dpg.add_text(str(num_bars), tag="num_bars")
+            dpg.add_button(arrow=True, direction=dpg.mvDir_Right, user_data=True, callback=set_num_bars)
+
+            # dpg.add_button(label="Apply", callback=apply_window)
+            dpg.add_text(label="WindowText", default_value="", tag="WindowText")
         with dpg.group():
             dpg.add_slider_float(label="Window Threshold", max_value=1.0, format="threshold = %.3f", callback=set_w_threshold)
             dpg.add_slider_float(label="Total Threshold", max_value=1.0, format="threshold = %.3f", callback=set_t_threshold)
@@ -273,7 +266,6 @@ with dpg.window(label="Improvisation Tool",
             dpg.add_text(label="label", default_value="Select amount of notes: ")
             for i in range(5,13):
                 dpg.add_checkbox(label=str(i), callback=set_notecounts, default_value=True, user_data=i)
-
 
     with dpg.collapsing_header(label="Suggestion"):
         dpg.add_text(label="label", default_value="Suggested Scales: ")

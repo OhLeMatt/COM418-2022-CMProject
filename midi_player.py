@@ -17,9 +17,14 @@ class MidiPlayer:
         self.file_name = file_name 
         self.path = path
         self.playing = False
-        self.cursor = 0
-        self.time_cursor = 0
-        self.df_cursor = 0
+        self.cursor = {
+            "idx": 0,
+            "time": 0,
+            "bartime": 0,
+            "ticks": 0
+        }
+        
+        self.on_cursor_change_listeners = set()
         
         self.channels = [i for i in range(16)]
         self.as_mido = mido.MidiFile(filename=self.file_name)
@@ -46,17 +51,17 @@ class MidiPlayer:
                     self.stop_now = True
                     raise sd.CallbackAbort()
                 elif not self.mute:
-                    sound = self.volume * self.audio_data[self.cursor:self.cursor+frame_count]
-                    outdata[:] = stereo_sound(sound, sound, min(1-self.balance, 1.0), min(1+self.balance, 1.0))
+                    sound = self.volume * self.audio_data[self.cursor["idx"]:self.cursor["idx"]+frame_count]
+                    outdata[:len(sound)] = stereo_sound(sound, sound, min(1-self.balance, 1.0), min(1+self.balance, 1.0))
             
-                self.update_cursor(self.cursor + frame_count)
+                self.update_cursor(self.cursor["idx"] + frame_count, call_listeners=True)
             self.ctx.callback_exit()
 
         self.output_callback = output_callback
     
         self.refresh_dataframe()
         
-
+    
     def refresh_dataframe(self):
         self.midiframe.make_playing_track_frame(self.channels)
         self.df = self.midiframe.playing_track_frame.dataframe
@@ -81,18 +86,24 @@ class MidiPlayer:
         if was_playing:
             self.play()
             
-    def update_cursor(self, cursor):
-        forward = cursor > self.cursor
-        self.cursor = cursor
-        self.time_cursor = self.cursor/self.Fs
-        if cursor == 0:
-            self.df_cursor = 0
-        elif forward:
-            while self.df.time.iloc[self.df_cursor] < self.time_cursor:
-                self.df_cursor += 1
-        else:
-            while self.df.time.iloc[self.df_cursor] > self.time_cursor:
-                self.df_cursor -= 1
+    def update_cursor(self, cursor, call_listeners=False):
+        if cursor != self.cursor["idx"]:
+            if cursor < 0:
+                cursor = 0
+            self.cursor["idx"] = cursor
+            self.cursor["time"] = self.cursor["idx"]/self.Fs
+            
+            if cursor == 0:
+                self.cursor["ticks"] = 0
+                self.cursor["bartime"] = 0
+            else:
+                self.cursor["ticks"] = self.midiframe.converters["time"].to_ticks(self.cursor["time"])
+                self.cursor["bartime"] = self.midiframe.converters["bartime"].to_bartime(self.cursor["ticks"])
+            
+            if call_listeners:
+                for callback in self.on_cursor_change_listeners:
+                    callback(self)
+        
         
         # print(self.df.iloc[self.df_cursor])
     def add_channel(self, channel):
@@ -111,16 +122,13 @@ class MidiPlayer:
             self.ctx.start_stream(sd.OutputStream, self.Fs, 2, 
                                 self.ctx.output_dtype, self.output_callback, False,
                                 prime_output_buffers_using_stream_callback=False)
-               
+            
     def pause(self):
         if self.playing:
             self.playing = False
             sd.stop()
 
     def stop(self):
-        if self.playing:
-            self.update_cursor(0)
-            self.playing = False
-            sd.stop()
-        else: 
-            print("Not playing")
+        self.update_cursor(0, call_listeners=True)
+        self.playing = False
+        sd.stop()
