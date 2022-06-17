@@ -1,6 +1,7 @@
 
 from pickle import GLOBAL
 import weakref
+from cv2 import threshold
 import dearpygui.dearpygui as dpg
 from sklearn import metrics
 from midi_frame import MidiFrame, MidiTrackFrame
@@ -14,7 +15,7 @@ import time
 
 
 ###########################    Init Variables     ########################### 
-inputMidi = None
+inputMidi:MidiPlayer = None
 
 MIDI_PATH = "MIDI_Files"
 MIDIFILES = [f for f in listdir(MIDI_PATH) if isfile(join(MIDI_PATH, f))]
@@ -48,7 +49,7 @@ dpg.create_context()
 
 dpg.add_texture_registry(label="Texture Container", tag="texture_container")
 dpg.add_static_texture(1, 1, [1,1,1,1], parent="texture_container", tag="Texture_C", label="Texture_C")
-dpg.add_static_texture(1, 1, [1,1,1,0.1], parent="texture_container", tag="TransparentWindowTexture", label="TransparentWindowTexture")
+dpg.add_static_texture(1, 1, [1,1,1,0.05], parent="texture_container", tag="TransparentWindowTexture", label="TransparentWindowTexture")
 
 ###########################    Callback & utility functions     ########################### 
 
@@ -74,14 +75,15 @@ def load_midi(midi_file, path, name):
 
     global inputMidi 
 
-    if inputMidi is not None: 
+    if inputMidi is not None:
         inputMidi.stop()
 
     inputMidi = MidiPlayer(midi_file, path)
-    inputMidi.on_cursor_change_listeners.append(update_ui_cursor)
-    inputMidi.on_cursor_change_listeners.append(update_ui_window)
+    inputMidi.on_cursor_change_callback = update_ui_cursor
+    inputMidi.on_window_change_callback = update_ui_window
+    inputMidi.on_analysis_change_callback = update_ui_suggestions
 
-    dpg.set_value("PlayText", "Selected: " + name)
+    dpg.set_value("PlayText", "Selected: " + name.replace(".mid", "").replace("_", " "))
     dpg.set_item_label("PlayButton", "Play")
     display(None, None, None)
     if not inputMidi.displayable:
@@ -154,14 +156,28 @@ def channel_selection(sender, app_data, user_data):
 def set_threshold(sender, app_data, user_data):
     global THRESHOLD
     THRESHOLD = app_data
+    if inputMidi is not None:
+        inputMidi.analysis_parameters["threshold"] = THRESHOLD
+
+def set_normalize(sender, app_data, user_data):
+    global NORMALIZE_SCORES
+    NORMALIZE_SCORES = app_data
+    if inputMidi is not None:
+        inputMidi.analysis_parameters["normalize_scores"] = NORMALIZE_SCORES
+
+def set_weighted(sender, app_data, user_data):
+    global WEIGHTED
+    WEIGHTED = app_data
+    display(None, None, None)
+    if inputMidi is not None:
+        inputMidi.analysis_parameters["weighted"] = WEIGHTED
 
 def set_scale(sender, app_data, user_data):
     print("scale: " + str(app_data))
 
 def ui_cursor_change(sender, app_data, user_data):
     if inputMidi is not None:
-        inputMidi.update_cursor(dpg.get_value(sender), metric=METRIC, exclude_listeners=[0])
-
+        inputMidi.update_cursor(dpg.get_value(sender), metric=METRIC, on_cursor_callback=False)
 
 def set_notecounts(sender, app_data, user_data):
     global NOTE_COUNTS, GENERAL_SCALE_SUBSET
@@ -170,21 +186,14 @@ def set_notecounts(sender, app_data, user_data):
     else:
         NOTE_COUNTS.remove(user_data)
     GENERAL_SCALE_SUBSET = scales.create_general_scale_subset(NOTE_COUNTS)
+    if inputMidi is not None:
+        inputMidi.analysis_parameters["general_scale_subset"] = GENERAL_SCALE_SUBSET
     print(f"note counts selected: {NOTE_COUNTS} | number of general scales: {len(GENERAL_SCALE_SUBSET)}")
     print("note counts selected: " + str(user_data))
 
 # def view_change(sender, app_data, user_data):
 #     dpg.set_axis_limits("imgx", app_data, app_data + 100)
 
-def set_normalize(sender, app_data, user_data):
-    global NORMALIZE
-    NORMALIZE = app_data
-
-def set_weighted(sender, app_data, user_data):
-    global WEIGHTED
-    WEIGHTED = app_data
-    print(WEIGHTED)
-    display(None, None, None)
 
 def set_metric(sender, app_data, user_data):
     global METRIC
@@ -200,9 +209,21 @@ def set_num_bars(sender, app_data, user_data):
     else:
         NUM_BARS = NUM_BARS - 1
     dpg.set_value("num_bars", NUM_BARS)
-    if inputMidi is not None:
+    if inputMidi is not None and not inputMidi.analysis_window_global:
         inputMidi.update_window(barsize=NUM_BARS)
-        update_ui_window(inputMidi)
+
+def entire_window(sender, app_data, user_data):
+    if inputMidi is not None:
+        if inputMidi.analysis_window_global:
+            inputMidi.set_entire_window(False)
+            dpg.set_item_label(sender, "Entire Window Suggestions")
+        else:
+            inputMidi.set_entire_window(True)
+            dpg.set_item_label(sender, "Cursor Window Suggestions")
+     
+def compute_suggestions(sender, app_data, user_data):
+    if inputMidi:
+        inputMidi.analyse()
 
 def update_ui_cursor(midiplayer: MidiPlayer):
     dpg.set_value("ui_cursor", midiplayer.cursor[METRIC])
@@ -213,35 +234,25 @@ def update_ui_window(midiplayer: MidiPlayer):
     WINDOW[1] = midiplayer.convert_unit(midiplayer.analysis_window[1], "bartime", METRIC)
     dpg.configure_item("ui_window", bounds_min=(WINDOW[0], 0), bounds_max=(WINDOW[1], 128))
 
-    # WIN_POSITION = int(dpg.get_value("drag_window"))
-    # dpg.delete_item("drag_window")
-    # dpg.add_drag_line(label="drag_window", color=[0, 164, 255, 50], tag="drag_window", parent="midiviz", default_value=WIN_POSITION, thickness=NUM_BARS)
+def update_ui_suggestions(midiplayer: MidiPlayer):
+    suggestions = midiplayer.get_suggestions()
 
-def remove_win(sender, app_data, user_data):
-    dpg.hide_item("ui_window")
+    dpg.delete_item("suggestion_content")
 
-def get_suggestion(sender, app_data, user_data):
-    if inputMidi is not None: 
-        suggestion = inputMidi.get_suggestion()
+    with dpg.table(header_row=False, tag="suggestion_content", parent="suggestion_tab"):
+        # use add_table_column to add columns to the table,
+        # table columns use slot 0
+        dpg.add_table_column()
+        dpg.add_table_column()
+        dpg.add_table_column()
+        dpg.add_table_column()
 
-        dpg.delete_item("suggestion_content")
-
-        with dpg.table(header_row=False, tag="suggestion_content", parent="suggestion_tab"):
-
-            
-            # use add_table_column to add columns to the table,
-            # table columns use slot 0
-            dpg.add_table_column()
-            dpg.add_table_column()
-            dpg.add_table_column()
-            dpg.add_table_column()
-
-            for i in range(len(suggestion)):
-                with dpg.table_row(parent="suggestion_content"):
-                        dpg.add_text(suggestion[i]["name"])
-                        dpg.add_text(suggestion[i]["accuracy"])
-                        dpg.add_text(suggestion[i]["note_count"])
-                        dpg.add_text(suggestion[i]["alternate_names"])
+        for scale, accuracy in suggestions.items():
+            with dpg.table_row(parent="suggestion_content"):
+                    dpg.add_text(repr(scale))
+                    dpg.add_text(f"{int(accuracy * 100)}%")
+                    dpg.add_text(scale.note_count)
+                    dpg.add_text(scale.name)
 
 
 
@@ -327,7 +338,7 @@ with dpg.window(label="Improvisation Tool",
         with dpg.group(horizontal=True): 
             dpg.add_checkbox(label="Normalize Accuracy", callback=set_normalize, default_value=False)
             dpg.add_checkbox(label="Weighted by Beat Importance", callback=set_weighted, default_value=False)
-        dpg.add_text("Compute suggestion over: ")
+        dpg.add_text("Compute suggestions over: ")
         with dpg.group(horizontal=True): 
             # dpg.add_button(label="Choose Window", callback=show_window_select)
             dpg.add_text("Bars: ")
@@ -338,7 +349,7 @@ with dpg.window(label="Improvisation Tool",
             # dpg.add_button(label="Apply", callback=apply_window)
             dpg.add_text(label="WindowText", default_value="", tag="WindowText")
             
-            dpg.add_button(label="Entire file", callback=remove_win)
+            dpg.add_button(label="Entire Window Suggestions", callback=entire_window)
         with dpg.group():
             dpg.add_slider_float(label="Accuracy Threshold", 
                                  max_value=1.0, 
@@ -351,8 +362,8 @@ with dpg.window(label="Improvisation Tool",
             for i in range(5,13):
                 dpg.add_checkbox(label=str(i), callback=set_notecounts, default_value=True, user_data=i)
 
-    with dpg.collapsing_header(label="Suggestion", tag="suggestion_tab"):
-        dpg.add_button(label="Compute Suggestion", callback=get_suggestion)
+    with dpg.collapsing_header(label="Suggestions", tag="suggestion_tab"):
+        dpg.add_button(label="Compute Suggestions", callback=compute_suggestions)
 
         with dpg.table(header_row=False, tag="suggestion_table"):
 
@@ -392,9 +403,12 @@ with dpg.window(label="Improvisation Tool",
 # FORCED INIT
 
 set_metric(None, "ticks", None)
-
 dpg.set_axis_ticks("imgy", tuple((mu.MIDI_NAMES[i], i) for i in range(0, 120, 12)))
 
+try:
+    load_midi(MidiFrame.EXPORT_DEFAULT_FILEPATH, "TMP_Files", "Last played")
+except:
+    pass
 
 dpg.create_viewport(title='Improvisation Helper', width=1000, height=600)
 dpg.set_primary_window("primary_window", True)
