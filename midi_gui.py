@@ -50,7 +50,7 @@ dpg.add_texture_registry(label="Texture Container", tag="texture_container")
 dpg.add_static_texture(1, 1, [1,1,1,1], parent="texture_container", tag="Texture_C", label="Texture_C")
 dpg.add_static_texture(1, 1, [1,1,1,0.1], parent="texture_container", tag="TransparentWindowTexture", label="TransparentWindowTexture")
 
-###########################    Callback functions     ########################### 
+###########################    Callback & utility functions     ########################### 
 
 def _log(sender, app_data, user_data):
     print(f"sender: {sender}, \t app_data: {app_data}, \t user_data: {user_data}")
@@ -193,6 +193,7 @@ def set_metric(sender, app_data, user_data):
     display(None, None, None)
 
 def set_num_bars(sender, app_data, user_data):
+    dpg.show_item("ui_window")
     global NUM_BARS, METRIC
     if user_data:
         NUM_BARS = NUM_BARS + 1
@@ -215,6 +216,10 @@ def update_ui_window(midiplayer: MidiPlayer):
     # WIN_POSITION = int(dpg.get_value("drag_window"))
     # dpg.delete_item("drag_window")
     # dpg.add_drag_line(label="drag_window", color=[0, 164, 255, 50], tag="drag_window", parent="midiviz", default_value=WIN_POSITION, thickness=NUM_BARS)
+
+def remove_win(sender, app_data, user_data):
+    dpg.hide_item("ui_window")
+
 
 ###########################    UI     ########################### 
 
@@ -270,6 +275,7 @@ with dpg.window(label="Improvisation Tool",
         with dpg.group(horizontal=True): 
             dpg.add_checkbox(label="Normalize Accuracy", callback=set_normalize, default_value=False)
             dpg.add_checkbox(label="Weighted by Beat Importance", callback=set_weighted, default_value=False)
+        dpg.add_text("Compute suggestion over: ")
         with dpg.group(horizontal=True): 
             # dpg.add_button(label="Choose Window", callback=show_window_select)
             dpg.add_text("Bars: ")
@@ -279,6 +285,8 @@ with dpg.window(label="Improvisation Tool",
 
             # dpg.add_button(label="Apply", callback=apply_window)
             dpg.add_text(label="WindowText", default_value="", tag="WindowText")
+            
+            dpg.add_button(label="Entire file", callback=remove_win)
         with dpg.group():
             dpg.add_slider_float(label="Accuracy Threshold", 
                                  max_value=1.0, 
