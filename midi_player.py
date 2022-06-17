@@ -1,7 +1,7 @@
 
 from math import ceil
 from xmlrpc.client import Boolean
-from cv2 import threshold
+#from cv2 import threshold
 from jinja2 import TemplateRuntimeError
 import mido
 import midi_utils as mu
@@ -245,3 +245,5 @@ class MidiPlayer:
 
         return self.analysis_suggestions
         
+    def set_volume(self, volume):
+        self.volume = max(min(volume, 10.0), 0.0)/10

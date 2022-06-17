@@ -1,7 +1,7 @@
 
 from pickle import GLOBAL
 import weakref
-from cv2 import threshold
+#from cv2 import threshold
 import dearpygui.dearpygui as dpg
 from sklearn import metrics
 from midi_frame import MidiFrame, MidiTrackFrame
@@ -116,10 +116,6 @@ def load_midi(midi_file, path, name):
     dpg.set_item_label("PlayButton", "Play")
     
     display(None, None, None)
-    if not inputMidi.displayable:
-        dpg.set_value("WarningText", "Warning: this midi file is not displayable")
-    else:
-        dpg.set_value("WarningText", "")
     
     
 
@@ -246,7 +242,7 @@ def set_num_bars(sender, app_data, user_data):
 def set_volume(sender, app_data, user_data):
     if inputMidi is not None: 
         inputMidi.set_volume(app_data)
-        
+
 def entire_window(sender, app_data, user_data):
     if inputMidi is not None:
         if inputMidi.analysis_window_global:
@@ -279,12 +275,12 @@ with dpg.window(label="Improvisation Tool",
             dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog_id"))
             dpg.add_button(label="Random", callback=random_midi)
         dpg.add_text(label="PlayText", default_value="No file selected", tag="PlayText")
-        dpg.add_text(label="WarningText", default_value="", tag="WarningText")
+        #dpg.add_text(label="WarningText", default_value="", tag="WarningText")
         with dpg.group(horizontal=True):
             dpg.add_button(label="Play", callback=play_midi, tag="PlayButton", user_data=True)
             dpg.add_button(label="Stop", callback=play_midi, tag="StopButton", user_data=False)
             dpg.add_button(label="Reset Display", callback=display, tag="DisplayButton")
-            dpg.add_drag_int(format="volume = %d ", tag="volume", min_value=0, max_value=10, default_value=1, callback=set_volume, width=100)
+            dpg.add_slider_int(format="volume = %d ", tag="volume", min_value=0, max_value=10, default_value=1, callback=set_volume, width=100)
             dpg.add_combo(("ticks", "time", "bartime"), label="", tag="MetricSelector", default_value="ticks", callback=set_metric, width=80)
             dpg.add_text("colour code")
             with dpg.tooltip(dpg.last_item()):
@@ -293,13 +289,12 @@ with dpg.window(label="Improvisation Tool",
                         dpg.add_table_column()
                    
                     with dpg.table_row():
-                        for name in mu.CHROMA_NAMES:
+                        for name in mu.CHROMA_SHARP_NAMES:
                             dpg.add_text(name)
 
                     with dpg.table_row():
                         for colour in NOTE_COLORS:
                             dpg.add_image("Texture_C", width=15, height=15, tint_color=tuple(colour))
-
 
 
 
