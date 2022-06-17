@@ -38,13 +38,13 @@ class MidiPlayer:
         }
     
         self.analysis_window_global = False
-        self.analysis_last_bar = -1
+        self.analysis_last_bar = -10
         self.analysis_window = [-2, 2]
         self.analysis_window_extent = [2, 2]
         
-        self.on_cursor_change_callback = lambda midiplayer: None
-        self.on_window_change_callback = lambda midiplayer: None
-        self.on_analysis_change_callback = lambda midiplayer: None
+        self.on_cursor_change_callback = lambda midiplayer: print("No on cursor change callback")
+        self.on_window_change_callback = lambda midiplayer: print("No on window change callback")
+        self.on_analysis_change_callback = lambda midiplayer: print("No on analysis change callback")
         self.general_scale_subset = scales.ALL_GENERAL_SCALES
         
         self.channels = [i for i in range(16)]
@@ -134,9 +134,11 @@ class MidiPlayer:
             self.cursor["time"] = self.midiframe.converters["time"].to_time(self.cursor["ticks"])
             self.cursor["idx"] = int(self.cursor["time"] * self.Fs)
         
+        
         if int(self.cursor["bartime"]) != self.analysis_last_bar:
             self.analysis_last_bar = int(self.cursor["bartime"])
             if not self.analysis_window_global:
+                
                 self.update_window(on_window_call_back=on_window_call_back)
          
         if on_cursor_callback:
@@ -144,6 +146,7 @@ class MidiPlayer:
     
     def update_window(self, barsize=None, on_window_call_back=True):
         if self.analysis_active:
+            
             if barsize is not None:
                 self.analysis_window_extent[1] = barsize//2
                 self.analysis_window_extent[0] = barsize - self.analysis_window_extent[1]
@@ -165,10 +168,13 @@ class MidiPlayer:
     
     def analyse(self):
         if self.analysis_active:
-            self.analysis_suggestions = self.midiframe.playing_track_frame\
-                .suggest_scale(self.analysis_window[0],
-                               self.analysis_window[1],
-                               **self.analysis_parameters)        
+            if self.analysis_window_global:
+                pass
+            else:
+                self.analysis_suggestions = self.midiframe.playing_track_frame\
+                    .suggest_scale(self.analysis_window[0],
+                                self.analysis_window[1],
+                                **self.analysis_parameters)        
             self.on_analysis_change_callback(self)
     
     def convert_unit(self, value, from_metric, to_metric):

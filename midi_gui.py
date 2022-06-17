@@ -55,8 +55,37 @@ dpg.add_static_texture(1, 1, [1,1,1,0.05], parent="texture_container", tag="Tran
 
 def _log(sender, app_data, user_data):
     print(f"sender: {sender}, \t app_data: {app_data}, \t user_data: {user_data}")
-        
-        
+
+def update_ui_cursor(midiplayer: MidiPlayer):
+    dpg.set_value("ui_cursor", midiplayer.cursor[METRIC])
+
+def update_ui_window(midiplayer: MidiPlayer):
+    global WINDOW, METRIC
+    WINDOW[0] = midiplayer.convert_unit(midiplayer.analysis_window[0], "bartime", METRIC)
+    WINDOW[1] = midiplayer.convert_unit(midiplayer.analysis_window[1], "bartime", METRIC)
+    
+    dpg.configure_item("ui_window", bounds_min=(WINDOW[0], 0), bounds_max=(WINDOW[1], 128))
+
+def update_ui_suggestions(midiplayer: MidiPlayer):
+    suggestions = midiplayer.get_suggestions()
+
+    dpg.delete_item("suggestion_content")
+
+    with dpg.table(header_row=False, tag="suggestion_content", parent="suggestion_tab"):
+        # use add_table_column to add columns to the table,
+        # table columns use slot 0
+        dpg.add_table_column()
+        dpg.add_table_column()
+        dpg.add_table_column()
+        dpg.add_table_column()
+
+        for scale, accuracy in suggestions.items():
+            with dpg.table_row(parent="suggestion_content"):
+                    dpg.add_text(repr(scale))
+                    dpg.add_text(f"{int(accuracy * 100)}%")
+                    dpg.add_text(scale.note_count)
+                    dpg.add_text(scale.name)
+           
 def random_midi(sender, app_data, user_data):
     midi_name = random.choice(MIDIFILES)
     random_file = MIDI_PATH + "/" + midi_name
@@ -85,11 +114,13 @@ def load_midi(midi_file, path, name):
 
     dpg.set_value("PlayText", "Selected: " + name.replace(".mid", "").replace("_", " "))
     dpg.set_item_label("PlayButton", "Play")
+    
     display(None, None, None)
     if not inputMidi.displayable:
         dpg.set_value("WarningText", "Warning: this midi file is not displayable")
     else:
         dpg.set_value("WarningText", "")
+    
     
 
 def play_midi(sender, app_data, user_data):
@@ -225,36 +256,6 @@ def compute_suggestions(sender, app_data, user_data):
     if inputMidi:
         inputMidi.analyse()
 
-def update_ui_cursor(midiplayer: MidiPlayer):
-    dpg.set_value("ui_cursor", midiplayer.cursor[METRIC])
-
-def update_ui_window(midiplayer: MidiPlayer):
-    global WINDOW, METRIC
-    WINDOW[0] = midiplayer.convert_unit(midiplayer.analysis_window[0], "bartime", METRIC)
-    WINDOW[1] = midiplayer.convert_unit(midiplayer.analysis_window[1], "bartime", METRIC)
-    dpg.configure_item("ui_window", bounds_min=(WINDOW[0], 0), bounds_max=(WINDOW[1], 128))
-
-def update_ui_suggestions(midiplayer: MidiPlayer):
-    suggestions = midiplayer.get_suggestions()
-
-    dpg.delete_item("suggestion_content")
-
-    with dpg.table(header_row=False, tag="suggestion_content", parent="suggestion_tab"):
-        # use add_table_column to add columns to the table,
-        # table columns use slot 0
-        dpg.add_table_column()
-        dpg.add_table_column()
-        dpg.add_table_column()
-        dpg.add_table_column()
-
-        for scale, accuracy in suggestions.items():
-            with dpg.table_row(parent="suggestion_content"):
-                    dpg.add_text(repr(scale))
-                    dpg.add_text(f"{int(accuracy * 100)}%")
-                    dpg.add_text(scale.note_count)
-                    dpg.add_text(scale.name)
-
-
 
 ###########################    UI     ########################### 
 
@@ -279,31 +280,20 @@ with dpg.window(label="Improvisation Tool",
             dpg.add_button(label="Play", callback=play_midi, tag="PlayButton", user_data=True)
             dpg.add_button(label="Stop", callback=play_midi, tag="StopButton", user_data=False)
             dpg.add_button(label="Display", callback=display, tag="DisplayButton")
-            dpg.add_combo(("ticks", "time", "bartime"), label="MetricSelector", tag="MetricSelector", default_value="ticks", callback=set_metric)
+            dpg.add_combo(("ticks", "time", "bartime"), label="", tag="MetricSelector", default_value="ticks", callback=set_metric, width=80)
             dpg.add_text("colour code")
             with dpg.tooltip(dpg.last_item()):
                 with dpg.table(tag="colour-code", header_row=False):
-                    
                     for i in range(12):
                         dpg.add_table_column()
                    
                     with dpg.table_row():
-                        dpg.add_text("C")
-                        dpg.add_text("C#")
-                        dpg.add_text("D")
-                        dpg.add_text("D#")
-                        dpg.add_text("E")
-                        dpg.add_text("F")
-                        dpg.add_text("F#")
-                        dpg.add_text("G")
-                        dpg.add_text("G#")
-                        dpg.add_text("A")
-                        dpg.add_text("A#")
-                        dpg.add_text("B")
+                        for name in mu.CHROMA_NAMES:
+                            dpg.add_text(name)
 
                     with dpg.table_row():
                         for colour in NOTE_COLORS:
-                            dpg.add_image("Texture_C", tint_color=tuple(colour))
+                            dpg.add_image("Texture_C", width=15, height=15, tint_color=tuple(colour))
 
 
 
@@ -386,24 +376,11 @@ with dpg.window(label="Improvisation Tool",
             dpg.add_table_column()
             
 
-
-        # with dpg.group(horizontal=True):
-        #     dpg.add_text(label="label", default_value="None", tag="scale_suggestion_text_0")
-        #     dpg.add_text(label="label", default_value="       ")
-        #     dpg.add_text(label="label", default_value="Accuracy: ")
-        #     dpg.add_text(label="label", default_value="0", tag="suggestion accuracy_0")
-        #     dpg.add_text(label="label", default_value="%")
-        # with dpg.group(horizontal=True):
-        #     dpg.add_text(label="label", default_value="Other", tag="scale_suggestion_text_1")
-        #     dpg.add_text(label="label", default_value="       ")
-        #     dpg.add_text(label="label", default_value="Accuracy: ")
-        #     dpg.add_text(label="label", default_value="23", tag="suggestion accuracy_1")
-        #     dpg.add_text(label="label", default_value="%")
-
 # FORCED INIT
 
-set_metric(None, "ticks", None)
+
 dpg.set_axis_ticks("imgy", tuple((mu.MIDI_NAMES[i], i) for i in range(0, 120, 12)))
+set_metric(None, "bartime", None)
 
 try:
     load_midi(MidiFrame.EXPORT_DEFAULT_FILEPATH, "TMP_Files", "Last played")
