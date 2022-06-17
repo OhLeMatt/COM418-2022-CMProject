@@ -393,8 +393,7 @@ with dpg.window(label="Improvisation Tool",
     with dpg.collapsing_header(label="Chords", tag="chords_tab"):
         dpg.add_text("No scale selected", tag="selected_scale_text")
         
-        all_scales = ("A","B","C","D","E","F","G","H","I","J","K","L","M" "O","P","Q","R","S","T","U","V","W","X","Y","Z")
-        dpg.add_listbox(all_scales, label="All scales", callback=select_scale_from_all)
+        dpg.add_listbox(GENERAL_SCALE_SUBSET, label="All scales", callback=select_scale_from_all)
 
 # FORCED INIT
 
