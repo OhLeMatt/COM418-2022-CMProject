@@ -1,6 +1,8 @@
 
 from pickle import GLOBAL
+import weakref
 import dearpygui.dearpygui as dpg
+from sklearn import metrics
 from midi_frame import MidiFrame, MidiTrackFrame
 from midi_player import MidiPlayer
 import scales
@@ -12,30 +14,41 @@ import time
 
 
 ###########################    Init Variables     ########################### 
+inputMidi = None
 
 MIDI_PATH = "MIDI_Files"
 MIDIFILES = [f for f in listdir(MIDI_PATH) if isfile(join(MIDI_PATH, f))]
 PLOT_DISPLAYED = False
-inputMidi = None
 NORMALIZE_SCORES = False
-WEIGHTED = True
+WEIGHTED = False
+THRESHOLD = 0.9
 METRIC = "ticks"
-WINDOW = [0,100]
+BAR_WINDOW = [0,0]
+WINDOW = [0,0]
 WIN_POSITION = 10000
-NUM_BARS = 100
-
-## create static textures
-texture_c = []
-for i in range(30*30):
-    texture_c.append(255/255)
-    texture_c.append(255/255)
-    texture_c.append(255/255)
-    texture_c.append(255/255)
+NUM_BARS = 4
+NOTE_COUNTS = set(i for i in range(5,13))
+GENERAL_SCALE_SUBSET = scales.create_general_scale_subset(NOTE_COUNTS)
+NOTE_COLORS = [
+        [255,0,0], # C
+        [255,127,0],  # C#
+        [255,255,0],  # D
+        [0,127,0], # D#
+        [0,255,0],  # E
+        [0,255,147],  # F
+        [0,255,255], # F#
+        [0,127,255],  # G
+        [0,0,255], # G#
+        [127,0,255], # A 
+        [255,0,255], # A#
+        [255,0,127] # B
+    ]
 
 dpg.create_context()
 
-dpg.add_texture_registry(label="Demo Texture Container", tag="__demo_texture_container")
-dpg.add_static_texture(30, 30, texture_c, parent="__demo_texture_container", tag="Texture_C", label="Texture_C")
+dpg.add_texture_registry(label="Texture Container", tag="texture_container")
+dpg.add_static_texture(1, 1, [1,1,1,1], parent="texture_container", tag="Texture_C", label="Texture_C")
+dpg.add_static_texture(1, 1, [1,1,1,0.1], parent="texture_container", tag="TransparentWindowTexture", label="TransparentWindowTexture")
 
 ###########################    Callback functions     ########################### 
 
@@ -65,12 +78,11 @@ def load_midi(midi_file, path, name):
         inputMidi.stop()
 
     inputMidi = MidiPlayer(midi_file, path)
-    def update_ui_cursor_callback(midiplayer: MidiPlayer):
-        dpg.set_value("ui_cursor", midiplayer.cursor[METRIC])
-    inputMidi.on_cursor_change_listeners.add(update_ui_cursor_callback)
+    inputMidi.on_cursor_change_listeners.append(update_ui_cursor)
+    inputMidi.on_cursor_change_listeners.append(update_ui_window)
 
     dpg.set_value("PlayText", "Selected: " + name)
-    #dpg.set_item_label("PlayButton", "Play")
+    dpg.set_item_label("PlayButton", "Play")
     display(None, None, None)
     if not inputMidi.displayable:
         dpg.set_value("WarningText", "Warning: this midi file is not displayable")
@@ -95,7 +107,7 @@ def play_midi(sender, app_data, user_data):
 
 def display(sender, app_data, user_data):
     if inputMidi is not None and inputMidi.displayable:
-        global PLOT_DISPLAYED
+        global PLOT_DISPLAYED, METRIC, WEIGHTED
 
         if PLOT_DISPLAYED:
             dpg.delete_item("imgy", children_only=True)
@@ -110,33 +122,23 @@ def display(sender, app_data, user_data):
             PLOT_DISPLAYED = True
             if len(inputMidi.df) > 0:
                 metric_release = METRIC + "_release"
-                df_copy = inputMidi.df[[METRIC, "note", metric_release]]
+                df_copy = inputMidi.df[[METRIC, "note", metric_release, "weight"]]
                 for i, x in df_copy.iterrows():
                     
                     tint = get_note_colour(x.note)
-                    dpg.add_image_series("Texture_C", [x[METRIC], x.note - 0.5], [x[metric_release], x.note + 0.5], label="C", parent="imgy", tint_color=tint)
-                
+                    if WEIGHTED:
+                        tint[0] *= x.weight
+                        tint[1] *= x.weight
+                        tint[2] *= x.weight
+                    
+                    dpg.add_image_series("Texture_C", 
+                                         [x[METRIC], x.note - 0.5], [x[metric_release], x.note + 0.5], 
+                                         label="C", tag=f"MidiNote{i}", parent="imgy", tint_color=tuple(tint))
                 dpg.fit_axis_data("imgx")
 
 # Get colour texture for each note (in progress)
 def get_note_colour(note):
-    mod_note = note % 12
-
-    switcher = {
-        0: (255,0,0), # C
-        1: (255,127,0),  # C#
-        2: (255,255,0),  # D
-        3: (0,127,0), # D#
-        4: (0,255,0),  # E
-        5: (0,255,147),  # F
-        6: (0,255,255), # F#
-        7: (0,127,255),  # G
-        8: (0,0,255),  # G#
-        9: (127,0,255), # A 
-        10: (255,0,255), # A#
-        11: (255,0,127), # B
-    }
-    return switcher.get(mod_note, (255,255,255))
+    return NOTE_COLORS[int(note) % 12].copy()
 
 def channel_selection(sender, app_data, user_data):
     if inputMidi is not None:
@@ -149,22 +151,17 @@ def channel_selection(sender, app_data, user_data):
             display(None, None, None)
         print("channels: " + str(inputMidi.channels))
 
-def set_w_threshold(sender, app_data, user_data):
-    print("threshold: " + str(app_data))
-
-def set_t_threshold(sender, app_data, user_data):
-    print("threshold: " + str(app_data))
+def set_threshold(sender, app_data, user_data):
+    global THRESHOLD
+    THRESHOLD = app_data
 
 def set_scale(sender, app_data, user_data):
     print("scale: " + str(app_data))
 
-
 def ui_cursor_change(sender, app_data, user_data):
     if inputMidi is not None:
-        inputMidi.update_cursor(dpg.get_value(sender), metric=METRIC)
+        inputMidi.update_cursor(dpg.get_value(sender), metric=METRIC, exclude_listeners=[0])
 
-NOTE_COUNTS = set(i for i in range(5,13))
-GENERAL_SCALE_SUBSET = scales.create_general_scale_subset(NOTE_COUNTS)
 
 def set_notecounts(sender, app_data, user_data):
     global NOTE_COUNTS, GENERAL_SCALE_SUBSET
@@ -186,6 +183,8 @@ def set_normalize(sender, app_data, user_data):
 def set_weighted(sender, app_data, user_data):
     global WEIGHTED
     WEIGHTED = app_data
+    print(WEIGHTED)
+    display(None, None, None)
 
 def set_metric(sender, app_data, user_data):
     global METRIC
@@ -194,17 +193,28 @@ def set_metric(sender, app_data, user_data):
     display(None, None, None)
 
 def set_num_bars(sender, app_data, user_data):
-    global NUM_BARS, WIN_POSITION
+    global NUM_BARS, METRIC
     if user_data:
         NUM_BARS = NUM_BARS + 1
     else:
         NUM_BARS = NUM_BARS - 1
-
     dpg.set_value("num_bars", NUM_BARS)
+    if inputMidi is not None:
+        inputMidi.update_window(barsize=NUM_BARS)
+        update_ui_window(inputMidi)
 
-    WIN_POSITION = int(dpg.get_value("drag_window"))
-    dpg.delete_item("drag_window")
-    dpg.add_drag_line(label="drag_window", color=[0, 164, 255, 50], tag="drag_window", parent="midiviz", default_value=WIN_POSITION, thickness=NUM_BARS)
+def update_ui_cursor(midiplayer: MidiPlayer):
+    dpg.set_value("ui_cursor", midiplayer.cursor[METRIC])
+
+def update_ui_window(midiplayer: MidiPlayer):
+    global WINDOW, METRIC
+    WINDOW[0] = midiplayer.convert_unit(midiplayer.analysis_window[0], "bartime", METRIC)
+    WINDOW[1] = midiplayer.convert_unit(midiplayer.analysis_window[1], "bartime", METRIC)
+    dpg.configure_item("ui_window", bounds_min=(WINDOW[0], 0), bounds_max=(WINDOW[1], 128))
+
+    # WIN_POSITION = int(dpg.get_value("drag_window"))
+    # dpg.delete_item("drag_window")
+    # dpg.add_drag_line(label="drag_window", color=[0, 164, 255, 50], tag="drag_window", parent="midiviz", default_value=WIN_POSITION, thickness=NUM_BARS)
 
 ###########################    UI     ########################### 
 
@@ -231,6 +241,7 @@ with dpg.window(label="Improvisation Tool",
             dpg.add_button(label="Display", callback=display, tag="DisplayButton")
             dpg.add_combo(("ticks", "time", "bartime"), label="MetricSelector", tag="MetricSelector", default_value="ticks", callback=set_metric)
         with dpg.plot(label="Midi Visualiser", height=400, width=-1, tag="midiviz"):
+            
             xaxis = dpg.add_plot_axis(dpg.mvXAxis, label="Time", tag="imgx")
             yaxis = dpg.add_plot_axis(dpg.mvYAxis, label="Note", tag="imgy")
             dpg.add_drag_line(label="ui_cursor",
@@ -240,6 +251,9 @@ with dpg.window(label="Improvisation Tool",
                                 default_value=0,
                                 thickness=1,
                                 callback=ui_cursor_change)
+            dpg.add_image_series("TransparentWindowTexture", 
+                                 [0, 0], [1,128], 
+                                 tag="ui_window", parent="imgx")
         
         # max_len = 100 if inputMidi is None else inputMidi.length
         # dpg.add_slider_int(label="ViewSlider", max_value=max_len, callback=view_change)
@@ -255,7 +269,7 @@ with dpg.window(label="Improvisation Tool",
     with dpg.collapsing_header(label="Suggestion Settings"):
         with dpg.group(horizontal=True): 
             dpg.add_checkbox(label="Normalize Accuracy", callback=set_normalize, default_value=False)
-            dpg.add_checkbox(label="Weighted", callback=set_weighted, default_value=False)
+            dpg.add_checkbox(label="Weighted by Beat Importance", callback=set_weighted, default_value=False)
         with dpg.group(horizontal=True): 
             # dpg.add_button(label="Choose Window", callback=show_window_select)
             dpg.add_text("Bars: ")
@@ -266,8 +280,11 @@ with dpg.window(label="Improvisation Tool",
             # dpg.add_button(label="Apply", callback=apply_window)
             dpg.add_text(label="WindowText", default_value="", tag="WindowText")
         with dpg.group():
-            dpg.add_slider_float(label="Window Threshold", max_value=1.0, format="threshold = %.3f", callback=set_w_threshold)
-            dpg.add_slider_float(label="Total Threshold", max_value=1.0, format="threshold = %.3f", callback=set_t_threshold)
+            dpg.add_slider_float(label="Accuracy Threshold", 
+                                 max_value=1.0, 
+                                 format="threshold = %.3f", 
+                                 callback=set_threshold, 
+                                 default_value=0.9)
 
         with dpg.group(horizontal=True): 
             dpg.add_text(label="label", default_value="Select amount of notes: ")
@@ -292,6 +309,7 @@ with dpg.window(label="Improvisation Tool",
 # FORCED INIT
 
 set_metric(None, "ticks", None)
+
 dpg.set_axis_ticks("imgy", tuple((mu.MIDI_NAMES[i], i) for i in range(0, 120, 12)))
 
 

@@ -24,8 +24,10 @@ class MidiPlayer:
             "bartime": 0,
             "ticks": 0
         }
+        self.analysis_window = [0, 0]
+        self.analysis_window_extent = [-2, 2]
         
-        self.on_cursor_change_listeners = set()
+        self.on_cursor_change_listeners = []
         
         self.channels = [i for i in range(16)]
         self.as_mido = mido.MidiFile(filename=self.file_name)
@@ -39,6 +41,7 @@ class MidiPlayer:
         self.volume = volume
         
         self.balance = 0
+        
         
         self.ctx = sd._CallbackContext(loop=False)
         self.ctx.output_channels = 2
@@ -55,7 +58,7 @@ class MidiPlayer:
                     sound = self.volume * self.audio_data[self.cursor["idx"]:self.cursor["idx"]+frame_count]
                     outdata[:len(sound)] = stereo_sound(sound, sound, min(1-self.balance, 1.0), min(1+self.balance, 1.0))
             
-                self.update_cursor(self.cursor["idx"] + frame_count, call_listeners=True)
+                self.update_cursor(self.cursor["idx"] + frame_count, exclude_listeners=False)
             self.ctx.callback_exit()
 
         self.output_callback = output_callback
@@ -87,7 +90,7 @@ class MidiPlayer:
         if was_playing:
             self.play()
             
-    def update_cursor(self, cursor, metric="idx", call_listeners=False):
+    def update_cursor(self, cursor, metric="idx", exclude_listeners=True):
         if cursor <= 0:
             for k in self.cursor:
                 self.cursor[k] = 0
@@ -115,12 +118,54 @@ class MidiPlayer:
             self.cursor["ticks"] = self.midiframe.converters["bartime"].to_ticks(self.cursor["bartime"])
             self.cursor["time"] = self.midiframe.converters["time"].to_time(self.cursor["ticks"])
             self.cursor["idx"] = int(self.cursor["time"] * self.Fs)
-            
-        if call_listeners:
+        
+        self.update_window()   
+         
+        if exclude_listeners == False:
             for callback in self.on_cursor_change_listeners:
                 callback(self)
+        elif type(exclude_listeners) is list:
+            for listener_index, callback in enumerate(self.on_cursor_change_listeners):
+                if listener_index not in exclude_listeners:
+                    callback(self)
     
-        # print(self.df.iloc[self.df_cursor])
+    def update_window(self, barsize=None):
+        if barsize is not None:
+            self.analysis_window_extent[1] = barsize//2
+            self.analysis_window_extent[0] = barsize - self.analysis_window_extent[1]
+        self.analysis_window[0] = int(self.cursor["bartime"]) - self.analysis_window_extent[0]
+        self.analysis_window[1] = int(self.cursor["bartime"]) + self.analysis_window_extent[1]
+        
+    def convert_unit(self, value, from_metric, to_metric):
+        if from_metric == to_metric:
+            return value
+        if from_metric == "bartime":
+            ticks = self.midiframe.converters["bartime"].to_ticks(value)
+            if to_metric == "ticks":
+                return ticks
+            else:
+                time = self.midiframe.converters["time"].to_time(ticks)
+                return time if to_metric == "time" else int(time * self.Fs)
+        elif from_metric == "ticks":
+            if to_metric == "bartime":
+                return self.midiframe.converters["bartime"].to_bartime(value)
+            else:
+                time = self.midiframe.converters["time"].to_time(value)
+                return time if to_metric == "time" else int(time * self.Fs)
+        elif from_metric == "time":
+            if to_metric in ("ticks", "bartime"):
+                ticks = self.midiframe.converters["time"].to_ticks(value)
+                return ticks if to_metric == "ticks" else self.midiframe.converters["bartime"].to_bartime(ticks)
+            else:
+                return int(value * self.Fs)
+        elif from_metric == "idx":
+            time = value / self.Fs
+            if to_metric == "time":
+                return time
+            else:
+                ticks = self.midiframe.converters["time"].to_ticks(time)
+                return ticks if to_metric == "ticks" else self.midiframe.converters["bartime"].to_bartime(ticks)
+            
     def add_channel(self, channel):
         if channel not in self.channels: 
             self.channels.append(channel)
@@ -148,6 +193,6 @@ class MidiPlayer:
             sd.stop()
 
     def stop(self):
-        self.update_cursor(0, call_listeners=True)
+        self.update_cursor(0, exclude_listeners=False)
         self.playing = False
         sd.stop()
