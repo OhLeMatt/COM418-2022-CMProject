@@ -196,3 +196,11 @@ class MidiPlayer:
         self.update_cursor(0, exclude_listeners=False)
         self.playing = False
         sd.stop()
+
+    def get_suggestion(self):
+        dummy = [{"name": "Hard Japan descending", "accuracy": 0.9, "note_count": 5, "alternate_names": "Raga Malkauns, Blues Pentatonic Minor"}, 
+        {"name": "Enigmatic Descending", "accuracy": 0.78, "note_count": 7, "alternate_names": "Katadianas"}, 
+        {"name": "Major Lydian", "accuracy": 0.53, "note_count": 8, "alternate_names": "Genus Diatonicum Veterum Correctum, Zylyllic, Ishikotsucho (Japan)"}]
+
+        return dummy 
+        

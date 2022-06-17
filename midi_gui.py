@@ -220,6 +220,30 @@ def update_ui_window(midiplayer: MidiPlayer):
 def remove_win(sender, app_data, user_data):
     dpg.hide_item("ui_window")
 
+def get_suggestion(sender, app_data, user_data):
+    if inputMidi is not None: 
+        suggestion = inputMidi.get_suggestion()
+
+        dpg.delete_item("suggestion_content")
+
+        with dpg.table(header_row=False, tag="suggestion_content", parent="suggestion_tab"):
+
+            
+            # use add_table_column to add columns to the table,
+            # table columns use slot 0
+            dpg.add_table_column()
+            dpg.add_table_column()
+            dpg.add_table_column()
+            dpg.add_table_column()
+
+            for i in range(len(suggestion)):
+                with dpg.table_row(parent="suggestion_content"):
+                        dpg.add_text(suggestion[i]["name"])
+                        dpg.add_text(suggestion[i]["accuracy"])
+                        dpg.add_text(suggestion[i]["note_count"])
+                        dpg.add_text(suggestion[i]["alternate_names"])
+
+
 
 ###########################    UI     ########################### 
 
@@ -299,20 +323,43 @@ with dpg.window(label="Improvisation Tool",
             for i in range(5,13):
                 dpg.add_checkbox(label=str(i), callback=set_notecounts, default_value=True, user_data=i)
 
-    with dpg.collapsing_header(label="Suggestion"):
-        dpg.add_text(label="label", default_value="Suggested Scales: ")
-        with dpg.group(horizontal=True):
-            dpg.add_text(label="label", default_value="None", tag="scale_suggestion_text_0")
-            dpg.add_text(label="label", default_value="       ")
-            dpg.add_text(label="label", default_value="Accuracy: ")
-            dpg.add_text(label="label", default_value="0", tag="suggestion accuracy_0")
-            dpg.add_text(label="label", default_value="%")
-        with dpg.group(horizontal=True):
-            dpg.add_text(label="label", default_value="Other", tag="scale_suggestion_text_1")
-            dpg.add_text(label="label", default_value="       ")
-            dpg.add_text(label="label", default_value="Accuracy: ")
-            dpg.add_text(label="label", default_value="23", tag="suggestion accuracy_1")
-            dpg.add_text(label="label", default_value="%")
+    with dpg.collapsing_header(label="Suggestion", tag="suggestion_tab"):
+        dpg.add_button(label="Compute Suggestion", callback=get_suggestion)
+
+        with dpg.table(header_row=False, tag="suggestion_table"):
+
+            
+            # use add_table_column to add columns to the table,
+            # table columns use slot 0
+            dpg.add_table_column()
+            dpg.add_table_column()
+            dpg.add_table_column()
+            dpg.add_table_column()
+
+            with dpg.table_row():
+                dpg.add_text("Scale")
+                dpg.add_text("Accuracy")
+                dpg.add_text("Note count")
+                dpg.add_text("Alternate names")
+            dpg.highlight_table_row("suggestion_table",0, [10, 0, 50, 100])
+
+        with dpg.table(header_row=False, tag="suggestion_content"):    
+            dpg.add_table_column()
+            
+
+
+        # with dpg.group(horizontal=True):
+        #     dpg.add_text(label="label", default_value="None", tag="scale_suggestion_text_0")
+        #     dpg.add_text(label="label", default_value="       ")
+        #     dpg.add_text(label="label", default_value="Accuracy: ")
+        #     dpg.add_text(label="label", default_value="0", tag="suggestion accuracy_0")
+        #     dpg.add_text(label="label", default_value="%")
+        # with dpg.group(horizontal=True):
+        #     dpg.add_text(label="label", default_value="Other", tag="scale_suggestion_text_1")
+        #     dpg.add_text(label="label", default_value="       ")
+        #     dpg.add_text(label="label", default_value="Accuracy: ")
+        #     dpg.add_text(label="label", default_value="23", tag="suggestion accuracy_1")
+        #     dpg.add_text(label="label", default_value="%")
 
 # FORCED INIT
 
