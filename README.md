@@ -9,13 +9,12 @@ We offer the following functionalities:
 * Personalisable scale suggestions
 * Parametrisable chord & note suggestions
 
-## User Interface
-### Midi Player
+## Midi Player
 To begin the user must select a midi file. This can either be done using the `File Selector` button or the `Random` button which selects a midi file at random from the `MIDI_Files` folder. 
 
 The midi player allows user to play, pause or stop the midi. The user can also control the volume directly from the interface. 
 
-### Midi Visualiser
+## Midi Visualiser
 
 The selected midi file will be displayed with notes along the x-axis. The y-axis can be displayed either in ticks, bartime or time (in seconds). The visualiser is colour-coded according to notes (independently of the octave). 
 
@@ -27,9 +26,9 @@ You can see an example of the visualisation for a midi of Eleanor Rigby by the B
 
 ![colour code](images/midiviz_beatles.png)
 
-### Scale Suggestion
+## Scale Suggestion
 
-#### Parameters
+### Parameters
 The scale suggestion can be personalised under the following parameters:
 * Normalize accuracy: TODO explain this
 * Weighted by Beat Importance: idem
@@ -39,7 +38,7 @@ The scale suggestion can be personalised under the following parameters:
 * Accuracy threshold: this threshold determines the accuracy with which the user would like the scales to be suggested (i.e. to filter out bad suggestions).
 * Amount of notes: the user can select how many notes they would like the scale suggestions to have. 
 
-#### Result
+### Result
 The resulting suggestions are displayed under a table which shows the scale name, the accuracy of the suggestion, the amount of notes in the scale and alternate names for the scale if any. 
 
-#### Methodology
+### Methodology
