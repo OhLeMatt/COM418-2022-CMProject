@@ -90,10 +90,32 @@ class MidiTrackFrame:
                       metric="bartime",
                       weighted=False,
                       **kwargs):
+        """Suggest Scale
+
+        Args:
+            start (float,int): The beggining of the analysis window in the metric you want ("bartime", "time", "ticks")
+            end (float,int): The end of the analysis window in the metric you want ("bartime", "time", "ticks")
+            metric (str, optional): The metric for start and end. Defaults to "bartime".
+            weighted (bool, optional): If the weight should be applied in the analysis. Defaults to False.
+        Kwargs:
+            normalize_score(bool): Normalize the score, 
+            threshold (float): Between 0 and 1, the threshold on scores to filter suggestions. Default to 0.99.
+            normalize_scores (float): If True, will normalize all scores before threshold pass. Default to True.
+            tonic_chromas (list(int)): List of allowed chroma for being the tonic. Default to mu.CHROMA_IDS.
+            general_scale_subset (list(scales.GeneralScale)): Set of scale on which the analysis will be performed. Default to ALL_GENERAL_SCALES.
+            
+        
+        Raises:
+            ValueError: start should be strictly inferior to end
+            ValueError: metric should be in ("ticks", "bartime", "time")
+
+        Returns:
+            _type_: _description_
+        """
         if start >= end:
-            raise ValueError("Argument start should be below end")
-        if metric not in ("ticks", "bartime"):
-            raise ValueError("Argument metric should be ")
+            raise ValueError(f"Argument start should be below end, current start={start}, end={end}")
+        if metric not in ("ticks", "bartime", "time"):
+            raise ValueError("Argument metric should be in (ticks, bartime, time)")
         weights = None
         
         mask = (self.dataframe[metric] >= start) & (self.dataframe[metric] < end)
@@ -110,6 +132,8 @@ class MidiTrackFrame:
 
 
 class MidiFrame:
+    
+    EXPORT_DEFAULT_FILEPATH = "TMP_Files/tmp.mid"
     
     def __init__(self, 
                  midofile: mido.MidiFile, 
@@ -132,6 +156,7 @@ class MidiFrame:
         self.track_frames = []
         self.playing_track_frame: MidiTrackFrame = None #type:ignore
         self.playing_midi_file = tempfile.TemporaryFile()
+        
         
         ticks = 0
         tempos = []
@@ -230,8 +255,7 @@ class MidiFrame:
                                      debug=False,
                                      clip =self.midi_clip,
                                      tracks=tracks)
-        playing_midi.save("MIDI_Files/tmp.mid")
-        
+        playing_midi.save(self.EXPORT_DEFAULT_FILEPATH)
 
     def filter_track_frames(self,
                             only=False,
