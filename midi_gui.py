@@ -300,7 +300,7 @@ with dpg.window(label="Improvisation Tool",
 
         with dpg.plot(label="Midi Visualiser", height=400, width=-1, tag="midiviz"):
             
-            xaxis = dpg.add_plot_axis(dpg.mvXAxis, label="Time", tag="imgx")
+            xaxis = dpg.add_plot_axis(dpg.mvXAxis, label="Time (s)", tag="imgx")
             yaxis = dpg.add_plot_axis(dpg.mvYAxis, label="Note", tag="imgy")
             dpg.add_drag_line(label="ui_cursor",
                                 color=[100, 164, 255, 200],
