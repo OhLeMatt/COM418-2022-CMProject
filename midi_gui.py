@@ -268,7 +268,7 @@ with dpg.window(label="Improvisation Tool",
             dpg.add_button(label="Play", callback=play_midi, tag="PlayButton", user_data=True)
             dpg.add_button(label="Stop", callback=play_midi, tag="StopButton", user_data=False)
             dpg.add_button(label="Display", callback=display, tag="DisplayButton")
-            dpg.add_combo(("ticks", "time", "bartime"), label="MetricSelector", tag="MetricSelector", default_value="ticks", callback=set_metric)
+            dpg.add_combo(("ticks", "time", "bartime"), label="", tag="MetricSelector", default_value="ticks", callback=set_metric, width=80)
             dpg.add_text("colour code")
             with dpg.tooltip(dpg.last_item()):
                 with dpg.table(tag="colour-code", header_row=False):
@@ -292,7 +292,7 @@ with dpg.window(label="Improvisation Tool",
 
                     with dpg.table_row():
                         for colour in NOTE_COLORS:
-                            dpg.add_image("Texture_C", tint_color=tuple(colour))
+                            dpg.add_image("Texture_C", width=15, height=15, tint_color=tuple(colour))
 
 
 
