@@ -79,9 +79,12 @@ def update_ui_suggestions(midiplayer: MidiPlayer):
         dpg.add_table_column()
         dpg.add_table_column()
 
+        scales = []
+
         for scale, accuracy in suggestions.items():
             with dpg.table_row(parent="suggestion_content"):
-                    dpg.add_text(repr(scale))
+                    new = dpg.add_selectable(label=repr(scale), callback=select_scale, user_data=[scale, scales])
+                    scales.append(new)
                     dpg.add_text(f"{int(accuracy * 100)}%")
                     dpg.add_text(scale.note_count)
                     dpg.add_text(scale.name)
@@ -257,6 +260,15 @@ def compute_suggestions(sender, app_data, user_data):
         inputMidi.analyse()
 
 
+def select_scale(sender, app_data, user_data):
+    scale = user_data[0]
+    scales = user_data[1]
+    for item in scales:
+        if item != sender:
+            dpg.set_value(item, False)
+    dpg.set_value("selected_scale_text", "Selected scale: " + repr(scale))
+
+
 ###########################    UI     ########################### 
 
 with dpg.file_dialog(directory_selector=False, show=False, callback=select_file, id="file_dialog_id", height=300):
@@ -375,6 +387,8 @@ with dpg.window(label="Improvisation Tool",
         with dpg.table(header_row=False, tag="suggestion_content"):    
             dpg.add_table_column()
             
+    with dpg.collapsing_header(label="Chords", tag="chords_tab"):
+        dpg.add_text("No scale selected", tag="selected_scale_text")
 
 # FORCED INIT
 
