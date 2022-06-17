@@ -16,9 +16,16 @@ To begin the user must select a midi file. This can either be done using the `Fi
 The midi player allows user to play, pause or stop the midi. The user can also control the volume directly from the interface. 
 
 ### Midi Visualiser
+
 The selected midi file will be displayed with notes along the x-axis. The y-axis can be displayed either in ticks, bartime or time (in seconds). The visualiser is colour-coded according to notes (independently of the octave). 
 
+![colour code](images/colour_code.png)
+
 The user can also select which of the 12 midi file channels to display.
+
+You can see an example of the visualisation for a midi of Eleanor Rigby by the Beatles below. 
+
+![colour code](images/midiviz_beatles.png)
 
 ### Scale Suggestion
 

@@ -294,7 +294,7 @@ with dpg.window(label="Improvisation Tool",
 
                     with dpg.table_row():
                         for colour in NOTE_COLORS:
-                            dpg.add_image("Texture_C", width=15, height=15, tint_color=tuple(colour))
+                            dpg.add_image("Texture_C", width=12, height=12, tint_color=tuple(colour))
 
 
 
