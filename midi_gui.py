@@ -269,6 +269,34 @@ with dpg.window(label="Improvisation Tool",
             dpg.add_button(label="Stop", callback=play_midi, tag="StopButton", user_data=False)
             dpg.add_button(label="Display", callback=display, tag="DisplayButton")
             dpg.add_combo(("ticks", "time", "bartime"), label="MetricSelector", tag="MetricSelector", default_value="ticks", callback=set_metric)
+            dpg.add_text("colour code")
+            with dpg.tooltip(dpg.last_item()):
+                with dpg.table(tag="colour-code", header_row=False):
+                    
+                    for i in range(12):
+                        dpg.add_table_column()
+                   
+                    with dpg.table_row():
+                        dpg.add_text("C")
+                        dpg.add_text("C#")
+                        dpg.add_text("D")
+                        dpg.add_text("D#")
+                        dpg.add_text("E")
+                        dpg.add_text("F")
+                        dpg.add_text("F#")
+                        dpg.add_text("G")
+                        dpg.add_text("G#")
+                        dpg.add_text("A")
+                        dpg.add_text("A#")
+                        dpg.add_text("B")
+
+                    with dpg.table_row():
+                        for colour in NOTE_COLORS:
+                            dpg.add_image("Texture_C", tint_color=tuple(colour))
+
+
+
+
         with dpg.plot(label="Midi Visualiser", height=400, width=-1, tag="midiviz"):
             
             xaxis = dpg.add_plot_axis(dpg.mvXAxis, label="Time", tag="imgx")
