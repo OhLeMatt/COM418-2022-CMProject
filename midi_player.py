@@ -203,4 +203,6 @@ class MidiPlayer:
         {"name": "Major Lydian", "accuracy": 0.53, "note_count": 8, "alternate_names": "Genus Diatonicum Veterum Correctum, Zylyllic, Ishikotsucho (Japan)"}]
 
         return dummy 
-        
+    
+    def set_volume(self, volume):
+        self.volume = max(min(volume, 10.0), 0.0)/10

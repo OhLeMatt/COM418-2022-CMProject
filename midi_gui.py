@@ -243,6 +243,9 @@ def get_suggestion(sender, app_data, user_data):
                         dpg.add_text(suggestion[i]["note_count"])
                         dpg.add_text(suggestion[i]["alternate_names"])
 
+def set_volume(sender, app_data, user_data):
+    if inputMidi is not None: 
+        inputMidi.set_volume(app_data)
 
 
 ###########################    UI     ########################### 
@@ -267,7 +270,8 @@ with dpg.window(label="Improvisation Tool",
         with dpg.group(horizontal=True):
             dpg.add_button(label="Play", callback=play_midi, tag="PlayButton", user_data=True)
             dpg.add_button(label="Stop", callback=play_midi, tag="StopButton", user_data=False)
-            dpg.add_button(label="Display", callback=display, tag="DisplayButton")
+            dpg.add_button(label="Reset Display", callback=display, tag="DisplayButton")
+            dpg.add_drag_int(format="volume = %d ", tag="volume", min_value=0, max_value=10, default_value=1, callback=set_volume, width=100)
             dpg.add_combo(("ticks", "time", "bartime"), label="", tag="MetricSelector", default_value="ticks", callback=set_metric, width=80)
             dpg.add_text("colour code")
             with dpg.tooltip(dpg.last_item()):
