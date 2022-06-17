@@ -268,6 +268,9 @@ def select_scale(sender, app_data, user_data):
             dpg.set_value(item, False)
     dpg.set_value("selected_scale_text", "Selected scale: " + repr(scale))
 
+def select_scale_from_all(sender, app_data, user_data):
+    dpg.set_value("selected_scale_text", "Selected scale: " + str(app_data))
+
 
 ###########################    UI     ########################### 
 
@@ -389,6 +392,9 @@ with dpg.window(label="Improvisation Tool",
             
     with dpg.collapsing_header(label="Chords", tag="chords_tab"):
         dpg.add_text("No scale selected", tag="selected_scale_text")
+        
+        all_scales = ("A","B","C","D","E","F","G","H","I","J","K","L","M" "O","P","Q","R","S","T","U","V","W","X","Y","Z")
+        dpg.add_listbox(all_scales, label="All scales", callback=select_scale_from_all)
 
 # FORCED INIT
 
