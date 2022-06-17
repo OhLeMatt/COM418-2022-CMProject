@@ -246,6 +246,7 @@ def set_num_bars(sender, app_data, user_data):
 def set_volume(sender, app_data, user_data):
     if inputMidi is not None: 
         inputMidi.set_volume(app_data)
+        
 def entire_window(sender, app_data, user_data):
     if inputMidi is not None:
         if inputMidi.analysis_window_global:
