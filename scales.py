@@ -217,7 +217,7 @@ class GeneralScale:
             self.rotations_circular_distance = SCALE_DATA.circular_distance[rota_mask]
 
     def __repr__(self):
-        return self.names[0] + " General Scale"
+        return self.names[0] + " Scale"
     
     def alt_name(self, i):
         return self.names[max(0, min(i, len(self.names)))] + " General Scale"

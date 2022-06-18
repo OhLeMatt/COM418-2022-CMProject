@@ -27,23 +27,34 @@ def name_to_alt_name(name):
 # we will also use the "chroma" keyword to designate the 12 different chromatic pitches.
 
 NOTES = {"C": 0, "DO": 0, 
-          "C#": 1, "DO#": 1, "Db": 1, "REb"
+          "C#": 1, "DO#": 1, "Db": 1, "REb":1, "C#/Db":1,
           "D": 2, "RE": 2,
-          "D#": 3, "RE#": 3, "Eb": 3, "MIb": 3,
+          "D#": 3, "RE#": 3, "Eb": 3, "MIb": 3, "D#/Eb":3,
           "E": 4, "MI": 4,
           "F": 5, "FA": 5,
-          "F#": 6, "FA#": 6, "Gb": 6, "SOLb": 6,
+          "F#": 6, "FA#": 6, "Gb": 6, "SOLb": 6, "F#/Gb":6,
           "G": 7, "SOL": 7,
-          "G#": 8, "SOL#": 8, "Ab": 8, "LAb": 8,
+          "G#": 8, "SOL#": 8, "Ab": 8, "LAb": 8, "G#/Ab":8,
           "A": 9, "LA": 9,
-          "A#": 10, "LA#": 10, "Bb": 10, "SIb": 10,
+          "A#": 10, "LA#": 10, "Bb": 10, "SIb": 10, "A#/Bb":10,
           "B": 11, "SI": 11}
+
+
 
 CHROMA_IDS = np.arange(12)
 CHROMA_SHARP_NAMES = np.array(["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"])
 CHROMA_FLAT_NAMES = np.array(["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"])
 CHROMA_NAMES = np.array([(sharp_name + "/" + flat_name) if sharp_name != flat_name else sharp_name 
                             for sharp_name, flat_name in zip(CHROMA_SHARP_NAMES, CHROMA_FLAT_NAMES)])
+class NoteToChroma:
+    def __init__(self, chroma):
+        self.chroma = chroma % 12
+    
+    def __repr__(self):
+        return CHROMA_NAMES[self.chroma]
+    
+SIMPLIFIED_NOTES = [NoteToChroma(c) for c in CHROMA_IDS]
+
 CHROMA_ALT_NAMES = np.array([name_to_alt_name(name) for name in CHROMA_NAMES])
 
 MIDI_SHARP_NAMES = np.array([CHROMA_SHARP_NAMES[to_chroma(midi_id)] + np.str_(to_octave(midi_id)) if midi_id >= 12 else "" 
