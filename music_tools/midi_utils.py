@@ -1,11 +1,11 @@
 
-from zlib import DEF_BUF_SIZE
 import numpy as np
 import mido
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-from temporal_converters import TicksBartimeConverter, TicksTimeConverter
+
+from music_tools.temporal_converters import TicksBartimeConverter, TicksTimeConverter
 
 MIDI_IDS = np.arange(128)
 

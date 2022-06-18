@@ -1,12 +1,12 @@
 import mido
-import midi_utils as mu
-import scales
-from midi_frame import MidiFrame
 from pretty_midi import PrettyMIDI
 import sounddevice as sd
-import numpy as np
-from utils import stereo_sound
 from math import ceil
+
+from music_tools.midi_frame import MidiFrame
+import music_tools.midi_utils as mu
+import music_tools.scales as scales
+from music_tools.utils import stereo_sound
 
 class MidiPlayer: 
     def __init__(self, 
@@ -37,7 +37,7 @@ class MidiPlayer:
             "general_scale_subset": scales.ALL_GENERAL_ROTZERO_SCALES
         }
     
-        self.analysis_window_global = False
+        self.analysis_window_entire = False
         self.analysis_last_bar = -10
         self.analysis_window = [-1, 1]
         self.analysis_window_extent = [1, 1]
@@ -137,7 +137,7 @@ class MidiPlayer:
         
         if int(self.cursor["bartime"]) != self.analysis_last_bar:
             self.analysis_last_bar = int(self.cursor["bartime"])
-            if not self.analysis_window_global:
+            if not self.analysis_window_entire:
                 
                 self.update_window(on_window_call_back=on_window_call_back)
          
@@ -157,8 +157,8 @@ class MidiPlayer:
         self.analyse()
         
     def set_entire_window(self, activate: bool):
-        self.analysis_window_global = activate
-        if self.analysis_window_global:
+        self.analysis_window_entire = activate
+        if self.analysis_window_entire:
             self.analysis_window[0] = 0
             self.analysis_window[1] = ceil(self.df.bartime_release.max())
             self.on_window_change_callback(self)
@@ -168,7 +168,7 @@ class MidiPlayer:
     
     def analyse(self):
         if self.analysis_active:
-            if self.analysis_window_global:
+            if self.analysis_window_entire:
                 # TODO:
                 # This version is not adapted, need to rework the "windowed" version
                 self.analysis_suggestions = self.midiframe.playing_track_frame\

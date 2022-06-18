@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
-import midi_utils as mu
 import pickle
+
+import music_tools.midi_utils as mu
 
 FOLDER = "scale_researches/"
 SCALE_DATA = pd.read_csv(FOLDER + "scale_final_data.csv")

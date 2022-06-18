@@ -1,11 +1,10 @@
 
 import mido
-import midi_utils as mu
 import numpy as np
 import pandas as pd
-import scales
-import os
-import tempfile
+
+import music_tools.midi_utils as mu
+import music_tools.scales as scales
 
 class MidiTrackFrame:
 
@@ -155,7 +154,7 @@ class MidiFrame:
         self.length = midofile.length
         self.track_frames = []
         self.playing_track_frame: MidiTrackFrame = None #type:ignore
-        self.playing_midi_file = tempfile.TemporaryFile()
+        # self.playing_midi_file = tempfile.TemporaryFile()
         
         
         ticks = 0

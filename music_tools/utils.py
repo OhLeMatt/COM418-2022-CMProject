@@ -1,4 +1,3 @@
-from typing import Type
 import numpy as np
 
 def base_to_list(n, base=10):

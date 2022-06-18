@@ -1,6 +1,7 @@
 import mido
 import numpy as np
-from utils import is_iterable
+
+from music_tools.utils import is_iterable
           
 class TicksConverter:
     
