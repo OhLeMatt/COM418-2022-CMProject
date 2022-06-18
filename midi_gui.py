@@ -1,6 +1,8 @@
 
+from email.policy import default
 from pickle import GLOBAL
 import dearpygui.dearpygui as dpg
+from platformdirs import AppDirs
 from sklearn import metrics
 from midi_frame import MidiFrame, MidiTrackFrame
 from midi_player import MidiPlayer
@@ -27,7 +29,18 @@ WINDOW = [0,0]
 WIN_POSITION = 10000
 NUM_BARS = 4
 NOTE_COUNTS = set(i for i in range(5,13))
+
+LAST_SELECTED_SCALE_UI_ELEMENT = ""
+SELECTED_GENERAL_SCALE = scales.scale(2773)
+SELECTED_TONIC_CHROMA = 0
+SELECTED_SCALE = SELECTED_GENERAL_SCALE.scale_in(SELECTED_TONIC_CHROMA)
+
 GENERAL_SCALE_SUBSET = scales.create_general_scale_subset(NOTE_COUNTS)
+TONIC_CHROMA_SUBSET = mu.CHROMA_IDS
+ROTATIONS_SCALES = SELECTED_SCALE.rotated_scales()
+CHILDREN_SCALES = SELECTED_SCALE.child_scales()
+PARENTS_SCALES = SELECTED_SCALE.parent_scales()
+
 NOTE_COLORS = [
         [255,0,0], # C
         [255,127,0],  # C#
@@ -42,6 +55,12 @@ NOTE_COLORS = [
         [255,0,255], # A#
         [255,0,127] # B
     ]
+
+def combo_getter(item, list):
+    for x in list:
+        if str(x) == item:
+            return x
+    
 
 dpg.create_context()
 
@@ -77,12 +96,15 @@ def update_ui_suggestions(midiplayer: MidiPlayer):
         dpg.add_table_column()
         dpg.add_table_column()
 
+        scales = []
         for scale, tonic, accuracy in suggestions:
             with dpg.table_row(parent="suggestion_content"):
-                    dpg.add_text(repr(scale).replace("General Scale", "Scale in " + mu.CHROMA_NAMES[tonic]))
-                    dpg.add_text(f"{int(accuracy * 100)}%")
-                    dpg.add_text(scale.note_count)
-                    dpg.add_text(scale.name)
+                dpg.add_selectable(label=repr(scale)+ " in " + mu.CHROMA_NAMES[tonic], 
+                                   callback=select_scale_from_suggestions, 
+                                   user_data=(scale, tonic))
+                dpg.add_text(f"{int(accuracy * 100)}%")
+                dpg.add_text(scale.note_count)
+                dpg.add_text(scale.name)
            
 def random_midi(sender, app_data, user_data):
     midi_name = random.choice(MIDIFILES)
@@ -114,10 +136,6 @@ def load_midi(midi_file, path, name):
     dpg.set_item_label("PlayButton", "Play")
     
     display(None, None, None)
-    if not inputMidi.displayable:
-        dpg.set_value("WarningText", "Warning: this midi file is not displayable")
-    else:
-        dpg.set_value("WarningText", "")
     
     
 
@@ -215,6 +233,8 @@ def set_notecounts(sender, app_data, user_data):
     else:
         NOTE_COUNTS.remove(user_data)
     GENERAL_SCALE_SUBSET = scales.create_general_scale_subset(NOTE_COUNTS)
+    dpg.configure_item("general_scale_list", items=GENERAL_SCALE_SUBSET)
+    
     if inputMidi is not None:
         inputMidi.analysis_parameters["general_scale_subset"] = GENERAL_SCALE_SUBSET
     print(f"note counts selected: {NOTE_COUNTS} | number of general scales: {len(GENERAL_SCALE_SUBSET)}")
@@ -241,6 +261,10 @@ def set_num_bars(sender, app_data, user_data):
     if inputMidi is not None and not inputMidi.analysis_window_global:
         inputMidi.update_window(barsize=NUM_BARS)
 
+def set_volume(sender, app_data, user_data):
+    if inputMidi is not None: 
+        inputMidi.set_volume(app_data)
+
 def entire_window(sender, app_data, user_data):
     if inputMidi is not None:
         if inputMidi.analysis_window_global:
@@ -254,6 +278,58 @@ def compute_suggestions(sender, app_data, user_data):
     if inputMidi:
         inputMidi.analyse()
 
+
+def select_scale_from_suggestions(sender, app_data, user_data):
+    global LAST_SELECTED_SCALE_UI_ELEMENT, SELECTED_GENERAL_SCALE, SELECTED_TONIC_CHROMA
+    try:
+        dpg.set_value(LAST_SELECTED_SCALE_UI_ELEMENT, False)
+    except:
+        pass
+    LAST_SELECTED_SCALE_UI_ELEMENT = sender
+    dpg.set_value(sender, True)
+    SELECTED_GENERAL_SCALE = user_data[0]
+    SELECTED_TONIC_CHROMA = user_data[1]
+    update_selected_scale()
+
+def select_general_scale_from_all(sender, app_data, user_data):
+    global SELECTED_GENERAL_SCALE
+    print(app_data)
+    SELECTED_GENERAL_SCALE = combo_getter(app_data, GENERAL_SCALE_SUBSET)
+    update_selected_scale()
+
+def select_tonic_chroma_from_all(sender, app_data, user_data):
+    global SELECTED_TONIC_CHROMA
+    SELECTED_TONIC_CHROMA = mu.NOTES[combo_getter(app_data, mu.CHROMA_NAMES[TONIC_CHROMA_SUBSET])]
+    update_selected_scale()
+
+def select_scale_from_navigation(sender, app_data, user_data):
+    global SELECTED_GENERAL_SCALE, SELECTED_TONIC_CHROMA, ROTATIONS_SCALES, PARENTS_SCALES, CHILDREN_SCALES
+    
+    scale = SELECTED_SCALE
+    if user_data=="rotations":
+        scale = combo_getter(app_data, ROTATIONS_SCALES)
+    elif user_data=="parents":
+        scale = combo_getter(app_data, PARENTS_SCALES)
+    elif user_data=="children":
+        scale = combo_getter(app_data, CHILDREN_SCALES)
+        
+    SELECTED_GENERAL_SCALE = scale.general_scale()
+    SELECTED_TONIC_CHROMA = scale.tonic_chroma
+    update_selected_scale()
+
+def update_selected_scale():
+    global SELECTED_SCALE, SELECTED_GENERAL_SCALE, SELECTED_TONIC_CHROMA, ROTATIONS_SCALES, PARENTS_SCALES, CHILDREN_SCALES
+    SELECTED_SCALE = SELECTED_GENERAL_SCALE.scale_in(SELECTED_TONIC_CHROMA)
+    ROTATIONS_SCALES = SELECTED_SCALE.rotated_scales()
+    PARENTS_SCALES = SELECTED_SCALE.parent_scales()
+    CHILDREN_SCALES = SELECTED_SCALE.child_scales()
+    dpg.configure_item("general_scale_list", default_value=repr(SELECTED_GENERAL_SCALE))
+    dpg.configure_item("tonic_chroma_list", default_value=mu.CHROMA_NAMES[SELECTED_TONIC_CHROMA])
+    dpg.configure_item("scale_rotations_list", items=ROTATIONS_SCALES, default_value=repr(SELECTED_SCALE))
+    dpg.configure_item("scale_parents_list", items=PARENTS_SCALES)
+    
+    dpg.configure_item("scale_children_list", items=CHILDREN_SCALES)
+    
 
 ###########################    UI     ########################### 
 
@@ -273,11 +349,12 @@ with dpg.window(label="Improvisation Tool",
             dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog_id"))
             dpg.add_button(label="Random", callback=random_midi)
         dpg.add_text(label="PlayText", default_value="No file selected", tag="PlayText")
-        dpg.add_text(label="WarningText", default_value="", tag="WarningText")
+        #dpg.add_text(label="WarningText", default_value="", tag="WarningText")
         with dpg.group(horizontal=True):
             dpg.add_button(label="Play", callback=play_midi, tag="PlayButton", user_data=True)
             dpg.add_button(label="Stop", callback=play_midi, tag="StopButton", user_data=False)
-            dpg.add_button(label="Display", callback=display, tag="DisplayButton")
+            dpg.add_button(label="Reset Display", callback=display, tag="DisplayButton")
+            dpg.add_slider_int(format="volume = %d ", tag="volume", min_value=0, max_value=10, default_value=1, callback=set_volume, width=100)
             dpg.add_combo(("ticks", "time", "bartime"), label="", tag="MetricSelector", default_value="ticks", callback=set_metric, width=80)
             dpg.add_text("colour code")
             with dpg.tooltip(dpg.last_item()):
@@ -286,19 +363,18 @@ with dpg.window(label="Improvisation Tool",
                         dpg.add_table_column()
                    
                     with dpg.table_row():
-                        for name in mu.CHROMA_NAMES:
+                        for name in mu.CHROMA_SHARP_NAMES:
                             dpg.add_text(name)
 
                     with dpg.table_row():
                         for colour in NOTE_COLORS:
-                            dpg.add_image("Texture_C", width=15, height=15, tint_color=tuple(colour))
-
+                            dpg.add_image("Texture_C", width=12, height=12, tint_color=tuple(colour))
 
 
 
         with dpg.plot(label="Midi Visualiser", height=400, width=-1, tag="midiviz"):
             
-            xaxis = dpg.add_plot_axis(dpg.mvXAxis, label="Time", tag="imgx")
+            xaxis = dpg.add_plot_axis(dpg.mvXAxis, label="Time (s)", tag="imgx")
             yaxis = dpg.add_plot_axis(dpg.mvYAxis, label="Note", tag="imgy")
             dpg.add_drag_line(label="ui_cursor",
                                 color=[100, 164, 255, 200],
@@ -354,8 +430,6 @@ with dpg.window(label="Improvisation Tool",
         dpg.add_button(label="Compute Suggestions", callback=compute_suggestions)
 
         with dpg.table(header_row=False, tag="suggestion_table"):
-
-            
             # use add_table_column to add columns to the table,
             # table columns use slot 0
             dpg.add_table_column()
@@ -373,12 +447,34 @@ with dpg.window(label="Improvisation Tool",
         with dpg.table(header_row=False, tag="suggestion_content"):    
             dpg.add_table_column()
             
-
+    with dpg.collapsing_header(label="Chords", tag="chords_tab"):
+        with dpg.child_window(autosize_x=True, height=200, menubar=True):
+            with dpg.group(horizontal=True):
+                dpg.add_text("Selected Scale: ")
+                dpg.add_combo(GENERAL_SCALE_SUBSET, no_arrow_button=True, width=340, 
+                                tag="general_scale_list", callback=select_general_scale_from_all)
+                dpg.add_text(" in ")
+                dpg.add_combo(mu.CHROMA_NAMES[TONIC_CHROMA_SUBSET].tolist(), no_arrow_button=True, width=60,
+                                tag="tonic_chroma_list", callback=select_tonic_chroma_from_all)
+            with dpg.menu_bar():
+                dpg.add_text("Scale Navigation")
+            with dpg.group(horizontal=True):
+                with dpg.group(horizontal=False):
+                    dpg.add_text("Rotations:", bullet=True)
+                    dpg.add_listbox(ROTATIONS_SCALES, width=360, tag="scale_rotations_list", user_data="rotations", callback=select_scale_from_navigation)
+                with dpg.group(horizontal=False):
+                    dpg.add_text("Children:", bullet=True)
+                    dpg.add_listbox(CHILDREN_SCALES, width=360, tag="scale_children_list", user_data="children", callback=select_scale_from_navigation)
+                with dpg.group(horizontal=False):
+                    dpg.add_text("Parents:", bullet=True)
+                    dpg.add_listbox(PARENTS_SCALES, width=360, tag="scale_parents_list", user_data="parents", callback=select_scale_from_navigation)
+        
 # FORCED INIT
 
 
 dpg.set_axis_ticks("imgy", tuple((mu.MIDI_NAMES[i], i) for i in range(0, 120, 12)))
 set_metric(None, "bartime", None)
+update_selected_scale()
 
 try:
     load_midi(MidiFrame.EXPORT_DEFAULT_FILEPATH, "TMP_Files", "Last played")
