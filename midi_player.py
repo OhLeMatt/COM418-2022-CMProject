@@ -17,7 +17,10 @@ class MidiPlayer:
                  file_name, 
                  path,
                  volume=0.5,
-                 sample_frequency=22050):
+                 sample_frequency=22050,
+                 on_cursor_change_callback=lambda midiplayer: print("No on cursor change callback"),
+                 on_window_change_callback=lambda midiplayer: print("No on window change callback"),
+                 on_analysis_change_callback=lambda midiplayer: print("No on analysis change callback")):
         self.file_name = file_name 
         self.path = path
         self.playing = False
@@ -39,12 +42,12 @@ class MidiPlayer:
     
         self.analysis_window_global = False
         self.analysis_last_bar = -10
-        self.analysis_window = [-2, 2]
-        self.analysis_window_extent = [2, 2]
+        self.analysis_window = [-1, 1]
+        self.analysis_window_extent = [1, 1]
         
-        self.on_cursor_change_callback = lambda midiplayer: print("No on cursor change callback")
-        self.on_window_change_callback = lambda midiplayer: print("No on window change callback")
-        self.on_analysis_change_callback = lambda midiplayer: print("No on analysis change callback")
+        self.on_cursor_change_callback = on_cursor_change_callback
+        self.on_window_change_callback = on_window_change_callback
+        self.on_analysis_change_callback = on_analysis_change_callback
         self.general_scale_subset = scales.ALL_GENERAL_ROTZERO_SCALES
         
         self.channels = [i for i in range(16)]
@@ -169,7 +172,12 @@ class MidiPlayer:
     def analyse(self):
         if self.analysis_active:
             if self.analysis_window_global:
-                pass
+                # TODO:
+                # This version is not adapted, need to rework the "windowed" version
+                self.analysis_suggestions = self.midiframe.playing_track_frame\
+                    .suggest_scale(self.analysis_window[0],
+                                self.analysis_window[1],
+                                **self.analysis_parameters)        
             else:
                 self.analysis_suggestions = self.midiframe.playing_track_frame\
                     .suggest_scale(self.analysis_window[0],

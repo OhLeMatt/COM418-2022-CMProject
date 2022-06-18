@@ -20,7 +20,7 @@ inputMidi:MidiPlayer = None
 MIDI_PATH = "MIDI_Files"
 MIDIFILES = [f for f in listdir(MIDI_PATH) if isfile(join(MIDI_PATH, f))]
 PLOT_DISPLAYED = False
-NORMALIZE_SCORES = False
+NORMALIZE_SCORES = True
 WEIGHTED = False
 THRESHOLD = 0.9
 METRIC = "ticks"
@@ -29,6 +29,12 @@ WINDOW = [0,0]
 WIN_POSITION = 10000
 NUM_BARS = 4
 NOTE_COUNTS = set(i for i in range(5,13))
+FOLLOW_CURSOR = False
+
+TABLE_SCALE_NAME_WIDTH = 350
+TABLE_ACCURACY_WIDTH = 30
+TABLE_NOTECOUNT_WIDTH = 30
+TABLE_ALTNAMES_WIDTH = 400
 
 LAST_SELECTED_SCALE_UI_ELEMENT = ""
 SELECTED_GENERAL_SCALE = scales.scale(2773)
@@ -73,8 +79,17 @@ dpg.add_static_texture(1, 1, [1,1,1,0.05], parent="texture_container", tag="Tran
 def _log(sender, app_data, user_data):
     print(f"sender: {sender}, \t app_data: {app_data}, \t user_data: {user_data}")
 
+
 def update_ui_cursor(midiplayer: MidiPlayer):
+    global METRIC, FOLLOW_CURSOR
     dpg.set_value("ui_cursor", midiplayer.cursor[METRIC])
+    limits = dpg.get_axis_limits("imgx")
+    view_width = limits[1] - limits[0]
+    if FOLLOW_CURSOR:
+        dpg.set_axis_limits("imgx", 
+                        midiplayer.cursor[METRIC] - view_width/2,
+                        midiplayer.cursor[METRIC] + view_width/2)
+    
 
 def update_ui_window(midiplayer: MidiPlayer):
     global WINDOW, METRIC
@@ -88,15 +103,15 @@ def update_ui_suggestions(midiplayer: MidiPlayer):
 
     dpg.delete_item("suggestion_content")
 
-    with dpg.table(header_row=False, tag="suggestion_content", parent="suggestion_tab"):
+    with dpg.table(header_row=False, tag="suggestion_content", parent="suggestion_tab", 
+                   scrollY=True, height=100):
         # use add_table_column to add columns to the table,
         # table columns use slot 0
-        dpg.add_table_column()
-        dpg.add_table_column()
-        dpg.add_table_column()
-        dpg.add_table_column()
-
-        scales = []
+        dpg.add_table_column(width=TABLE_SCALE_NAME_WIDTH)
+        dpg.add_table_column(width=TABLE_ACCURACY_WIDTH)
+        dpg.add_table_column(width=TABLE_NOTECOUNT_WIDTH)
+        dpg.add_table_column(width=TABLE_ALTNAMES_WIDTH)
+        
         for scale, tonic, accuracy in suggestions:
             with dpg.table_row(parent="suggestion_content"):
                 dpg.add_selectable(label=repr(scale)+ " in " + mu.CHROMA_NAMES[tonic], 
@@ -127,13 +142,25 @@ def load_midi(midi_file, path, name):
     if inputMidi is not None:
         inputMidi.stop()
 
-    inputMidi = MidiPlayer(midi_file, path)
-    inputMidi.on_cursor_change_callback = update_ui_cursor
-    inputMidi.on_window_change_callback = update_ui_window
-    inputMidi.on_analysis_change_callback = update_ui_suggestions
-
+    inputMidi = MidiPlayer(midi_file, 
+                           path,
+                           on_cursor_change_callback=update_ui_cursor,
+                           on_window_change_callback=update_ui_window,
+                           on_analysis_change_callback=update_ui_suggestions)
+    
+    for i in range(16):
+        item = f"channel_{i}"
+        dpg.set_value(item, True)
+        dpg.enable_item(item)
+        
+        if i in inputMidi.midiframe.playing_track_frame.channel_count:
+            dpg.show_item(item)
+        else:
+            dpg.hide_item(item)
+    
     dpg.set_value("PlayText", "Selected: " + name.replace(".mid", "").replace("_", " "))
     dpg.set_item_label("PlayButton", "Play")
+    
     
     display(None, None, None)
     
@@ -246,7 +273,7 @@ def set_notecounts(sender, app_data, user_data):
 
 def set_metric(sender, app_data, user_data):
     global METRIC
-    METRIC = app_data
+    METRIC = app_data.lower()
     dpg.set_item_label("imgx", app_data.capitalize())
     display(None, None, None)
 
@@ -264,6 +291,12 @@ def set_num_bars(sender, app_data, user_data):
 def set_volume(sender, app_data, user_data):
     if inputMidi is not None: 
         inputMidi.set_volume(app_data)
+
+def set_follow_cursor(sender, app_data, user_data):
+    global FOLLOW_CURSOR
+    FOLLOW_CURSOR = app_data
+    if not FOLLOW_CURSOR:
+        dpg.set_axis_limits_auto("imgx")
 
 def entire_window(sender, app_data, user_data):
     if inputMidi is not None:
@@ -327,8 +360,8 @@ def update_selected_scale():
     dpg.configure_item("tonic_chroma_list", default_value=mu.CHROMA_NAMES[SELECTED_TONIC_CHROMA])
     dpg.configure_item("scale_rotations_list", items=ROTATIONS_SCALES, default_value=repr(SELECTED_SCALE))
     dpg.configure_item("scale_parents_list", items=PARENTS_SCALES)
-    
     dpg.configure_item("scale_children_list", items=CHILDREN_SCALES)
+    dpg.configure_item("scale_alternative_names", default_value=SELECTED_SCALE.name) 
     
 
 ###########################    UI     ########################### 
@@ -338,8 +371,8 @@ with dpg.file_dialog(directory_selector=False, show=False, callback=select_file,
     dpg.add_file_extension("", color=(150, 255, 150, 255))
 
 with dpg.window(label="Improvisation Tool", 
-                width=1000, 
-                height=600, 
+                width=1200, 
+                height=700, 
                 tag="primary_window",
                 no_title_bar=True, 
                 no_move=True):
@@ -353,9 +386,9 @@ with dpg.window(label="Improvisation Tool",
         with dpg.group(horizontal=True):
             dpg.add_button(label="Play", callback=play_midi, tag="PlayButton", user_data=True)
             dpg.add_button(label="Stop", callback=play_midi, tag="StopButton", user_data=False)
-            dpg.add_button(label="Reset Display", callback=display, tag="DisplayButton")
+            dpg.add_checkbox(label="Follow Cursor", callback=set_follow_cursor, tag="FollowCursor", default_value=FOLLOW_CURSOR)
             dpg.add_slider_int(format="volume = %d ", tag="volume", min_value=0, max_value=10, default_value=1, callback=set_volume, width=100)
-            dpg.add_combo(("ticks", "time", "bartime"), label="", tag="MetricSelector", default_value="ticks", callback=set_metric, width=80)
+            dpg.add_combo(("Ticks", "Time", "Bartime"), label="", tag="MetricSelector", default_value="Bartime", callback=set_metric, width=80)
             dpg.add_text("colour code")
             with dpg.tooltip(dpg.last_item()):
                 with dpg.table(tag="colour-code", header_row=False):
@@ -370,11 +403,9 @@ with dpg.window(label="Improvisation Tool",
                         for colour in NOTE_COLORS:
                             dpg.add_image("Texture_C", width=12, height=12, tint_color=tuple(colour))
 
-
-
-        with dpg.plot(label="Midi Visualiser", height=400, width=-1, tag="midiviz"):
+        with dpg.plot(label="Midi Visualiser", height=400, width=-1, tag="midiviz", callback=_log):
             
-            xaxis = dpg.add_plot_axis(dpg.mvXAxis, label="Time (s)", tag="imgx")
+            xaxis = dpg.add_plot_axis(dpg.mvXAxis, label="Bartime", tag="imgx")
             yaxis = dpg.add_plot_axis(dpg.mvYAxis, label="Note", tag="imgy")
             dpg.add_drag_line(label="ui_cursor",
                                 color=[100, 164, 255, 200],
@@ -387,55 +418,44 @@ with dpg.window(label="Improvisation Tool",
                                  [0, 0], [1,128], 
                                  tag="ui_window", parent="imgx")
         
-        # max_len = 100 if inputMidi is None else inputMidi.length
-        # dpg.add_slider_int(label="ViewSlider", max_value=max_len, callback=view_change)
-
-
-    with dpg.collapsing_header(label="Midi Settings"):
         with dpg.group(horizontal=True): 
             dpg.add_text(label="label", default_value="Select Midi Channels: ")
             for i in range(0,16):
-                dpg.add_checkbox(label=str(i), callback=channel_selection, default_value=True, user_data=i)
-
+                dpg.add_checkbox(label=str(i), tag=f"channel_{i}", callback=channel_selection, default_value=True, user_data=i)
 
     with dpg.collapsing_header(label="Suggestion Settings"):
         with dpg.group(horizontal=True): 
-            dpg.add_checkbox(label="Normalize Accuracy", callback=set_normalize, default_value=False)
-            dpg.add_checkbox(label="Weighted by Beat Importance", callback=set_weighted, default_value=False)
+            dpg.add_checkbox(label="Normalize Accuracy", callback=set_normalize, default_value=NORMALIZE_SCORES)
+            dpg.add_checkbox(label="Weighted by Beat Importance", callback=set_weighted, default_value=WEIGHTED)
         dpg.add_text("Compute suggestions over: ")
         with dpg.group(horizontal=True): 
-            # dpg.add_button(label="Choose Window", callback=show_window_select)
             dpg.add_text("Bars: ")
             dpg.add_button(arrow=True, direction=dpg.mvDir_Left, user_data=False, callback=set_num_bars)
             dpg.add_text(str(NUM_BARS), tag="num_bars")
             dpg.add_button(arrow=True, direction=dpg.mvDir_Right, user_data=True, callback=set_num_bars)
-
-            # dpg.add_button(label="Apply", callback=apply_window)
-            dpg.add_text(label="WindowText", default_value="", tag="WindowText")
-            
+            dpg.add_text(label="WindowText", default_value="", tag="WindowText")            
             dpg.add_button(label="Entire Window Suggestions", callback=entire_window)
         with dpg.group():
             dpg.add_slider_float(label="Accuracy Threshold", 
                                  max_value=1.0, 
                                  format="threshold = %.3f", 
                                  callback=set_threshold, 
-                                 default_value=0.9)
-
+                                 default_value=THRESHOLD)
         with dpg.group(horizontal=True): 
             dpg.add_text(label="label", default_value="Select amount of notes: ")
             for i in range(5,13):
                 dpg.add_checkbox(label=str(i), callback=set_notecounts, default_value=True, user_data=i)
 
-    with dpg.collapsing_header(label="Suggestions", tag="suggestion_tab"):
+    with dpg.collapsing_header(label="Suggestions", tag="suggestion_tab", default_open=True):
         dpg.add_button(label="Compute Suggestions", callback=compute_suggestions)
 
         with dpg.table(header_row=False, tag="suggestion_table"):
             # use add_table_column to add columns to the table,
             # table columns use slot 0
-            dpg.add_table_column()
-            dpg.add_table_column()
-            dpg.add_table_column()
-            dpg.add_table_column()
+            dpg.add_table_column(width=TABLE_SCALE_NAME_WIDTH)
+            dpg.add_table_column(width=TABLE_ACCURACY_WIDTH)
+            dpg.add_table_column(width=TABLE_NOTECOUNT_WIDTH)
+            dpg.add_table_column(width=TABLE_ALTNAMES_WIDTH)
 
             with dpg.table_row():
                 dpg.add_text("Scale")
@@ -447,8 +467,10 @@ with dpg.window(label="Improvisation Tool",
         with dpg.table(header_row=False, tag="suggestion_content"):    
             dpg.add_table_column()
             
-    with dpg.collapsing_header(label="Chords", tag="chords_tab"):
+    with dpg.collapsing_header(label="Improvisation Material", tag="improvisation", default_open=True):
         with dpg.child_window(autosize_x=True, height=200, menubar=True):
+            with dpg.menu_bar():
+                dpg.add_text("Scale Navigation")
             with dpg.group(horizontal=True):
                 dpg.add_text("Selected Scale: ")
                 dpg.add_combo(GENERAL_SCALE_SUBSET, no_arrow_button=True, width=340, 
@@ -456,8 +478,9 @@ with dpg.window(label="Improvisation Tool",
                 dpg.add_text(" in ")
                 dpg.add_combo(mu.CHROMA_NAMES[TONIC_CHROMA_SUBSET].tolist(), no_arrow_button=True, width=60,
                                 tag="tonic_chroma_list", callback=select_tonic_chroma_from_all)
-            with dpg.menu_bar():
-                dpg.add_text("Scale Navigation")
+                dpg.add_text(" -  Alternative names: ")
+                dpg.add_text(SELECTED_SCALE.name, tag="scale_alternative_names")
+            dpg.add_separator()
             with dpg.group(horizontal=True):
                 with dpg.group(horizontal=False):
                     dpg.add_text("Rotations:", bullet=True)
