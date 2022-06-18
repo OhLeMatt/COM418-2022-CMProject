@@ -1,9 +1,9 @@
-
 import mido
 import midi_utils as mu
 import numpy as np
 import pandas as pd
 import scales
+import suggestion
 import os
 import tempfile
 
@@ -129,6 +129,31 @@ class MidiTrackFrame:
                                                 **kwargs)
             
         return found_scales
+    
+    
+    def suggest_chord(self, 
+                      start,
+                      end,
+                      scale,
+                      nb_note,
+                      nb_chord,
+                      w_similarity,
+                      w_harmony,
+                      w_consonance,
+                      metric="bartime"):
+        
+        if start >= end:
+            raise ValueError(f"Argument start should be below end, current start={start}, end={end}")
+        if metric not in ("ticks", "bartime", "time"):
+            raise ValueError("Argument metric should be in (ticks, bartime, time)")
+        
+        mask = (self.dataframe[metric] >= start) & (self.dataframe[metric+"_release"] < end)
+        found_chords = []
+        if True in np.unique(mask):
+            sug = Suggestion(nb_note, scale, mu.to_chroma(self.dataframe.note[mask].to_numpy()),
+                            w_similarity, w_harmony, w_consonance)
+            found_chords = sug.suggest_chords(nb_chord)    
+        return found_chords
 
 
 class MidiFrame:
