@@ -1,3 +1,4 @@
+from cv2 import threshold
 import numpy as np
 import pandas as pd
 import midi_utils as mu
@@ -52,39 +53,42 @@ def compute_semitones(semitone_intervals):
     return np.diff(np.append(semitone_intervals, 12))
 
 
-def compute_match(scale_chromas, music_chromas, weights=None):
+def music_chroma_counts(music_chromas: np.ndarray, weights=None):
+    unique_music_chromas, counts = np.unique(music_chromas, return_counts=True)
+    if weights is not None:
+        counts = np.array([weights[music_chromas == chroma].sum() for chroma in unique_music_chromas])
+    chroma_counts = np.zeros(12)
+    chroma_counts[unique_music_chromas] = counts
+    return chroma_counts, chroma_counts.sum()
+
+def compute_accuracy(general_scale_subset: list,
+                    music_chroma_counts: np.ndarray, 
+                    music_chroma_counts_sum: float,
+                    tonic_chromas=mu.CHROMA_IDS,
+                    normalize_accuracy=True):
     
-    if len(music_chromas) == 0:
-        return -1 
-    if weights is None:
-        metric = np.array([0] * 12)
-        match_count = 0
-        for music_chroma, count in zip(*np.unique(music_chromas, return_counts=True)):
-            if music_chroma in scale_chromas:
-                match_count += 1
-                metric[music_chroma] += count
-            else:
-                match_count -= 1
-                metric[music_chroma] -= count
-        # if match_count == 0:
-        #     return -1
-        max_match_diff = max(len(scale_chromas), 12 - len(scale_chromas))
-        return metric.sum() / len(music_chromas) * (1 - abs(match_count - len(scale_chromas))/max_match_diff)
-    else:
-        metric = np.array([0] * 12)
-        match_count = 0
-        
-        for music_chroma in np.unique(music_chromas):
-            weighted_count = weights[music_chromas == music_chroma].sum()
-            
-            if music_chroma in scale_chromas:
-                match_count += 1
-                metric[music_chroma] += weighted_count
-            else:
-                match_count -= 1
-                metric[music_chroma] -= weighted_count
-        max_match_diff = max(len(scale_chromas), 12 - len(scale_chromas))
-        return metric.sum() / weights.sum() * (1 - abs(match_count - len(scale_chromas))/max_match_diff)
+    scales_matrix = np.array([gs.scale_bitmap.as_array() for gs in general_scale_subset])
+    scales_matrix = np.vstack([np.roll(scales_matrix, tonic, axis=1) for tonic in tonic_chromas])
+    
+    scales_note_count = np.array([gs.note_count for gs in general_scale_subset]).T
+    scales_note_count = np.tile(scales_note_count, len(tonic_chromas))
+    
+    scores = (scales_matrix @ music_chroma_counts / music_chroma_counts_sum - 0.5) * 2
+    # Equivalent:
+    # scores = (np.sum(scales_matrix * music_chroma_counts, axis=1) / music_chroma_counts_sum - 0.5) * 2  
+    
+    over_max_match_diff = 1.0/(6 + np.abs(6 - scales_note_count))
+    
+    matching = 1 - np.einsum("ij,i->i" ,np.abs(music_chroma_counts / music_chroma_counts.max() - scales_matrix), over_max_match_diff)
+    # Equivalent:
+    # matching = 1 - np.sum(np.abs(music_chroma_counts / music_chroma_counts.max() - scales_matrix), axis=1) * over_max_match_diff
+    
+    accuracy = scores * matching
+    if normalize_accuracy:
+        accuracy_min = accuracy.min()
+        accuracy = (accuracy - accuracy_min) / (accuracy.max() - accuracy.min())
+    
+    return accuracy.reshape(len(general_scale_subset), -1, order="F")
 
 
 class ChromaBitmap:
@@ -133,6 +137,11 @@ class ChromaBitmap:
     def chromas(self) -> list:
         return mu.CHROMA_IDS[self.on(mu.CHROMA_IDS)]
 
+    def as_array(self) -> np.ndarray:
+        array = np.zeros(12)
+        array[self.on(mu.CHROMA_IDS)] = 1
+        return array
+    
     def semitones(self) -> list:
         return compute_semitones(self.chromas()) #type: ignore
     
@@ -197,11 +206,15 @@ class GeneralScale:
         self.scale_id = self.scale_bitmap.bitmap
         
         self.rotation_id = None
+        self.rotations = []
         self.circular_distance = None
         if self.scale_id in SCALE_DATA.index:
             infos = SCALE_DATA.loc[self.scale_id]
             self.rotation_id = infos.rotation_id
             self.circular_distance = infos.circular_distance
+            rota_mask = (SCALE_DATA.rotation_id == self.rotation_id)
+            self.rotations = SCALE_DATA.index[rota_mask]
+            self.rotations_circular_distance = SCALE_DATA.circular_distance[rota_mask]
 
     def __repr__(self):
         return self.names[0] + " General Scale"
@@ -221,6 +234,9 @@ class GeneralScale:
     def child_scales(self):
         return [scale(scale_id) for scale_id in SCALE_FOREST[self.scale_bitmap.bitmap] if scale_id != "self"]
     
+    def rotated_scales(self):
+        return [scale(scale_id) for scale_id in self.rotations]
+    
     def scale_in(self, tonic_chroma):
         return Scale(self.semitones, tonic_chroma, name=self.name)
     
@@ -232,22 +248,17 @@ class GeneralScale:
     def from_semitones_intervals(semitone_intervals, name="Untitled"):
         return GeneralScale(semitones=compute_semitones(semitone_intervals), name=name) 
 
-    def suggest_tonic_chroma(self, 
-                             music_chromas, 
-                             return_match=False,
-                             weights=None):
-        max = -1.01
-        tonic_chroma = None
-        for chroma in mu.CHROMA_IDS:
-            score = compute_match(mu.to_chroma(self.semitone_intervals + chroma), music_chromas, weights)
-            if score > max:
-                max = score
-                tonic_chroma = chroma
-            
-        if return_match:
-            return tonic_chroma, max
-        else:
-            return tonic_chroma
+    def compute_accuracy(self, 
+                         midi_ids: np.ndarray, 
+                         weights=None,
+                         tonic_chromas=mu.CHROMA_IDS,
+                         normalize_accuracy=True):
+        chroma_counts, chroma_counts_sum = music_chroma_counts(mu.to_chroma(midi_ids), weights)
+        return compute_accuracy(general_scale_subset=[self], 
+                                music_chroma_counts=chroma_counts,
+                                music_chroma_counts_sum=chroma_counts_sum,
+                                tonic_chromas=tonic_chromas,
+                                normalize_accuracy=normalize_accuracy)
         
     def __eq__(self, other):
         return self.scale_id == other.scale_id
@@ -288,8 +299,17 @@ class Scale(GeneralScale):
     def child_scales(self):
         return [scale(scale_id, tonic_chroma=self.tonic_chroma) for scale_id in SCALE_FOREST[self.scale_bitmap.bitmap] if scale_id != "self"]
 
-    def compute_match(self, midi_ids):
-        return compute_match(self.chromas, midi_ids)
+    def rotated_scales(self):
+        return [scale(scale_id, tonic_chroma=mu.to_chroma(self.tonic_chroma + self.circular_distance - circular_distance)) 
+                    for scale_id, circular_distance in zip(self.rotations, self.rotations_circular_distance)]
+
+    def compute_accuracy(self, midi_ids: np.ndarray, weights=None):
+        chroma_counts, chroma_counts_sum = music_chroma_counts(mu.to_chroma(midi_ids), weights)
+        return compute_accuracy(general_scale_subset=[self.general_scale], 
+                                music_chroma_counts=chroma_counts,
+                                music_chroma_counts_sum=chroma_counts_sum,
+                                tonic_chromas=np.array(self.tonic_chroma),
+                                normalize_accuracy=False)
 
     def general_scale(self):
         return GeneralScale(self.semitones, self.name)
@@ -430,21 +450,16 @@ def altered_scale(tonic_chroma=None):
 # https://plucknplay.github.io/en/scale-list.html
 
 
-ALL_GENERAL_SCALES = [general_scale(scale_id) for scale_id in SCALE_DATA.index]
+# ALL_GENERAL_SCALES = [general_scale(scale_id) for scale_id in SCALE_DATA.index]
+ALL_GENERAL_ROTZERO_SCALES = [general_scale(scale_id) for scale_id in SCALE_DATA.index[SCALE_DATA.circular_distance == 0]]
 
 def create_general_scale_subset(note_counts=None, 
-                                contained_bitmap=None, 
-                                container_bitmap=None,
                                 scale_ids=None):
-    general_scale_subset = ALL_GENERAL_SCALES
+    general_scale_subset = ALL_GENERAL_ROTZERO_SCALES
     if scale_ids is not None:
         if type(scale_ids) is int:
             scale_ids = [scale_ids]
-        general_scale_subset = [scale for scale in general_scale_subset if scale.scale_id in scale_ids]
-    if container_bitmap is not None:
-        general_scale_subset = [scale for scale in general_scale_subset if scale.scale_bitmap.is_contained(container_bitmap)]
-    if contained_bitmap is not None:
-        general_scale_subset = [scale for scale in general_scale_subset if scale.scale_bitmap.contains(contained_bitmap)]
+        general_scale_subset = [scale for scale in general_scale_subset if scale.scale_id in scale_ids] 
     if note_counts is not None:
         if type(note_counts) is int:
             note_counts = [note_counts]
@@ -452,82 +467,68 @@ def create_general_scale_subset(note_counts=None,
     return general_scale_subset
     
 def suggest_scales(music_chromas, 
-                   threshold=0.99, 
-                   normalize_scores=True,
+                   threshold=0.99,
+                   weights=None,
+                   general_scale_subset=ALL_GENERAL_ROTZERO_SCALES,
                    tonic_chromas=mu.CHROMA_IDS,
-                   general_scale_subset=ALL_GENERAL_SCALES,
-                   weights=None):
+                   normalize_accuracy=True):
+    chroma_counts, chroma_counts_sum = music_chroma_counts(music_chromas=music_chromas, weights=weights)
     
-    if normalize_scores:
-        results = {}
-        min_score = 1
-        max_score = -1
-        for gs in general_scale_subset:
-            tonic_chroma, score = gs.suggest_tonic_chroma(music_chromas, return_match=True, weights=weights)
-            results[gs.scale_in(tonic_chroma)] = score
-            min_score = min(score, min_score)
-            max_score = max(score, max_score)
-            
-        amplitude_score = max_score - min_score
-        if amplitude_score != 0.0:
-            for scale in results:
-                results[scale] = (results[scale] - min_score)/amplitude_score
-        
-        filtered_results = {}
-        for scale in results:
-            if results[scale] > threshold:
-                filtered_results[scale] = results[scale]
-        return filtered_results
-    else:
-        results = {}
-        for gs in general_scale_subset:
-            tonic_chroma, score = gs.suggest_tonic_chroma(music_chromas, return_match=True)  # type: ignore
-            if score > threshold and tonic_chroma in tonic_chromas:
-                results[gs.scale_in(tonic_chroma)] = score
-        return results
+    accuracies = compute_accuracy(general_scale_subset=general_scale_subset,
+                                music_chroma_counts=chroma_counts, 
+                                music_chroma_counts_sum=chroma_counts_sum,
+                                tonic_chromas=tonic_chromas,
+                                normalize_accuracy=normalize_accuracy)
     
+    suggestions = []
+    for scale_index, general_scale in enumerate(general_scale_subset):
+        for tonic_index, tonic_chroma in enumerate(tonic_chromas):
+            accuracy = accuracies[scale_index, tonic_index]
+            if accuracies[scale_index, tonic_index] >= threshold:
+                suggestions.append((general_scale, tonic_chroma, accuracy))
+    return sorted(suggestions, key=lambda kv: (-kv[2], general_scale.names[0]))
+    # return suggestions
 
-def windowed_suggest_scales(music_chromas, 
-                            threshold=0.9, 
-                            normalize_scores=True,
-                            window_size=30, 
-                            window_threshold=0.95,
-                            **kwargs):
+# def windowed_suggest_scales(music_dataframe, 
+#                             threshold=0.9, 
+#                             normalize_scores=True,
+#                             window_size=30, 
+#                             window_threshold=0.95,
+#                             **kwargs):
     
-    results = {}
-    counts = {}
-    for i in range(window_size, len(music_chromas), window_size):
-        for scale, score in suggest_scales(music_chromas[i-window_size:i], 
-                                           threshold=window_threshold,
-                                           normalize_scores=normalize_scores,
-                                           **kwargs).items():
-            if scale not in results:
-                results[scale] = 0
-                counts [scale] = 0
-            results[scale] += score
-            counts[scale] += 1
+#     results = {}
+#     counts = {}
+#     for i in range(window_size, len(music_chromas), window_size):
+#         for scale, score in suggest_scales(music_chromas[i-window_size:i], 
+#                                            threshold=window_threshold,
+#                                            normalize_scores=normalize_scores,
+#                                            **kwargs).items():
+#             if scale not in results:
+#                 results[scale] = 0
+#                 counts [scale] = 0
+#             results[scale] += score
+#             counts[scale] += 1
     
     
-    
-    if len(results.keys()) > 0:
-        filtered_results = {}     
-        if normalize_scores:
-            max_score = results[max(results, key=results.get)]
-            min_score = results[min(results, key=results.get)]
-            amplitude_score = max_score - min_score
-            if amplitude_score != 0.0:
-                for scale in results:
-                    results[scale] = (results[scale] - min_score)/amplitude_score
-        else:
-            max_score_count = counts[max(results, key=results.get)]
-            for scale in results:
-                results[scale] /= max_score_count
+#     if len(results.keys()) > 0:
+#         filtered_results = {}     
+#         if normalize_scores:
+#             max_score = results[max(results, key=results.get)]
+#             min_score = results[min(results, key=results.get)]
+#             amplitude_score = max_score - min_score
+#             if amplitude_score != 0.0:
+#                 for scale in results:
+#                     results[scale] = (results[scale] - min_score)/amplitude_score
+#         else:
+#             max_score_count = counts[max(results, key=results.get)]
+#             for scale in results:
+#                 results[scale] /= max_score_count
         
-        for scale in results:
-            if results[scale] > threshold:
-                filtered_results[scale] = results[scale]
+#         for scale in results:
+#             if results[scale] > threshold:
+#                 filtered_results[scale] = results[scale]
         
-        return filtered_results
-    else:
-        return {}
+#         return filtered_results
+#     else:
+#         return {}
     

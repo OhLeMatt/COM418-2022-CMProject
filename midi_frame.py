@@ -81,7 +81,7 @@ class MidiTrackFrame:
                           start,
                           end,
                           metric="bartime"):
-        mask = (self.dataframe[metric] >= start) & (self.dataframe[metric] < end)
+        mask = (self.dataframe[metric] >= start) & (self.dataframe[metric+"_release"] < end)
         return self.dataframe[mask]
     
     def suggest_scale(self, 
@@ -100,7 +100,7 @@ class MidiTrackFrame:
         Kwargs:
             normalize_score(bool): Normalize the score, 
             threshold (float): Between 0 and 1, the threshold on scores to filter suggestions. Default to 0.99.
-            normalize_scores (float): If True, will normalize all scores before threshold pass. Default to True.
+            normalize_accuracy (float): If True, will normalize all scores before threshold pass. Default to True.
             tonic_chromas (list(int)): List of allowed chroma for being the tonic. Default to mu.CHROMA_IDS.
             general_scale_subset (list(scales.GeneralScale)): Set of scale on which the analysis will be performed. Default to ALL_GENERAL_SCALES.
             
@@ -118,15 +118,15 @@ class MidiTrackFrame:
             raise ValueError("Argument metric should be in (ticks, bartime, time)")
         weights = None
         
-        mask = (self.dataframe[metric] >= start) & (self.dataframe[metric] < end)
-        found_scales = {}
+        mask = (self.dataframe[metric] >= start) & (self.dataframe[metric+"_release"] < end)
+        found_scales = []
         if True in np.unique(mask):
             if weighted:
                 weights = self.dataframe.weight[mask].to_numpy()
             
             found_scales = scales.suggest_scales(mu.to_chroma(self.dataframe.note[mask].to_numpy()), 
-                                weights=weights, 
-                                **kwargs)
+                                                weights=weights, 
+                                                **kwargs)
             
         return found_scales
 

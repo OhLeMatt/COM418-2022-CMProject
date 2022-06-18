@@ -1,7 +1,5 @@
 
 from pickle import GLOBAL
-import weakref
-from cv2 import threshold
 import dearpygui.dearpygui as dpg
 from sklearn import metrics
 from midi_frame import MidiFrame, MidiTrackFrame
@@ -79,9 +77,9 @@ def update_ui_suggestions(midiplayer: MidiPlayer):
         dpg.add_table_column()
         dpg.add_table_column()
 
-        for scale, accuracy in suggestions.items():
+        for scale, tonic, accuracy in suggestions:
             with dpg.table_row(parent="suggestion_content"):
-                    dpg.add_text(repr(scale))
+                    dpg.add_text(repr(scale).replace("General Scale", "Scale in " + mu.CHROMA_NAMES[tonic]))
                     dpg.add_text(f"{int(accuracy * 100)}%")
                     dpg.add_text(scale.note_count)
                     dpg.add_text(scale.name)
@@ -194,7 +192,7 @@ def set_normalize(sender, app_data, user_data):
     global NORMALIZE_SCORES
     NORMALIZE_SCORES = app_data
     if inputMidi is not None:
-        inputMidi.analysis_parameters["normalize_scores"] = NORMALIZE_SCORES
+        inputMidi.analysis_parameters["normalize_accuracy"] = NORMALIZE_SCORES
 
 def set_weighted(sender, app_data, user_data):
     global WEIGHTED
@@ -393,3 +391,6 @@ dpg.setup_dearpygui()
 dpg.show_viewport()
 dpg.start_dearpygui()
 dpg.destroy_context()
+
+# TODO:
+#   Understand what's going on when we init -> Get clean init

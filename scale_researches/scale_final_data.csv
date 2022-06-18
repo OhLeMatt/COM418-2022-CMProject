@@ -77,8 +77,8 @@ scale_id,scale_bits,rotation_id,circular_distance,note_count,name
 2766,101011001110,31411,10,7,Mixolydian Augmented
 2741,101010110101,31413,0,7,"Lydian, Kalyan, IonianPing (China), Nis Garb.ri (Mesopotamian)"
 3418,110101011010,31413,1,7,"Phrygian, Bhairavi, Ishartum (Sumerian), Ousak (Greece), Gregorian Scale 3"
+2773,101011010101,31413,5,7,"Major, Ionian, Bilaval"
 3434,110101101010,31413,6,7,"Locrian, Qablitum (Sumerian)"
-2773,101011010101,31413,10,7,"Major, Ionian, Bilaval"
 2745,101010111001,31417,0,7,"Mela Latangi (India), Dolian"
 2970,101110011010,31417,8,7,Sabach (Greece)
 2748,101010111100,31420,0,7,Mela Kantamani (India)

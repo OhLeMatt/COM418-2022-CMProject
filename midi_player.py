@@ -31,10 +31,10 @@ class MidiPlayer:
         self.analysis_suggestions = {}
         self.analysis_parameters = {
             "weighted": False,
-            "normalize_scores": True,
+            "normalize_accuracy": True,
             "threshold": 0.9,
             "tonic_chromas": mu.CHROMA_IDS,
-            "general_scale_subset": scales.ALL_GENERAL_SCALES
+            "general_scale_subset": scales.ALL_GENERAL_ROTZERO_SCALES
         }
     
         self.analysis_window_global = False
@@ -45,7 +45,7 @@ class MidiPlayer:
         self.on_cursor_change_callback = lambda midiplayer: print("No on cursor change callback")
         self.on_window_change_callback = lambda midiplayer: print("No on window change callback")
         self.on_analysis_change_callback = lambda midiplayer: print("No on analysis change callback")
-        self.general_scale_subset = scales.ALL_GENERAL_SCALES
+        self.general_scale_subset = scales.ALL_GENERAL_ROTZERO_SCALES
         
         self.channels = [i for i in range(16)]
         self.as_mido = mido.MidiFile(filename=self.file_name)
@@ -63,7 +63,7 @@ class MidiPlayer:
         
         def output_callback(outdata, frame_count, time, status):
             assert len(outdata) == frame_count
-            self.ctx.callback_enter(status, outdata)
+            # self.ctx.callback_enter(status, outdata)
 
             if self.playing:
                 if not self.mute:
@@ -71,7 +71,7 @@ class MidiPlayer:
                     outdata[:len(sound)] = stereo_sound(sound, sound, min(1-self.balance, 1.0), min(1+self.balance, 1.0))
             
                 self.update_cursor(self.cursor["idx"] + frame_count)
-            self.ctx.callback_exit()
+            # self.ctx.callback_exit()
 
         self.output_callback = output_callback
     
@@ -97,7 +97,7 @@ class MidiPlayer:
         was_playing = self.playing
         self.stop()
         self.audio_data = music.synthesize(fs=self.Fs)
-        self.ctx.frames = self.ctx.check_data(self.audio_data, None, sd.default.device)
+        self.ctx.frames = self.ctx.check_data(self.audio_data, None, sd.default.device)   # type: ignore
         if was_playing:
             self.play()
             
@@ -148,7 +148,7 @@ class MidiPlayer:
         if self.analysis_active:
             
             if barsize is not None:
-                self.analysis_window_extent[1] = barsize//2
+                self.analysis_window_extent[1] = 1
                 self.analysis_window_extent[0] = barsize - self.analysis_window_extent[1]
             self.analysis_window[0] = int(self.cursor["bartime"]) - self.analysis_window_extent[0]
             self.analysis_window[1] = int(self.cursor["bartime"]) + self.analysis_window_extent[1]
