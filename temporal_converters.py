@@ -1,6 +1,5 @@
 import mido
 import numpy as np
-
 from utils import is_iterable
           
 class TicksConverter:

@@ -1,8 +1,3 @@
-
-from math import ceil
-from xmlrpc.client import Boolean
-#from cv2 import threshold
-from jinja2 import TemplateRuntimeError
 import mido
 import midi_utils as mu
 import scales
@@ -11,6 +6,7 @@ from pretty_midi import PrettyMIDI
 import sounddevice as sd
 import numpy as np
 from utils import stereo_sound
+from math import ceil
 
 class MidiPlayer: 
     def __init__(self, 
@@ -30,6 +26,7 @@ class MidiPlayer:
             "bartime": 0,
             "ticks": 0
         }
+        
         self.analysis_active = True
         self.analysis_suggestions = {}
         self.analysis_parameters = {
@@ -98,7 +95,7 @@ class MidiPlayer:
         # music = PrettyMIDI(midi_file=file_name)
         music = PrettyMIDI(midi_file=MidiFrame.EXPORT_DEFAULT_FILEPATH)
         was_playing = self.playing
-        self.stop()
+        self.pause()
         self.audio_data = music.synthesize(fs=self.Fs)
         self.ctx.frames = self.ctx.check_data(self.audio_data, None, sd.default.device)   # type: ignore
         if was_playing:
@@ -247,10 +244,6 @@ class MidiPlayer:
         sd.stop()
 
     def get_suggestions(self):
-        # dummy = [{"name": "Hard Japan descending", "accuracy": 0.9, "note_count": 5, "alternate_names": "Raga Malkauns, Blues Pentatonic Minor"}, 
-        # {"name": "Enigmatic Descending", "accuracy": 0.78, "note_count": 7, "alternate_names": "Katadianas"}, 
-        # {"name": "Major Lydian", "accuracy": 0.53, "note_count": 8, "alternate_names": "Genus Diatonicum Veterum Correctum, Zylyllic, Ishikotsucho (Japan)"}]
-
         return self.analysis_suggestions
         
     def set_volume(self, volume):

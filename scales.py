@@ -1,4 +1,3 @@
-from cv2 import threshold
 import numpy as np
 import pandas as pd
 import midi_utils as mu

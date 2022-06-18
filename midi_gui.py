@@ -1,9 +1,4 @@
-
-from email.policy import default
-from pickle import GLOBAL
 import dearpygui.dearpygui as dpg
-from platformdirs import AppDirs
-from sklearn import metrics
 from midi_frame import MidiFrame, MidiTrackFrame
 from midi_player import MidiPlayer
 import scales
@@ -15,7 +10,7 @@ import time
 
 
 ###########################    Init Variables     ########################### 
-inputMidi:MidiPlayer = None
+INPUTMIDI:MidiPlayer = None
 
 MIDI_PATH = "MIDI_Files"
 MIDIFILES = [f for f in listdir(MIDI_PATH) if isfile(join(MIDI_PATH, f))]
@@ -24,9 +19,8 @@ NORMALIZE_SCORES = True
 WEIGHTED = False
 THRESHOLD = 0.9
 METRIC = "ticks"
-BAR_WINDOW = [0,0]
+
 WINDOW = [0,0]
-WIN_POSITION = 10000
 NUM_BARS = 4
 NOTE_COUNTS = set(i for i in range(5,13))
 FOLLOW_CURSOR = False
@@ -61,12 +55,14 @@ NOTE_COLORS = [
         [255,0,255], # A#
         [255,0,127] # B
     ]
+# Get colour texture for each note (in progress)
+def get_note_colour(note):
+    return NOTE_COLORS[int(note) % 12].copy()
 
 def combo_getter(item, list):
     for x in list:
         if str(x) == item:
             return x
-    
 
 dpg.create_context()
 
@@ -79,7 +75,6 @@ dpg.add_static_texture(1, 1, [1,1,1,0.05], parent="texture_container", tag="Tran
 def _log(sender, app_data, user_data):
     print(f"sender: {sender}, \t app_data: {app_data}, \t user_data: {user_data}")
 
-
 def update_ui_cursor(midiplayer: MidiPlayer):
     global METRIC, FOLLOW_CURSOR
     dpg.set_value("ui_cursor", midiplayer.cursor[METRIC])
@@ -90,7 +85,6 @@ def update_ui_cursor(midiplayer: MidiPlayer):
                         midiplayer.cursor[METRIC] - view_width/2,
                         midiplayer.cursor[METRIC] + view_width/2)
     
-
 def update_ui_window(midiplayer: MidiPlayer):
     global WINDOW, METRIC
     WINDOW[0] = midiplayer.convert_unit(midiplayer.analysis_window[0], "bartime", METRIC)
@@ -130,19 +124,18 @@ def random_midi(sender, app_data, user_data):
 def select_file(sender, app_data, user_data):
     path = app_data['current_path']  # path to sound font file
     midi_file = app_data['file_path_name']
-
     load_midi(midi_file, path, app_data['file_name'])
 
 # Utility function to load selected midi file 
 def load_midi(midi_file, path, name):
     print("Filename: ", midi_file)
 
-    global inputMidi 
+    global INPUTMIDI 
+    
+    if INPUTMIDI is not None:
+        INPUTMIDI.stop()
 
-    if inputMidi is not None:
-        inputMidi.stop()
-
-    inputMidi = MidiPlayer(midi_file, 
+    INPUTMIDI = MidiPlayer(midi_file, 
                            path,
                            on_cursor_change_callback=update_ui_cursor,
                            on_window_change_callback=update_ui_window,
@@ -153,36 +146,41 @@ def load_midi(midi_file, path, name):
         dpg.set_value(item, True)
         dpg.enable_item(item)
         
-        if i in inputMidi.midiframe.playing_track_frame.channel_count:
+        if i in INPUTMIDI.midiframe.playing_track_frame.channel_count:
             dpg.show_item(item)
         else:
             dpg.hide_item(item)
     
+    INPUTMIDI.analysis_parameters["general_scale_subset"] = GENERAL_SCALE_SUBSET
+    INPUTMIDI.analysis_parameters["weighted"] = WEIGHTED
+    INPUTMIDI.analysis_parameters["threshold"] = THRESHOLD
+    INPUTMIDI.analysis_parameters["normalize_accuracy"] = NORMALIZE_SCORES
+    INPUTMIDI.update_window(barsize=NUM_BARS)
+    set_volume(None, , None)
+    compute_suggestions(None, None, None)    
+
     dpg.set_value("PlayText", "Selected: " + name.replace(".mid", "").replace("_", " "))
     dpg.set_item_label("PlayButton", "Play")
     
-    
     display(None, None, None)
-    
-    
 
 def play_midi(sender, app_data, user_data):
-    if inputMidi is not None:
+    if INPUTMIDI is not None:
         # user_data is either playpause at True, stop at False
         if user_data:
-            if inputMidi.playing:
-                inputMidi.pause()
+            if INPUTMIDI.playing:
+                INPUTMIDI.pause()
                 dpg.set_item_label("PlayButton", "Play")
             else:
-                inputMidi.play()
+                INPUTMIDI.play()
                 dpg.set_item_label("PlayButton", "Pause")
         else:
-            inputMidi.stop()
+            INPUTMIDI.stop()
             dpg.set_item_label("PlayButton", "Play")
             
 
 def display(sender, app_data, user_data):
-    if inputMidi is not None and inputMidi.displayable:
+    if INPUTMIDI is not None and INPUTMIDI.displayable:
         global PLOT_DISPLAYED, METRIC, WEIGHTED
 
         if PLOT_DISPLAYED:
@@ -190,15 +188,15 @@ def display(sender, app_data, user_data):
             PLOT_DISPLAYED = False
 
         if not PLOT_DISPLAYED: 
-            dpg.set_axis_limits("imgy", inputMidi.min_note - 1, inputMidi.max_note + 1)
+            dpg.set_axis_limits("imgy", INPUTMIDI.min_note - 1, INPUTMIDI.max_note + 1)
             #dpg.set_axis_limits("imgx", 0, 100)
             # dpg.set_axis_limits_auto("imgx")
             #dpg.set_axis_limits_auto("imgx")
                     
             PLOT_DISPLAYED = True
-            if len(inputMidi.df) > 0:
+            if len(INPUTMIDI.df) > 0:
                 metric_release = METRIC + "_release"
-                df_copy = inputMidi.df[[METRIC, "note", metric_release, "weight"]]
+                df_copy = INPUTMIDI.df[[METRIC, "note", metric_release, "weight"]]
                 for i, x in df_copy.iterrows():
                     
                     tint = get_note_colour(x.note)
@@ -212,46 +210,43 @@ def display(sender, app_data, user_data):
                                          label="C", tag=f"MidiNote{i}", parent="imgy", tint_color=tuple(tint))
                 dpg.fit_axis_data("imgx")
 
-# Get colour texture for each note (in progress)
-def get_note_colour(note):
-    return NOTE_COLORS[int(note) % 12].copy()
 
 def channel_selection(sender, app_data, user_data):
-    if inputMidi is not None:
+    if INPUTMIDI is not None:
         change = False
         if app_data:
-            change = inputMidi.add_channel(user_data)
+            change = INPUTMIDI.add_channel(user_data)
         else: 
-            change = inputMidi.remove_channel(user_data)
+            change = INPUTMIDI.remove_channel(user_data)
         if change:
             display(None, None, None)
-        print("channels: " + str(inputMidi.channels))
+        print("channels: " + str(INPUTMIDI.channels))
 
 def set_threshold(sender, app_data, user_data):
     global THRESHOLD
     THRESHOLD = app_data
-    if inputMidi is not None:
-        inputMidi.analysis_parameters["threshold"] = THRESHOLD
+    if INPUTMIDI is not None:
+        INPUTMIDI.analysis_parameters["threshold"] = THRESHOLD
 
 def set_normalize(sender, app_data, user_data):
     global NORMALIZE_SCORES
     NORMALIZE_SCORES = app_data
-    if inputMidi is not None:
-        inputMidi.analysis_parameters["normalize_accuracy"] = NORMALIZE_SCORES
+    if INPUTMIDI is not None:
+        INPUTMIDI.analysis_parameters["normalize_accuracy"] = NORMALIZE_SCORES
 
 def set_weighted(sender, app_data, user_data):
     global WEIGHTED
     WEIGHTED = app_data
     display(None, None, None)
-    if inputMidi is not None:
-        inputMidi.analysis_parameters["weighted"] = WEIGHTED
+    if INPUTMIDI is not None:
+        INPUTMIDI.analysis_parameters["weighted"] = WEIGHTED
 
 def set_scale(sender, app_data, user_data):
     print("scale: " + str(app_data))
 
 def ui_cursor_change(sender, app_data, user_data):
-    if inputMidi is not None:
-        inputMidi.update_cursor(dpg.get_value(sender), metric=METRIC, on_cursor_callback=False)
+    if INPUTMIDI is not None:
+        INPUTMIDI.update_cursor(dpg.get_value(sender), metric=METRIC, on_cursor_callback=False)
 
 def set_notecounts(sender, app_data, user_data):
     global NOTE_COUNTS, GENERAL_SCALE_SUBSET
@@ -262,14 +257,10 @@ def set_notecounts(sender, app_data, user_data):
     GENERAL_SCALE_SUBSET = scales.create_general_scale_subset(NOTE_COUNTS)
     dpg.configure_item("general_scale_list", items=GENERAL_SCALE_SUBSET)
     
-    if inputMidi is not None:
-        inputMidi.analysis_parameters["general_scale_subset"] = GENERAL_SCALE_SUBSET
+    if INPUTMIDI is not None:
+        INPUTMIDI.analysis_parameters["general_scale_subset"] = GENERAL_SCALE_SUBSET
     print(f"note counts selected: {NOTE_COUNTS} | number of general scales: {len(GENERAL_SCALE_SUBSET)}")
     print("note counts selected: " + str(user_data))
-
-# def view_change(sender, app_data, user_data):
-#     dpg.set_axis_limits("imgx", app_data, app_data + 100)
-
 
 def set_metric(sender, app_data, user_data):
     global METRIC
@@ -285,12 +276,12 @@ def set_num_bars(sender, app_data, user_data):
     else:
         NUM_BARS = NUM_BARS - 1
     dpg.set_value("num_bars", NUM_BARS)
-    if inputMidi is not None and not inputMidi.analysis_window_global:
-        inputMidi.update_window(barsize=NUM_BARS)
+    if INPUTMIDI is not None and not INPUTMIDI.analysis_window_global:
+        INPUTMIDI.update_window(barsize=NUM_BARS)
 
 def set_volume(sender, app_data, user_data):
-    if inputMidi is not None: 
-        inputMidi.set_volume(app_data)
+    if INPUTMIDI is not None: 
+        INPUTMIDI.set_volume(app_data)
 
 def set_follow_cursor(sender, app_data, user_data):
     global FOLLOW_CURSOR
@@ -299,18 +290,17 @@ def set_follow_cursor(sender, app_data, user_data):
         dpg.set_axis_limits_auto("imgx")
 
 def entire_window(sender, app_data, user_data):
-    if inputMidi is not None:
-        if inputMidi.analysis_window_global:
-            inputMidi.set_entire_window(False)
+    if INPUTMIDI is not None:
+        if INPUTMIDI.analysis_window_global:
+            INPUTMIDI.set_entire_window(False)
             dpg.set_item_label(sender, "Entire Window Suggestions")
         else:
-            inputMidi.set_entire_window(True)
+            INPUTMIDI.set_entire_window(True)
             dpg.set_item_label(sender, "Cursor Window Suggestions")
      
 def compute_suggestions(sender, app_data, user_data):
-    if inputMidi:
-        inputMidi.analyse()
-
+    if INPUTMIDI:
+        INPUTMIDI.analyse()
 
 def select_scale_from_suggestions(sender, app_data, user_data):
     global LAST_SELECTED_SCALE_UI_ELEMENT, SELECTED_GENERAL_SCALE, SELECTED_TONIC_CHROMA
