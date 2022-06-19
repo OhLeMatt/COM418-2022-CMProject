@@ -1,6 +1,6 @@
-# COM418-2022-CMProject - Improvisation Guidance Tool
+# Extemporaneous, an Improvisation Guidance Tool
 
-In the context of the Computers & Music (COM-418) course at EPFL, we implemented an Improvisation Guidance Tool. We analyse midi files to extract corresponding scales and suggest chords or notes to play along. 
+In the context of the Computers & Music (COM-418) course at EPFL, we created Extemporaneous, an Improvisation Guidance Tool. We analyse midi files to extract corresponding scales and suggest chords or notes to play along. 
 
 We offer the following functionalities:
 * [Midi file selection](#midi-player) 
@@ -137,6 +137,10 @@ sugg
 ![Suggested piano tiles](images/piano_tiles.png)
 
 ![Suggested piano chords](images/piano_chords.png)
+
+## Methodology 
+
+Our methodology for the scale and chord suggestions can be found in the `technical_challenges.ipynb` notebook. 
 
 # References 
 The midi files were collected from the following websites: 
