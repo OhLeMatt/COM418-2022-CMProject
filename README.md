@@ -48,9 +48,12 @@ You can see an example of the visualisation for a midi of Eleanor Rigby by the B
 ![colour code](images/midiviz_beatles.png)
 
 ### Scale Navigation
-The Scale Navigation window allows users to select the scale for which they will receive chord suggestions. We have 170 scales to choose from in total. The user can select the tonic of the scale. 
+The Scale Navigation window allows users to select the scale for which they will receive chord suggestions. We have 170 scales to choose from in total. The user can select the tonic of the scale. We also show the rotations of this scale (i.e. other scales that have the exact same notes), children scales (whose notes are a subset of the selected scale) and parent scales (whose notes are a superset of the selected scale). 
 
 ![colour code](images/scalenav.gif)
+
+#### Scale Suggestion
+The scale suggestions are displayed under a table which shows the scale name, the accuracy of the suggestion, the amount of notes in the scale and alternate names for the scale if any. Suggestions can be tuned using the parameters explained hereafter. 
 
 #### Parameters
 The scale suggestion can be personalised under the following parameters:
@@ -62,8 +65,6 @@ The scale suggestion can be personalised under the following parameters:
 * Accuracy threshold: this threshold determines the accuracy with which the user would like the scales to be suggested (i.e. to filter out bad suggestions).
 * Amount of notes: the user can select how many notes they would like the scale suggestions to have. 
 
-#### Result
-The resulting suggestions are displayed under a table which shows the scale name, the accuracy of the suggestion, the amount of notes in the scale and alternate names for the scale if any. 
 
 #### Methodology
 
