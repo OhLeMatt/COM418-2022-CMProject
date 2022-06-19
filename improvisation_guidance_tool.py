@@ -16,6 +16,7 @@ def draw_midi_player_ui():
         with dpg.group(horizontal=True):
             dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog_id"))
             dpg.add_button(label="Random", callback=random_midi)
+            dpg.add_loading_indicator(show=False, tag="file_loadindicator", width=5, height=5, style=1)
             dpg.add_text(label="PlayText", default_value="No file selected", tag="PlayText")
         
         with dpg.group(horizontal=True, horizontal_spacing=10):

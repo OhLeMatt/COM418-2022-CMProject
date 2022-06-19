@@ -8,6 +8,7 @@ from gui.interactive_callbacks import display, compute_suggestions, \
                         
 # Utility function to load selected midi file 
 def load_midi(midi_file, path, name):
+    dpg.show_item("file_loadindicator")
     
     print("Filename: ", midi_file)
     
@@ -42,6 +43,7 @@ def load_midi(midi_file, path, name):
     dpg.set_item_label("PlayButton", "Play")
     
     display(None, None, None)
+    dpg.hide_item("file_loadindicator")
     
     
 def random_midi(sender, app_data, user_data):
