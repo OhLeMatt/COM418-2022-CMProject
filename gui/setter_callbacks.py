@@ -22,9 +22,9 @@ def set_threshold(sender, app_data, user_data):
         gc.MIDIPLAYER.analysis_parameters["threshold"] = gc.THRESHOLD
 
 def set_normalize(sender, app_data, user_data):
-    gc.NORMALIZE_SCORES = app_data
+    gc.NORMALIZE_ACCURACY = app_data
     if gc.MIDIPLAYER is not None:
-        gc.MIDIPLAYER.analysis_parameters["normalize_accuracy"] = gc.NORMALIZE_SCORES
+        gc.MIDIPLAYER.analysis_parameters["normalize_accuracy"] = gc.NORMALIZE_ACCURACY
 
 def set_weighted(sender, app_data, user_data):    
     gc.WEIGHTED = app_data
@@ -41,12 +41,13 @@ def set_notecounts(sender, app_data, user_data):
         gc.NOTE_COUNTS.add(user_data)
     else:
         gc.NOTE_COUNTS.remove(user_data)
-    gc.GENERAL_SCALE_SUBSET = scales.create_general_scale_subset(gc.NOTE_COUNTS)
+
+    gc.GENERAL_SCALE_ROTZERO_SUBSET, gc.GENERAL_SCALE_SUBSET = scales.create_general_scale_subset(gc.NOTE_COUNTS, not_only_rotation_zero=True)
     dpg.configure_item("general_scale_list", items=gc.GENERAL_SCALE_SUBSET)
     
     if gc.MIDIPLAYER is not None:
-        gc.MIDIPLAYER.analysis_parameters["general_scale_subset"] = gc.GENERAL_SCALE_SUBSET
-    print(f"note counts selected: {gc.NOTE_COUNTS} | number of general scales: {len(gc.GENERAL_SCALE_SUBSET)}")
+        gc.MIDIPLAYER.analysis_parameters["general_scale_subset"] = gc.GENERAL_SCALE_ROTZERO_SUBSET
+    print(f"note counts selected: {gc.NOTE_COUNTS} | number of general scales: {len(gc.GENERAL_SCALE_ROTZERO_SUBSET)}")
     print("note counts selected: " + str(user_data))
 
 def set_metric(sender, app_data, user_data):

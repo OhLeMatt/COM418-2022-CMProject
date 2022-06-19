@@ -450,12 +450,15 @@ def altered_scale(tonic_chroma=None):
 # https://plucknplay.github.io/en/scale-list.html
 
 
-# ALL_GENERAL_SCALES = [general_scale(scale_id) for scale_id in SCALE_DATA.index]
+ALL_GENERAL_SCALES = [general_scale(scale_id) for scale_id in SCALE_DATA.index]
 ALL_GENERAL_ROTZERO_SCALES = [general_scale(scale_id) for scale_id in SCALE_DATA.index[SCALE_DATA.circular_distance == 0]]
 
 def create_general_scale_subset(note_counts=None, 
-                                scale_ids=None):
+                                scale_ids=None,
+                                not_only_rotation_zero=False):
     general_scale_subset = ALL_GENERAL_ROTZERO_SCALES
+    if not_only_rotation_zero:
+        general_scale_subset = ALL_GENERAL_SCALES
     if scale_ids is not None:
         if type(scale_ids) is int:
             scale_ids = [scale_ids]
@@ -464,7 +467,11 @@ def create_general_scale_subset(note_counts=None,
         if type(note_counts) is int:
             note_counts = [note_counts]
         general_scale_subset = [scale for scale in general_scale_subset if scale.note_count in note_counts]    
-    return general_scale_subset
+    if not_only_rotation_zero:
+        general_scale_rotzero_subset = [scale for scale in general_scale_subset if scale.circular_distance == 0]    
+        return general_scale_rotzero_subset, general_scale_subset
+    else:
+        return general_scale_subset
     
 def suggest_scales(music_chromas, 
                    threshold=0.99,
@@ -487,11 +494,10 @@ def suggest_scales(music_chromas,
             if accuracies[scale_index, tonic_index] >= threshold:
                 suggestions.append((general_scale, tonic_chroma, accuracy))
     return sorted(suggestions, key=lambda kv: (-kv[2], general_scale))
-    # return suggestions
 
 # def windowed_suggest_scales(music_dataframe, 
 #                             threshold=0.9, 
-#                             normalize_scores=True,
+#                             NORMALIZE_ACCURACY=True,
 #                             window_size=30, 
 #                             window_threshold=0.95,
 #                             **kwargs):
@@ -501,7 +507,7 @@ def suggest_scales(music_chromas,
 #     for i in range(window_size, len(music_chromas), window_size):
 #         for scale, score in suggest_scales(music_chromas[i-window_size:i], 
 #                                            threshold=window_threshold,
-#                                            normalize_scores=normalize_scores,
+#                                            NORMALIZE_ACCURACY=NORMALIZE_ACCURACY,
 #                                            **kwargs).items():
 #             if scale not in results:
 #                 results[scale] = 0
@@ -512,7 +518,7 @@ def suggest_scales(music_chromas,
     
 #     if len(results.keys()) > 0:
 #         filtered_results = {}     
-#         if normalize_scores:
+#         if NORMALIZE_ACCURACY:
 #             max_score = results[max(results, key=results.get)]
 #             min_score = results[min(results, key=results.get)]
 #             amplitude_score = max_score - min_score

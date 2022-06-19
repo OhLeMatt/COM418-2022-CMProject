@@ -75,7 +75,7 @@ def play_midi(sender, app_data, user_data):
             dpg.configure_item("PlayButton", texture_tag="play")
 
 def display(sender, app_data, user_data):
-    print(gc.MIDIPLAYER)
+    dpg.show_item("loading_indicator")
     if gc.MIDIPLAYER is not None and gc.MIDIPLAYER.displayable:
         if gc.PLOT_DISPLAYED:
             dpg.delete_item("imgy", children_only=True)
@@ -99,6 +99,8 @@ def display(sender, app_data, user_data):
                                          [x[gc.METRIC], x.note - 0.5], [x[metric_release], x.note + 0.5], 
                                          label="C", tag=f"MidiNote{i}", parent="imgy", tint_color=tint)
                 dpg.fit_axis_data("imgx")
+    dpg.hide_item("loading_indicator")        
+        
 
 def compute_suggestions(sender, app_data, user_data):
     if gc.MIDIPLAYER:

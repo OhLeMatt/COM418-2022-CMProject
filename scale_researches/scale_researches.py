@@ -2,6 +2,7 @@ import pickle
 import numpy as np
 import pandas as pd
 import copy
+
 from music_tools.scales import *
 from music_tools.utils import base_to_list, list_to_str
 

@@ -8,7 +8,7 @@ from gui.interactive_callbacks import display, compute_suggestions, \
                         
 # Utility function to load selected midi file 
 def load_midi(midi_file, path, name):
-    dpg.show_item("file_loadindicator")
+    dpg.show_item("loading_indicator")
     
     print("Filename: ", midi_file)
     
@@ -31,10 +31,10 @@ def load_midi(midi_file, path, name):
         else:
             dpg.hide_item(item)
     
-    gc.MIDIPLAYER.analysis_parameters["general_scale_subset"] = gc.GENERAL_SCALE_SUBSET
+    gc.MIDIPLAYER.analysis_parameters["general_scale_subset"] = gc.GENERAL_SCALE_ROTZERO_SUBSET
     gc.MIDIPLAYER.analysis_parameters["weighted"] = gc.WEIGHTED
     gc.MIDIPLAYER.analysis_parameters["threshold"] = gc.THRESHOLD
-    gc.MIDIPLAYER.analysis_parameters["normalize_accuracy"] = gc.NORMALIZE_SCORES
+    gc.MIDIPLAYER.analysis_parameters["normalize_accuracy"] = gc.NORMALIZE_ACCURACY
     gc.MIDIPLAYER.update_window(barsize=gc.NUM_BARS)
     gc.MIDIPLAYER.set_volume(dpg.get_value("volume")/100)
     compute_suggestions(None, None, None)    
@@ -43,7 +43,7 @@ def load_midi(midi_file, path, name):
     dpg.set_item_label("PlayButton", "Play")
     
     display(None, None, None)
-    dpg.hide_item("file_loadindicator")
+    dpg.hide_item("loading_indicator")
     
     
 def random_midi(sender, app_data, user_data):

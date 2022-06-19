@@ -16,7 +16,7 @@ def draw_midi_player_ui():
         with dpg.group(horizontal=True):
             dpg.add_button(label="File Selector", callback=lambda: dpg.show_item("file_dialog_id"))
             dpg.add_button(label="Random", callback=random_midi)
-            dpg.add_loading_indicator(show=False, tag="file_loadindicator", width=5, height=5, style=1)
+            dpg.add_loading_indicator(show=False, tag="loading_indicator", width=5, height=5, style=1)
             dpg.add_text(label="PlayText", default_value="No file selected", tag="PlayText")
         
         with dpg.group(horizontal=True, horizontal_spacing=10):
@@ -65,7 +65,7 @@ def draw_midi_player_ui():
 def draw_suggestions_settings_ui():
     with dpg.collapsing_header(label="Suggestion Settings", indent=12):
         with dpg.group(horizontal=True): 
-            dpg.add_checkbox(label="Normalize Accuracy", callback=set_normalize, default_value=gc.NORMALIZE_SCORES)
+            dpg.add_checkbox(label="Normalize Accuracy", callback=set_normalize, default_value=gc.NORMALIZE_ACCURACY)
             dpg.add_checkbox(label="Weighted by Beat Importance", callback=set_weighted, default_value=gc.WEIGHTED)
         dpg.add_text("Compute suggestions over: ")
         with dpg.group(horizontal=True): 
@@ -81,10 +81,6 @@ def draw_suggestions_settings_ui():
                                 format="threshold = %.3f", 
                                 callback=set_threshold, 
                                 default_value=gc.THRESHOLD)
-        with dpg.group(horizontal=True): 
-            dpg.add_text(label="label", default_value="Select amount of notes: ")
-            for i in range(5,13):
-                dpg.add_checkbox(label=str(i), callback=set_notecounts, default_value=True, user_data=i)
  
 def draw_suggestions_ui():
     with dpg.child_window(label="Suggestions", tag="suggestion_tab", menubar=True, autosize_x=True, autosize_y=True):
@@ -99,41 +95,54 @@ def draw_suggestions_ui():
                 policy=dpg.mvTable_SizingStretchProp,
                 resizable=True, borders_innerV=True):
         
-            dpg.add_table_column(label="Scale", width=gc.TABLE_SCALE_NAME_WIDTH, width_fixed=True)
+            dpg.add_table_column(label="Scale" + " "*60, width=gc.TABLE_SCALE_NAME_WIDTH, width_fixed=True)
             dpg.add_table_column(label="Accuracy", width=gc.TABLE_ACCURACY_WIDTH, width_fixed=True)
             dpg.add_table_column(label="Notes", width=gc.TABLE_NOTECOUNT_WIDTH, width_fixed=True)
             dpg.add_table_column(label="Alternate names", width_stretch=True, init_width_or_weight=0.0)
  
 def draw_improvisation_material_ui():
-    with dpg.group(horizontal=True):
-        with dpg.child_window(menubar=True, autosize_x=True, autosize_y=True):
-            with dpg.menu_bar():
-                dpg.add_text("Scale Navigation")
-            with dpg.group(horizontal=True):
-                dpg.add_text("Selected Scale: ")
-                dpg.add_combo(gc.GENERAL_SCALE_SUBSET, no_arrow_button=True, width=340, 
-                                tag="general_scale_list", callback=set_general_scale_from_all)
-                dpg.add_text(" in ")
-                dpg.add_combo(mu.CHROMA_NAMES[gc.TONIC_CHROMA_SUBSET].tolist(), no_arrow_button=True, width=60,
-                                tag="tonic_chroma_list", callback=set_tonic_chroma_from_all)
-            with dpg.group(horizontal=True):
-                dpg.add_text("Alternative names: ")
-                dpg.add_text(gc.SELECTED_SCALE.name, tag="scale_alternative_names")
-            dpg.add_separator()
-            with dpg.group(horizontal=True):
-                with dpg.group():
-                    dpg.add_text("Rotations:", bullet=True)
-                    dpg.add_listbox(gc.ROTATIONS_SCALES, width=300, tag="scale_rotations_list", #type:ignore
-                                    num_items=8, user_data="rotations", callback=set_scale_from_navigation)
-                with dpg.group():
-                    dpg.add_text("Children:", bullet=True)
-                    dpg.add_listbox(gc.CHILDREN_SCALES, width=300, tag="scale_children_list", #type:ignore
-                                    num_items=3, user_data="children", callback=set_scale_from_navigation)
-            
-                    dpg.add_text("Parents:", bullet=True)
-                    dpg.add_listbox(gc.PARENTS_SCALES, width=300, tag="scale_parents_list", #type:ignore
-                                    num_items=3, user_data="parents", callback=set_scale_from_navigation) 
-            draw_suggestions_ui()
+    with dpg.child_window(menubar=True, autosize_x=True, autosize_y=True):
+        with dpg.menu_bar():
+            dpg.add_text("Scale Navigation")
+        with dpg.group(horizontal=True):
+            with dpg.group():
+                with dpg.group(horizontal=True):
+                    dpg.add_text("Selected Scale: ")
+                    dpg.add_combo(gc.GENERAL_SCALE_SUBSET, no_arrow_button=True, width=340, 
+                                    tag="general_scale_list", callback=set_general_scale_from_all)
+                    dpg.add_text(" in ")
+                    dpg.add_combo(mu.CHROMA_NAMES[gc.TONIC_CHROMA_SUBSET].tolist(), no_arrow_button=True, width=60,
+                                    tag="tonic_chroma_list", callback=set_tonic_chroma_from_all)
+                    
+                    dpg.add_text(label="label", default_value="Filter by note count: ")
+                with dpg.group(horizontal=True):
+                    dpg.add_text("Alternative names: ")
+                    dpg.add_text(gc.SELECTED_SCALE.name, tag="scale_alternative_names")
+            with dpg.table(header_row=False):
+                for _ in range(4):
+                    dpg.add_table_column()
+                with dpg.table_row():
+                    for i in range(5,9):
+                        dpg.add_checkbox(label=str(i), callback=set_notecounts, default_value=True, user_data=i)
+                with dpg.table_row():
+                    for i in range(9,13):
+                        dpg.add_checkbox(label=str(i), callback=set_notecounts, default_value=True, user_data=i)
+        dpg.add_separator()
+        with dpg.group(horizontal=True):
+            with dpg.group():
+                dpg.add_text("Rotations:", bullet=True)
+                dpg.add_listbox(gc.ROTATIONS_SCALES, width=300, tag="scale_rotations_list", #type:ignore
+                                num_items=8, user_data="rotations", callback=set_scale_from_navigation)
+            with dpg.group():
+                dpg.add_text("Children:", bullet=True)
+                dpg.add_listbox(gc.CHILDREN_SCALES, width=300, tag="scale_children_list", #type:ignore
+                                num_items=3, user_data="children", callback=set_scale_from_navigation)
+        
+                dpg.add_text("Parents:", bullet=True)
+                dpg.add_listbox(gc.PARENTS_SCALES, width=300, tag="scale_parents_list", #type:ignore
+                                num_items=3, user_data="parents", callback=set_scale_from_navigation) 
+        draw_suggestions_ui()
+        
 
 
 def draw_chroma_chord_suggestions():

@@ -21,7 +21,7 @@ inputMidi:MidiPlayer = None
 MIDI_PATH = "MIDI_Files"
 MIDIFILES = [f for f in listdir(MIDI_PATH) if isfile(join(MIDI_PATH, f))]
 PLOT_DISPLAYED = False
-NORMALIZE_SCORES = True
+NORMALIZE_ACCURACY = True
 WEIGHTED = False
 THRESHOLD = 0.9
 METRIC = "ticks"
@@ -42,7 +42,7 @@ SELECTED_GENERAL_SCALE = scales.scale(2773)
 SELECTED_TONIC_CHROMA = 0
 SELECTED_SCALE = SELECTED_GENERAL_SCALE.scale_in(SELECTED_TONIC_CHROMA)
 
-GENERAL_SCALE_SUBSET = scales.create_general_scale_subset(NOTE_COUNTS)
+GENERAL_SCALE_ROTZERO_SUBSET = scales.create_GENERAL_SCALE_ROTZERO_SUBSET(NOTE_COUNTS)
 TONIC_CHROMA_SUBSET = mu.CHROMA_IDS
 ROTATIONS_SCALES = SELECTED_SCALE.rotated_scales()
 CHILDREN_SCALES = SELECTED_SCALE.child_scales()
@@ -240,10 +240,10 @@ def set_threshold(sender, app_data, user_data):
         inputMidi.analysis_parameters["threshold"] = THRESHOLD
 
 def set_normalize(sender, app_data, user_data):
-    global NORMALIZE_SCORES
-    NORMALIZE_SCORES = app_data
+    global NORMALIZE_ACCURACY
+    NORMALIZE_ACCURACY = app_data
     if inputMidi is not None:
-        inputMidi.analysis_parameters["normalize_accuracy"] = NORMALIZE_SCORES
+        inputMidi.analysis_parameters["normalize_accuracy"] = NORMALIZE_ACCURACY
 
 def set_weighted(sender, app_data, user_data):
     global WEIGHTED
@@ -260,17 +260,17 @@ def ui_cursor_change(sender, app_data, user_data):
         inputMidi.update_cursor(dpg.get_value(sender), metric=METRIC, on_cursor_callback=False)
 
 def set_notecounts(sender, app_data, user_data):
-    global NOTE_COUNTS, GENERAL_SCALE_SUBSET
+    global NOTE_COUNTS, GENERAL_SCALE_ROTZERO_SUBSET
     if app_data:
         NOTE_COUNTS.add(user_data)
     else:
         NOTE_COUNTS.remove(user_data)
-    GENERAL_SCALE_SUBSET = scales.create_general_scale_subset(NOTE_COUNTS)
-    dpg.configure_item("general_scale_list", items=GENERAL_SCALE_SUBSET)
+    GENERAL_SCALE_ROTZERO_SUBSET = scales.create_GENERAL_SCALE_ROTZERO_SUBSET(NOTE_COUNTS)
+    dpg.configure_item("general_scale_list", items=GENERAL_SCALE_ROTZERO_SUBSET)
     
     if inputMidi is not None:
-        inputMidi.analysis_parameters["general_scale_subset"] = GENERAL_SCALE_SUBSET
-    print(f"note counts selected: {NOTE_COUNTS} | number of general scales: {len(GENERAL_SCALE_SUBSET)}")
+        inputMidi.analysis_parameters["GENERAL_SCALE_ROTZERO_SUBSET"] = GENERAL_SCALE_ROTZERO_SUBSET
+    print(f"note counts selected: {NOTE_COUNTS} | number of general scales: {len(GENERAL_SCALE_ROTZERO_SUBSET)}")
     print("note counts selected: " + str(user_data))
 
 # def view_change(sender, app_data, user_data):
@@ -333,7 +333,7 @@ def select_scale_from_suggestions(sender, app_data, user_data):
 def select_general_scale_from_all(sender, app_data, user_data):
     global SELECTED_GENERAL_SCALE
     print(app_data)
-    SELECTED_GENERAL_SCALE = combo_getter(app_data, GENERAL_SCALE_SUBSET)
+    SELECTED_GENERAL_SCALE = combo_getter(app_data, GENERAL_SCALE_ROTZERO_SUBSET)
     update_selected_scale()
 
 def select_tonic_chroma_from_all(sender, app_data, user_data):
@@ -510,7 +510,7 @@ with dpg.window(label="Improvisation Tool",
 
     with dpg.collapsing_header(label="Suggestion Settings"):
         with dpg.group(horizontal=True): 
-            dpg.add_checkbox(label="Normalize Accuracy", callback=set_normalize, default_value=NORMALIZE_SCORES)
+            dpg.add_checkbox(label="Normalize Accuracy", callback=set_normalize, default_value=NORMALIZE_ACCURACY)
             dpg.add_checkbox(label="Weighted by Beat Importance", callback=set_weighted, default_value=WEIGHTED)
         dpg.add_text("Compute suggestions over: ")
         with dpg.group(horizontal=True): 
@@ -600,7 +600,7 @@ with dpg.window(label="Improvisation Tool",
                 dpg.add_text("Scale Navigation")
             with dpg.group(horizontal=True):
                 dpg.add_text("Selected Scale: ")
-                dpg.add_combo(GENERAL_SCALE_SUBSET, no_arrow_button=True, width=340, 
+                dpg.add_combo(GENERAL_SCALE_ROTZERO_SUBSET, no_arrow_button=True, width=340, 
                                 tag="general_scale_list", callback=select_general_scale_from_all)
                 dpg.add_text(" in ")
                 dpg.add_combo(mu.CHROMA_NAMES[TONIC_CHROMA_SUBSET].tolist(), no_arrow_button=True, width=60,
