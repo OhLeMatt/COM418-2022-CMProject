@@ -49,7 +49,7 @@ The visualiser is colour-coded according to notes (independently of the octave).
 
 ![colour code](images/colour_code.png)
 
-The user can also select which of the 12 midi file channels to display.
+The user can also select which of the 12 midi file channels to display (only non-empty channels are shown).
 
 ![Channel selection](images/channels.gif)
 
@@ -148,8 +148,7 @@ The midi files were collected from the following websites:
 
 The GUI is based on the DearPyGUI library, for which we used the following ressources:
 * https://dearpygui.readthedocs.io
-* https://github.com/hoffstadt/DearPyGui/blob/master/DearPyGui/dearpygui/demo.py
-* https://github.com/hoffstadt/DearPyGui/wiki/Dear-PyGui-Showcase#dearbagplayer
+* https://github.com/hoffstadt/DearPyGui/
 
 The scale and chord suggestions gained a lot from the following ressources:
 * https://ianring.com/musictheory/scales/
