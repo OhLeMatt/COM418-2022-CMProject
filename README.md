@@ -104,7 +104,7 @@ The chord suggestions can be personalised by the user via the following paramete
 
 ![notecount](images/notecount_chord.gif)
 
-* Similarity Factor: TODO
+* Similarity Factor: tune how similar the suggested chords will be to the midi window.
 
 ![similarity](images/similarity.gif)
 
@@ -112,7 +112,7 @@ The chord suggestions can be personalised by the user via the following paramete
 
 ![harmony](images/harmony.gif)
 
-* Consonance Factor: TODO
+* Consonance Factor: tune the consonance of the chords (the impression of stability and repose).
 
 ![consonance](images/consonance.gif)
 
