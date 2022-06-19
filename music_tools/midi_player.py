@@ -88,8 +88,8 @@ class MidiPlayer:
         if self.displayable and len(self.df) > 0: 
             self.min_note = self.df['note'].min()
             self.max_note = self.df['note'].max()
-            self.length = self.df["ticks"].iloc[-1] + 5
-            print("midi length: " + str(self.length))
+            self.length = self.df["time"].iloc[-1]
+            print("midi length: " + str(self.length) + " seconds")
         self.midiframe.export_playing_track()
         
         # music = PrettyMIDI(midi_file=file_name)

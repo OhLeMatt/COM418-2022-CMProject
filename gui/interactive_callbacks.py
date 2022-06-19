@@ -1,4 +1,5 @@
 import dearpygui.dearpygui as dpg
+import numpy as np
 
 import gui.context as gc
 import music_tools.midi_utils as mu
@@ -80,24 +81,25 @@ def display(sender, app_data, user_data):
         if gc.PLOT_DISPLAYED:
             dpg.delete_item("imgy", children_only=True)
             gc.PLOT_DISPLAYED = False
-            print(2)
-
+        
         if not gc.PLOT_DISPLAYED: 
             gc.PLOT_DISPLAYED = True
             dpg.set_axis_limits("imgy", gc.MIDIPLAYER.min_note - 1, gc.MIDIPLAYER.max_note + 1)
-            
                     
             if len(gc.MIDIPLAYER.df) > 0:
                 metric_release = gc.METRIC + "_release"
                 df_copy = gc.MIDIPLAYER.df.loc[:,[gc.METRIC, "note", metric_release, "weight"]]
                 if not gc.WEIGHTED:
                     df_copy.weight = 1
-                for i, x in df_copy.iterrows():
-                    tint = gc.get_note_colour(x.note, x.weight)
-                                        
+                
+                tints = np.einsum("ij,i->ij", gc.NOTE_COLORS[mu.to_chroma(df_copy.note)], df_copy.weight)
+                
+                df_copy["min_bound_y"] = df_copy.note - 0.5
+                df_copy["max_bound_y"] = df_copy.note + 0.5
+                for i, x in df_copy.iterrows():                                        
                     dpg.add_image_series("Texture_C", 
-                                         [x[gc.METRIC], x.note - 0.5], [x[metric_release], x.note + 0.5], 
-                                         label="C", tag=f"MidiNote{i}", parent="imgy", tint_color=tint)
+                                         [x[gc.METRIC], x.min_bound_y], [x[metric_release], x.max_bound_y], 
+                                         label="C", tag=f"MidiNote{i}", parent="imgy", tint_color=tuple(tints[i]))
                 dpg.fit_axis_data("imgx")
     dpg.hide_item("loading_indicator")        
         
