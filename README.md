@@ -3,11 +3,11 @@
 In the context of the Computers & Music (COM-418) course at EPFL, we implemented an Improvisation Guidance Tool. We analyse midi files to extract corresponding scales and suggest chords or notes to play along. 
 
 We offer the following functionalities:
-* Midi file selection 
-* Midi player 
-* Midi visualiser
-* Personalisable scale suggestions
-* Parametrisable chord suggestions
+* [Midi file selection](#midi-player) 
+* [Midi player](#midi-player) 
+* [Midi visualiser](#midi-visualiser)
+* [Personalisable scale suggestions](#scale-savigation)
+* [Parametrisable chord suggestions](#chord-suggestions)
 
 The repository contains the following elements: 
 * [improvisation_guidance_tool.py](#improvisation-guidance-tool) : the GUI for our tool
@@ -85,7 +85,7 @@ The scale suggestion can be personalised under the following parameters:
 
 #### Methodology
 
-### Chord Suggestion
+### Chord Suggestions
 
 The chord suggestion tool suggests chords that are harmonious with the input MIDI file. The suggestions are highlighted in colour on the chromas and piano representations detailed below. 
 
