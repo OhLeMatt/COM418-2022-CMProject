@@ -83,9 +83,20 @@ The chord suggestion tool suggests chords that are harmonious with the input MID
 
 The chord suggestions can be personalised by the user via the following parameters in the "Chord Suggestions Settings" window:
 * Chord Beat Weighted: TODO
+
+![weighted](images/beatimportance_chords.gif)
+
 * Similarity Factor: TODO
+
+![similarity](images/similarity.gif)
+
 * Harmony Factor: TODO
+
+![harmony](images/harmony.gif)
+
 * Consonance Factor: TODO
+
+![consonance](images/consonance.gif)
 
 Just like for the scale suggestions, the chord suggestions can be computed for a specific region of the MIDI file delimited by the cursor, or for the whole file. This parameter is the same for all suggestions, and is therefore modifiable via the Scale Suggestion Settings.
 
