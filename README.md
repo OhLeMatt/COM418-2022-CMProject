@@ -47,7 +47,10 @@ You can see an example of the visualisation for a midi of Eleanor Rigby by the B
 
 ![colour code](images/midiviz_beatles.png)
 
-### Scale Suggestion
+### Scale Navigation
+The Scale Navigation window allows users to select the scale for which they will receive chord suggestions. We have 170 scales to choose from in total. The user can select the tonic of the scale. 
+
+![colour code](images/scalenav.gif)
 
 #### Parameters
 The scale suggestion can be personalised under the following parameters:
@@ -64,6 +67,7 @@ The resulting suggestions are displayed under a table which shows the scale name
 
 #### Methodology
 
+### Chord Suggestion
 
 
 # References 
