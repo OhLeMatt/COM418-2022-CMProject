@@ -368,12 +368,12 @@ def update_selected_scale():
     dpg.configure_item("scale_parents_list", items=PARENTS_SCALES)
     dpg.configure_item("scale_children_list", items=CHILDREN_SCALES)
     dpg.configure_item("scale_alternative_names", default_value=SELECTED_SCALE.name)
-    colour_scale(mu.CHROMA_IDS, SELECTED_SCALE.chromas)
-    colour_piano(mu.CHROMA_IDS, SELECTED_SCALE.chromas)
+    update_chroma_display(mu.CHROMA_IDS, SELECTED_SCALE.chromas)
+    update_piano_display(mu.CHROMA_IDS, SELECTED_SCALE.chromas)
 
 ## DRAWING FUNCTIONS
 
-def draw_empty_scale(scale, alt_scale=[], x_offset=0, y_offset=0, prefix=""):
+def draw_chroma_display(scale, alt_scale=[], x_offset=0, y_offset=0, prefix=""):
     with dpg.drawlist(width=1000, height=130, tag=prefix+"chroma_drawlist"):
         draw_x = x_offset
         draw_y = y_offset
@@ -386,14 +386,14 @@ def draw_empty_scale(scale, alt_scale=[], x_offset=0, y_offset=0, prefix=""):
                 dpg.draw_text([draw_x + chroma_x_size/2 - 10, draw_y + chroma_y_size/2], alt_scale[i], size=15, tag=prefix+"chroma_alt_text_"+str(i))
             draw_x = draw_x + chroma_x_size
 
-def colour_scale(scale, selected_scale, prefix=""):
+def update_chroma_display(scale, selected_scale, prefix=""):
     for i in scale:
         if i in selected_scale:
             dpg.configure_item(prefix+"chroma_rect_"+str(i), fill=[0, 100, 0])
         else:
             dpg.configure_item(prefix+"chroma_rect_"+str(i), fill=dpg.mvThemeColor)
 
-def draw_empty_piano(scale, alt_scale=[], x_offset=0, y_offset=0, prefix=""):
+def draw_piano_display(scale, alt_scale=[], x_offset=0, y_offset=0, prefix=""):
     with dpg.drawlist(width=1000, height=250, tag=prefix+"piano_drawlist"):
         white_draw_x = x_offset
         draw_y = y_offset
@@ -427,7 +427,7 @@ def draw_empty_piano(scale, alt_scale=[], x_offset=0, y_offset=0, prefix=""):
                 dpg.draw_text([black_draw_x + black_x_size/2 - 10, draw_y + black_y_size - 20], alt_scale[black_tiles_mapping[i+2]], size=15, color=[0, 0, 0], tag=prefix+"piano_alt_text_"+str(black_tiles_mapping[i+2]))
             black_draw_x = black_draw_x + black_x_size + 20
 
-def colour_piano(scale, selected_scale, prefix=""):
+def update_piano_display(scale, selected_scale, prefix=""):
     for i in scale:
         if i in selected_scale:
             dpg.configure_item(prefix+"piano_rect_"+str(i), fill=[0, 100, 0])
@@ -534,9 +534,9 @@ with dpg.window(label="Improvisation Tool",
     with dpg.collapsing_header(label="Suggestions", tag="suggestion_tab", default_open=True):
         dpg.add_button(label="Compute Suggestions", callback=compute_suggestions)
         with dpg.tree_node(label="Chromatic scale", tag="chroma_dropdown"):
-            draw_empty_scale(EN_NOTES_DISPLAY, FR_NOTES_DISPLAY, 4, 4)
+            draw_chroma_display(EN_NOTES_DISPLAY, FR_NOTES_DISPLAY, 4, 4)
         with dpg.tree_node(label="Piano", tag="piano_dropdown"):
-            draw_empty_piano(EN_NOTES_DISPLAY, FR_NOTES_DISPLAY, 4, 4)
+            draw_piano_display(EN_NOTES_DISPLAY, FR_NOTES_DISPLAY, 4, 4)
         with dpg.tree_node(label="Guitar"):
             notes=[0, 2] #to remove
             en_chroma_scale = EN_NOTES_DISPLAY #to remove

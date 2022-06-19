@@ -3,7 +3,7 @@ import dearpygui.dearpygui as dpg
 import gui.context as gc
 import music_tools.midi_utils as mu
 import music_tools.scales as scales
-from gui.interactive_callbacks import display, update_selected_scale
+from gui.interactive_callbacks import display, update_selected_scale, compute_chord_suggestions
             
 def set_channels(sender, app_data, user_data):
     if gc.MIDIPLAYER is not None:
@@ -116,3 +116,39 @@ def set_scale_from_navigation(sender, app_data, user_data):
     gc.SELECTED_GENERAL_SCALE = scale.general_scale() #type:ignore
     gc.SELECTED_TONIC_CHROMA = scale.tonic_chroma #type:ignore
     update_selected_scale()
+
+def set_chord_weighted(sender, app_data, user_data):
+    gc.CHORD_WEIGHTED = app_data
+    gc.CHORD_SUGGESTER.set_beat_weighted(gc.CHORD_WEIGHTED)
+    for prefix in ("chroma", "piano"):
+        dpg.set_value(prefix+"_chord_weighted", app_data)
+    compute_chord_suggestions()
+
+def set_chord_note_count(sender, app_data, user_data):
+    gc.CHORD_NOTE_COUNT = int(app_data)
+    gc.CHORD_SUGGESTER.set_note_count(gc.CHORD_NOTE_COUNT)
+    for prefix in ("chroma", "piano"):
+        dpg.set_value(prefix+"_chord_note_count", app_data)
+    compute_chord_suggestions()
+
+def set_similarity_factor(sender, app_data, user_data):
+    gc.SIMILARITY_FACTOR = app_data/100
+    gc.CHORD_SUGGESTER.w_similarity = gc.SIMILARITY_FACTOR 
+    for prefix in ("chroma", "piano"):
+        dpg.set_value(prefix+"_similarity", app_data)
+    compute_chord_suggestions()
+    
+def set_harmony_factor(sender, app_data, user_data):
+    gc.HARMONY_FACTOR = app_data/100
+    gc.CHORD_SUGGESTER.w_harmony = gc.HARMONY_FACTOR
+    for prefix in ("chroma", "piano"):
+        dpg.set_value(prefix+"_harmony", app_data)
+    compute_chord_suggestions()
+    
+def set_consonance_factor(sender, app_data, user_data):
+    gc.CONSONANCE_FACTOR = app_data/100
+    gc.CHORD_SUGGESTER.w_consonance = gc.CONSONANCE_FACTOR
+    for prefix in ("chroma", "piano"):
+        dpg.set_value(prefix+"_consonance", app_data)
+    compute_chord_suggestions()
+    

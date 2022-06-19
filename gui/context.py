@@ -4,6 +4,7 @@ from os.path import isfile, join
 import numpy as np
 import music_tools.scales as scales
 import music_tools.midi_utils as mu
+from music_tools.chords import ChordSuggester
 
 ###########################    Init Variables     ########################### 
 MIDIPLAYER = None 
@@ -39,6 +40,15 @@ PARENTS_SCALES = SELECTED_SCALE.parent_scales()
 
 EN_NOTES_DISPLAY = mu.CHROMA_SHARP_NAMES
 FR_NOTES_DISPLAY = mu.name_to_alt_name(EN_NOTES_DISPLAY)
+
+CHORD_WEIGHTED = ChordSuggester.DEFAULT_BEAT_WEIGHTED
+CHORD_NOTE_COUNT = ChordSuggester.DEFAULT_NOTE_COUNT
+SIMILARITY_FACTOR = ChordSuggester.DEFAULT_SIMILARITY
+HARMONY_FACTOR = ChordSuggester.DEFAULT_HARMONY
+CONSONANCE_FACTOR = ChordSuggester.DEFAULT_CONSONANCE
+
+CHORD_SUGGESTER = ChordSuggester(SELECTED_SCALE, None)
+CHORD_SUGGESTIONS = []
 
 NOTE_COLORS = np.array([
         [217, 31, 28], # C

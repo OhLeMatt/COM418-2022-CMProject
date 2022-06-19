@@ -2,7 +2,7 @@ import dearpygui.dearpygui as dpg
 
 import gui.context as gc
 import music_tools.midi_utils as mu
-from gui.visualizations import colour_piano, colour_scale
+from gui.visualizations import update_piano_display, update_chroma_display
 
 def _log(sender, app_data, user_data):
     print(f"sender: {sender}, \t app_data: {app_data}, \t user_data: {user_data}")
@@ -21,14 +21,20 @@ def update_ui_window(midiplayer):
     gc.WINDOW[1] = midiplayer.convert_unit(midiplayer.analysis_window[1], "bartime", gc.METRIC)
     
     dpg.configure_item("ui_window", bounds_min=(gc.WINDOW[0], 0), bounds_max=(gc.WINDOW[1], 128))
-
+    
+    df_copy = midiplayer.midiframe.playing_track_frame.get_sub_dataframe(midiplayer.analysis_last_bar, 
+                                                                         midiplayer.analysis_last_bar+1,
+                                                                         columns=["note", "weight"])
+    gc.CHORD_SUGGESTER.set_music_dataframe(df_copy)
+    compute_chord_suggestions()
+        
 def update_ui_suggestions(midiplayer):
     # To avoid circular dep:
     from gui.setter_callbacks import set_scale_from_suggestions
     suggestions = []
     if midiplayer is not None:
         suggestions = midiplayer.get_suggestions()
-        
+    
     dpg.delete_item("suggestion_content", children_only=True, slot=1)
         
     for i, (scale, tonic, accuracy) in enumerate(suggestions):
@@ -41,6 +47,18 @@ def update_ui_suggestions(midiplayer):
             dpg.add_text(scale.name)    
             if accuracy == 1.0:
                 dpg.highlight_table_row("suggestion_content", i, [10, 0, 50, 100])
+
+def update_ui_chord_suggestions():
+    
+    for i, chord in enumerate(gc.CHORD_SUGGESTIONS):
+        prefix = f"chord{i}"
+        update_chroma_display(chord, prefix)
+        update_piano_display(chord, prefix)
+    
+    for i in range(len(gc.CHORD_SUGGESTIONS), 4):
+        prefix = f"chord{i}"
+        update_chroma_display([], prefix)
+        update_piano_display([], prefix)
 
 def play_midi(sender, app_data, user_data):
     if gc.MIDIPLAYER is not None:
@@ -86,6 +104,10 @@ def compute_suggestions(sender, app_data, user_data):
     if gc.MIDIPLAYER:
         gc.MIDIPLAYER.analyse()
         
+def compute_chord_suggestions(sender=None, app_data=None, user_data=None):
+    gc.CHORD_SUGGESTIONS = gc.CHORD_SUGGESTER.suggest_chords(4)
+    update_ui_chord_suggestions()
+
 def update_selected_scale():
     gc.SELECTED_SCALE = gc.SELECTED_GENERAL_SCALE.scale_in(gc.SELECTED_TONIC_CHROMA)
     gc.ROTATIONS_SCALES = gc.SELECTED_SCALE.rotated_scales()
@@ -97,7 +119,7 @@ def update_selected_scale():
     dpg.configure_item("scale_parents_list", items=gc.PARENTS_SCALES)
     dpg.configure_item("scale_children_list", items=gc.CHILDREN_SCALES)
     dpg.configure_item("scale_alternative_names", default_value=gc.SELECTED_SCALE.name) 
-    colour_scale(gc.SELECTED_SCALE.chromas)
-    colour_piano(gc.SELECTED_SCALE.chromas)
-    colour_piano(gc.SELECTED_SCALE.chromas, prefix="+")
+    update_chroma_display(gc.SELECTED_SCALE.chromas)
+    update_piano_display(gc.SELECTED_SCALE.chromas)
+    update_piano_display(gc.SELECTED_SCALE.chromas, prefix="+")
     

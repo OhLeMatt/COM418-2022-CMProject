@@ -18,13 +18,14 @@ def draw_midi_player_ui():
             dpg.add_button(label="Random", callback=random_midi)
             dpg.add_text(label="PlayText", default_value="No file selected", tag="PlayText")
         
-        with dpg.group(horizontal=True):
+        with dpg.group(horizontal=True, horizontal_spacing=10):
             dpg.add_image_button("play", callback=play_midi, tag="PlayButton", user_data=True, width=15, height=15)
             dpg.add_image_button("stop", callback=play_midi, tag="StopButton", user_data=False, width=15, height=15)
             dpg.add_checkbox(label="Follow Cursor", callback=set_follow_cursor, tag="FollowCursor", default_value=gc.FOLLOW_CURSOR)
             dpg.add_slider_int(format="volume (%d%%) ", tag="volume", min_value=0, max_value=100, default_value=50, callback=set_volume, width=100)
             dpg.add_combo(("Ticks", "Time", "Bartime"), label="", tag="MetricSelector", default_value="Bartime", callback=set_metric, width=80)
-            dpg.add_text("Color Legend")
+            
+            dpg.add_button(label="Color Legend")
             with dpg.tooltip(dpg.last_item()):
                 with dpg.table(tag="colour-code", header_row=False):
                     for i in range(12):
@@ -37,6 +38,12 @@ def draw_midi_player_ui():
                     with dpg.table_row():
                         for colour in gc.NOTE_COLORS:
                             dpg.add_image("Texture_C", width=12, height=12, tint_color=tuple(colour))
+            
+            with dpg.group(horizontal=True): 
+                dpg.add_text(label="label", default_value="Select Midi Channels: ")
+                for i in range(0,16):
+                    dpg.add_checkbox(label=str(i), tag=f"channel_{i}", callback=set_channels, default_value=True, user_data=i)
+            
 
         with dpg.plot(label="Midi Visualiser", height=340, width=-1, tag="midiviz"):
             dpg.add_plot_axis(dpg.mvXAxis, label="Bartime", tag="imgx")
@@ -52,11 +59,7 @@ def draw_midi_player_ui():
             dpg.add_image_series("TransparentWindowTexture", 
                                 [0, 0], [1,128], 
                                 tag="ui_window", parent="imgx")
-        
-        with dpg.group(horizontal=True): 
-            dpg.add_text(label="label", default_value="Select Midi Channels: ")
-            for i in range(0,16):
-                dpg.add_checkbox(label=str(i), tag=f"channel_{i}", callback=set_channels, default_value=True, user_data=i)
+    
             
 def draw_suggestions_settings_ui():
     with dpg.collapsing_header(label="Suggestion Settings", indent=12):
@@ -83,9 +86,11 @@ def draw_suggestions_settings_ui():
                 dpg.add_checkbox(label=str(i), callback=set_notecounts, default_value=True, user_data=i)
  
 def draw_suggestions_ui():
-    with dpg.collapsing_header(label="Suggestions", tag="suggestion_tab", default_open=True):
+    with dpg.child_window(label="Suggestions", tag="suggestion_tab", menubar=True, autosize_x=True, autosize_y=True):
+        with dpg.menu_bar():
+            dpg.add_text("Scale Suggestions")
         draw_suggestions_settings_ui()
-        dpg.add_button(label="Compute Suggestions", callback=compute_suggestions)
+        dpg.add_button(label="Compute Scale Suggestions", callback=compute_suggestions)
         
         with dpg.table(header_row=True, 
                 tag="suggestion_content", 
@@ -100,7 +105,7 @@ def draw_suggestions_ui():
  
 def draw_improvisation_material_ui():
     with dpg.group(horizontal=True):
-        with dpg.child_window(menubar=True, autosize_x=True):
+        with dpg.child_window(menubar=True, autosize_x=True, autosize_y=True):
             with dpg.menu_bar():
                 dpg.add_text("Scale Navigation")
             with dpg.group(horizontal=True):
@@ -129,37 +134,65 @@ def draw_improvisation_material_ui():
                                     num_items=3, user_data="parents", callback=set_scale_from_navigation) 
             draw_suggestions_ui()
 
-def draw_scale_visualizations_ui():
-    with dpg.child_window():
-        with dpg.tab_bar():
-            with dpg.tab(label="Chromas"):    
-                draw_empty_scale(gc.EN_NOTES_DISPLAY, gc.FR_NOTES_DISPLAY, x_factor=0.9)
-                with dpg.table(header_row=False, policy=dpg.mvTable_SizingStretchProp):
-                    dpg.add_table_column()
-                    for i in range(4):
-                        with dpg.table_row(): 
-                            with dpg.group():
-                                dpg.add_text(f"Suggested Chord {i+1}:")
-                                draw_empty_scale(x_factor=0.5, y_factor=0.45, prefix=f"chord{i}")
-                
-            with dpg.tab(label="Piano", indent=10):
-                with dpg.group(horizontal=True, horizontal_spacing=1):
-                    draw_empty_piano(gc.EN_NOTES_DISPLAY, gc.FR_NOTES_DISPLAY)
-                    draw_empty_piano(gc.EN_NOTES_DISPLAY, gc.FR_NOTES_DISPLAY, prefix="+")
-                with dpg.table(header_row=False, policy=dpg.mvTable_SizingStretchProp):
-                    dpg.add_table_column()
-                    dpg.add_table_column()
-                    for i in range(2):
+
+def draw_chroma_chord_suggestions():
+    with dpg.table(header_row=False):
+        dpg.add_table_column()
+        for i in range(4):
+            with dpg.table_row(): 
+                with dpg.group():
+                    dpg.add_text(f"Suggested Chord {i+1}:")
+                    draw_chroma_display(x_factor=0.5, y_factor=0.45, prefix=f"chord{i}")
+
+def draw_piano_chord_suggestions():
+    with dpg.table(header_row=False):
+        dpg.add_table_column()
+        dpg.add_table_column()
+        for i in range(2):
+            with dpg.table_row():
+                for j in range(2):
+                    with dpg.group():
+                        k = i*2 + j
+                        dpg.add_text(f"Suggested Chord {k+1}:")
+                        draw_piano_display(x_factor=0.5, y_factor=0.4, prefix=f"chord{k}")
+
+def draw_chord_suggestion_settings(prefix):
+    with dpg.group():
+        dpg.add_text("Chord Suggestions Settings:")
+        dpg.add_checkbox(label="Chord Beat Weighted", tag=prefix+"_chord_weighted",
+                         default_value=gc.CHORD_WEIGHTED, callback=set_chord_weighted)
+        dpg.add_combo([str(i) for i in range(6)], label="Chord Note Count", tag=prefix+"_chord_note_count",
+                      default_value=str(gc.CHORD_NOTE_COUNT), callback=set_chord_note_count)
+        dpg.add_slider_int(format="Similarity Factor (%d%%)", min_value=-100, max_value=100, tag=prefix+"_similarity", 
+                           default_value=int(gc.SIMILARITY_FACTOR*100), callback=set_similarity_factor)
+        dpg.add_slider_int(format="Harmony Factor (%d%%)", min_value=-100, max_value=100, tag=prefix+"_harmony",
+                           default_value=int(gc.HARMONY_FACTOR*100), callback=set_harmony_factor)
+        dpg.add_slider_int(format="Consonance Factor (%d%%)", min_value=-100, max_value=100, tag=prefix+"_consonance",
+                           default_value=int(gc.CONSONANCE_FACTOR*100), callback=set_consonance_factor)
+
+def draw_visu_and_chord_suggestions_ui(autosize_x=True, autosize_y=True):
+    with dpg.child_window(autosize_x=True, autosize_y=True):
+            with dpg.tab_bar():
+                with dpg.tab(label="Chromas", ):    
+                    draw_chroma_display(gc.EN_NOTES_DISPLAY, gc.FR_NOTES_DISPLAY, x_factor=0.9)
+                    with dpg.table(header_row=False, borders_innerV=True, resizable=True):
+                        dpg.add_table_column(width_fixed=True, init_width_or_weight=480.0)
+                        dpg.add_table_column(width_stretch=True, init_width_or_weight=0.0)
                         with dpg.table_row():
-                            for j in range(2):
-                                with dpg.group():
-                                    k = i*2 + j + 1
-                                    dpg.add_text(f"Suggested Chord {k}:")
-                                    draw_empty_piano(x_factor=0.5, y_factor=0.4, prefix=f"chord{k}")
-
-
-            # with dpg.tab(label="Guitar"):
-            #     draw_empty_guitar(gc.EN_NOTES_DISPLAY, gc.FR_NOTES_DISPLAY)
+                            draw_chroma_chord_suggestions()
+                            draw_chord_suggestion_settings(prefix="chroma")
+                    
+                with dpg.tab(label="Piano", indent=10):
+                    
+                    with dpg.group(horizontal=True, horizontal_spacing=1):
+                        draw_piano_display(gc.EN_NOTES_DISPLAY, gc.FR_NOTES_DISPLAY)
+                        draw_piano_display(gc.EN_NOTES_DISPLAY, gc.FR_NOTES_DISPLAY, prefix="+")
+                    with dpg.table(header_row=False, borders_innerV=True, resizable=True, policy=dpg.mvTable_SizingStretchProp):
+                        dpg.add_table_column(width_fixed=True, init_width_or_weight=480.0)
+                        dpg.add_table_column(width_stretch=True, init_width_or_weight=0.0)
+                        with dpg.table_row():
+                            draw_piano_chord_suggestions()
+                            draw_chord_suggestion_settings(prefix="piano")
 
 FONTS_FOLDER = "gui/fonts/"
 TEXTURES_FOLDER = "gui/textures/"
@@ -186,12 +219,14 @@ with dpg.file_dialog(directory_selector=False, show=False, callback=select_file,
     dpg.add_file_extension(".mid")
     dpg.add_file_extension("", color=(150, 255, 150, 255))
 
-with dpg.window(label="Improvisation Tool", 
+with dpg.window(label="Improvisation Guidance Tool", 
                 width=1200, 
-                height=700, 
+                height=800, 
                 tag="primary_window",
                 no_title_bar=True, 
-                no_move=True):
+                no_move=True,
+                autosize=True,
+                no_scrollbar=True):
     
     draw_midi_player_ui()
     with dpg.table(header_row=False, resizable=True, borders_innerV=True):
@@ -200,7 +235,7 @@ with dpg.window(label="Improvisation Tool",
         with dpg.table_row():
             draw_improvisation_material_ui()
             with dpg.group(horizontal=True):
-                draw_scale_visualizations_ui()
+                draw_visu_and_chord_suggestions_ui()
 
 dpg.set_axis_ticks("imgy", tuple((mu.MIDI_NAMES[i], i) for i in range(0, 120, 12)))
 set_metric(None, "bartime", None)

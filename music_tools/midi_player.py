@@ -146,7 +146,6 @@ class MidiPlayer:
     
     def update_window(self, barsize=None, on_window_call_back=True):
         if self.analysis_active:
-            
             if barsize is not None:
                 self.analysis_window_extent[1] = 1
                 self.analysis_window_extent[0] = barsize - self.analysis_window_extent[1]
@@ -167,6 +166,7 @@ class MidiPlayer:
         self.analyse()
     
     def analyse(self):
+        
         if self.analysis_active:
             if self.analysis_window_entire:
                 # TODO:
@@ -176,6 +176,7 @@ class MidiPlayer:
                                 self.analysis_window[1],
                                 **self.analysis_parameters)        
             else:
+                
                 self.analysis_suggestions = self.midiframe.playing_track_frame\
                     .suggest_scale(self.analysis_window[0],
                                 self.analysis_window[1],

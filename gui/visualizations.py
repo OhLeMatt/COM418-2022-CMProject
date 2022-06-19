@@ -11,7 +11,7 @@ TEXT_COLOR = [255, 255, 255, 200]
 CHROMA_CELL_X = 70
 CHROMA_CELL_Y = 120
 CHROMA_TEXT_SIZE = 17
-CHROMA_WIDTH = 1000
+CHROMA_WIDTH = 930
 CHROMA_HEIGHT = 130
 CHROMA_KEY_THICKNESS = 3.0
 CHROMA_ROUNDING = 5
@@ -32,7 +32,7 @@ GUITAR_CELL_X = 15
 GUITAR_CELL_Y = 20
 GUITAR_THICKNESS = 1.0
 
-def draw_empty_scale(notes_name=[], 
+def draw_chroma_display(notes_name=[], 
                      alt_notes_name=[], 
                      spacing_factor=0.1, 
                      text_pos_factor=0.5,
@@ -61,7 +61,7 @@ def draw_empty_scale(notes_name=[],
         for chroma in mu.CHROMA_IDS:
             dpg.draw_rectangle([draw_x, draw_y], 
                                [draw_x + rec_width, draw_y + rec_height], 
-                               thickness=thickness, rounding=rounding,
+                               thickness=thickness, rounding=rounding, fill=CELL_INACTIVE_COLOR,
                                tag=prefix+"chroma_rect_"+str(chroma))
             if(len(notes_name) > 0):
                 dpg.draw_text([draw_x + text_x_pos, draw_y + text_y_pos], 
@@ -77,14 +77,14 @@ def draw_empty_scale(notes_name=[],
             draw_x += x_spacing
         
 
-def colour_scale(selected_chromas, prefix=""):
-    for chroma in mu.CHROMA_IDS:
+def update_chroma_display(selected_chromas, prefix=""):
+    for chroma in mu.CHROMA_IDS:    
         if chroma in selected_chromas:
             dpg.configure_item(prefix+"chroma_rect_"+str(chroma), fill=gc.get_note_colour(chroma, 0.8))
         else:
             dpg.configure_item(prefix+"chroma_rect_"+str(chroma), fill=CELL_INACTIVE_COLOR)
 
-def draw_empty_piano(notes_name=[], 
+def draw_piano_display(notes_name=[], 
                      alt_notes_name=[], 
                      spacing_factor=0.1, 
                      text_pos_factor=0.85,
@@ -158,7 +158,7 @@ def draw_empty_piano(notes_name=[],
             if i == 1:
                 black_draw_x += x_spacing
 
-def colour_piano(selected_chromas, prefix=""):
+def update_piano_display(selected_chromas, prefix=""):
     for chroma in mu.CHROMA_IDS:
         if chroma in selected_chromas:
             dpg.configure_item(prefix+"piano_rect_"+str(chroma), fill=gc.get_note_colour(chroma, 0.8))

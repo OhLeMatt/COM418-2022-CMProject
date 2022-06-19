@@ -35,7 +35,7 @@ def load_midi(midi_file, path, name):
     gc.MIDIPLAYER.analysis_parameters["threshold"] = gc.THRESHOLD
     gc.MIDIPLAYER.analysis_parameters["normalize_accuracy"] = gc.NORMALIZE_SCORES
     gc.MIDIPLAYER.update_window(barsize=gc.NUM_BARS)
-    gc.MIDIPLAYER.set_volume(dpg.get_value("volume"))
+    gc.MIDIPLAYER.set_volume(dpg.get_value("volume")/100)
     compute_suggestions(None, None, None)    
 
     dpg.set_value("PlayText", "Selected: " + name.replace(".mid", "").replace("_", " "))

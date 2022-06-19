@@ -1,6 +1,7 @@
 import mido
 import numpy as np
 import pandas as pd
+import os
 
 import music_tools.midi_utils as mu
 import music_tools.scales as scales
@@ -76,12 +77,20 @@ class MidiTrackFrame:
             rep = rep[:-2]
         return rep + "\n"
     
+    
     def get_sub_dataframe(self,
                           start,
                           end,
-                          metric="bartime"):
+                          metric="bartime",
+                          columns=[]):
+        
         mask = (self.dataframe[metric] >= start) & (self.dataframe[metric+"_release"] < end)
-        return self.dataframe[mask]
+        if not np.any(mask):
+            return None
+        if len(columns) == 0:
+            return self.dataframe.loc[mask]
+        else:
+            return self.dataframe.loc[mask, columns]
     
     def suggest_scale(self, 
                       start,
@@ -119,7 +128,9 @@ class MidiTrackFrame:
         
         mask = (self.dataframe[metric] >= start) & (self.dataframe[metric+"_release"] < end)
         found_scales = []
-        if True in np.unique(mask):
+        
+        if np.any(mask):
+            
             if weighted:
                 weights = self.dataframe.weight[mask].to_numpy()
             
@@ -157,7 +168,7 @@ class MidiTrackFrame:
 
 
 class MidiFrame:
-    
+    EXPORT_DEFAULT_DIRPATH = "TMP_Files"
     EXPORT_DEFAULT_FILEPATH = "TMP_Files/tmp.mid"
     
     def __init__(self, 
@@ -268,6 +279,9 @@ class MidiFrame:
                                                   track_name="Playing Track")
 
     def export_playing_track(self):
+        if not os.path.exists(self.EXPORT_DEFAULT_DIRPATH):
+            os.makedirs(self.EXPORT_DEFAULT_DIRPATH)
+        
         tracks = []
         for track_frame in self.track_frames:
             if track_frame.meta_only:

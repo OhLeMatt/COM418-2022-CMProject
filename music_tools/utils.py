@@ -25,3 +25,10 @@ def is_iterable(x):
     except AttributeError:
         return False
     
+def normalize(x):
+    min = x.min()
+    max = x.max()
+    if max == min:
+        return (x - min)/(max - min)
+    else:
+        return np.zeros_like(x)
