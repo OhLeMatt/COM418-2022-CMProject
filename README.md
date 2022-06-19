@@ -108,11 +108,11 @@ The chord suggestions can be personalised by the user via the following paramete
 
 ![similarity](images/similarity.gif)
 
-* Harmony Factor: TODO
+* Harmony Factor: a high harmonic factor will select chords that have notes which are musically similar to the tonic (i.e. the tonic itself, major/minor third, dominant,...). 
 
 ![harmony](images/harmony.gif)
 
-* Consonance Factor: tune the consonance of the chords (the impression of stability and repose).
+* Consonance Factor: tune the consonance of the chords (the impression of stability and repose). This is determined by the spacing of the notes. Perfect consonances (unisons, octaves, perfect fourths and perfect fifths) will have a higher weight over imperfect consonances (major seconds, minor sevenths, major thirds, minor sixths, minor thirds and major sixths). 
 
 ![consonance](images/consonance.gif)
 
