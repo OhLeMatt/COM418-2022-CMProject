@@ -7,7 +7,7 @@ We offer the following functionalities:
 * Midi player 
 * Midi visualiser
 * Personalisable scale suggestions
-* Parametrisable chord & note suggestions
+* Parametrisable chord suggestions
 
 The repository contains the following elements: 
 * [improvisation_guidance_tool.py](#improvisation-guidance-tool) : the GUI for our tool
@@ -34,23 +34,32 @@ python3 ./improvisation_guidance_tool.py
 To begin the user must select a midi file. This can either be done using the `File Selector` button or the `Random` button which selects a midi file at random from the `MIDI_Files` folder. 
 
 The midi player allows user to play, pause or stop the midi. The user can also control the volume directly from the interface. 
-
 ### Midi Visualiser
 
-The selected midi file will be displayed with notes along the x-axis. The y-axis can be displayed either in ticks, bartime or time (in seconds). The visualiser is colour-coded according to notes (independently of the octave). 
+The selected midi file will be displayed with notes along the x-axis. The y-axis can be displayed either in ticks, bartime or time (in seconds). 
+
+![yaxis](images/ticks.gif)
+
+The visualiser is colour-coded according to notes (independently of the octave). 
 
 ![colour code](images/colour_code.png)
 
 The user can also select which of the 12 midi file channels to display.
 
+![Channel selection](images/channels.gif)
+
 You can see an example of the visualisation for a midi of Eleanor Rigby by the Beatles below. 
 
-![colour code](images/midiviz_beatles.png)
+![Midi Visualizer](images/midiviz_beatles.png)
+
+The user can also make the display follow the cursor (i.e. the visualisation moves along with the music), as follows: 
+
+![Follow Cursor](images/followcursor.gif)
 
 ### Scale Navigation
 The Scale Navigation window allows users to select the scale for which they will receive chord suggestions. We have 170 scales to choose from in total. The user can select the tonic of the scale. We also show the rotations of this scale (i.e. other scales that have the exact same notes), children scales (whose notes are a subset of the selected scale) and parent scales (whose notes are a superset of the selected scale). 
 
-![colour code](images/scalenav.gif)
+![Scale navigation](images/scalenav.gif)
 
 #### Scale Suggestion
 The scale suggestions are displayed under a table which shows the scale name, the accuracy of the suggestion, the amount of notes in the scale and alternate names for the scale if any. Suggestions can be tuned using the parameters explained hereafter. 
