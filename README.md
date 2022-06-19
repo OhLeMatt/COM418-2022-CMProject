@@ -49,7 +49,7 @@ The visualiser is colour-coded according to notes (independently of the octave).
 
 ![colour code](images/colour_code.png)
 
-The user can also select which of the 12 midi file channels to display (only non-empty channels are shown).
+The user can also select which of the 16 midi file channels to display (only non-empty channels are shown).
 
 ![Channel selection](images/channels.gif)
 
@@ -108,7 +108,7 @@ The chord suggestions can be personalised by the user via the following paramete
 
 ![similarity](images/similarity.gif)
 
-* Harmony Factor: a high harmonic factor will select chords that have notes which are musically similar to the tonic (i.e. the tonic itself, major/minor third, dominant,...). 
+* Harmony Factor: a high harmonic factor will select chords that have notes which are musically similar (rather consonant intervals) to the most influent note (i.e. the note itself, major/minor third, dominant,...). 
 
 ![harmony](images/harmony.gif)
 

@@ -177,7 +177,7 @@ def draw_chord_suggestion_settings(prefix):
         dpg.add_text("Chord Suggestions Settings:")
         dpg.add_checkbox(label="Chord Beat Weighted", tag=prefix+"_chord_weighted",
                          default_value=gc.CHORD_WEIGHTED, callback=set_chord_weighted)
-        dpg.add_combo([str(i) for i in range(6)], label="Chord Note Count", tag=prefix+"_chord_note_count",
+        dpg.add_combo([str(i) for i in range(1,6)], label="Chord Note Count", tag=prefix+"_chord_note_count",
                       default_value=str(gc.CHORD_NOTE_COUNT), callback=set_chord_note_count)
         dpg.add_slider_int(format="Similarity Factor (%d%%)", min_value=-100, max_value=100, tag=prefix+"_similarity", 
                            default_value=int(gc.SIMILARITY_FACTOR*100), callback=set_similarity_factor)
