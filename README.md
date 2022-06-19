@@ -45,12 +45,24 @@ The resulting suggestions are displayed under a table which shows the scale name
 
 # References 
 The midi files were collected from the following websites: 
-* bitmidi.com
-* midiworld.com
-* feelyoursound.com
+* www.bitmidi.com
+* www.midiworld.com
+* www.feelyoursound.com
 * www.mutopiaproject.org
 * www.hooktheory.com
 
-The GUI is based on the DearPyGUI library.
+The GUI is based on the DearPyGUI library, for which we used the following ressources:
+* https://dearpygui.readthedocs.io
+* https://github.com/hoffstadt/DearPyGui/blob/master/DearPyGui/dearpygui/demo.py
+* https://github.com/hoffstadt/DearPyGui/wiki/Dear-PyGui-Showcase#dearbagplayer
 
-TODO: add research references
+The scale and chord suggestions gained a lot from the following ressources:
+* https://ianring.com/musictheory/scales/
+* http://allthescales.org/index.php
+* https://www.sciencedirect.com/science/article/abs/pii/S0020025518307163?via%3Dihub#fig0001
+
+And finally the following ressources came in handy for playing around with midi files (notably the Mido and PrettyMidi libraries):
+* https://mido.readthedocs.io
+* https://www.twilio.com/blog/working-with-midi-data-in-python-using-mido
+* https://craffel.github.io/pretty-midi/
+* https://notebook.community/craffel/pretty-midi/Tutorial
