@@ -2,4 +2,4 @@ __pycache__
 .vscode
 .idea
 /TMP_Files 
-/venv
+/venv/*
