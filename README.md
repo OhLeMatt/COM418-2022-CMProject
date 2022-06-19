@@ -138,6 +138,10 @@ sugg
 
 ![Suggested piano chords](images/piano_chords.png)
 
+## Methodology 
+
+Our methodology for the scale and chord suggestions can be found in the `technical_challenges.ipynb` notebook. 
+
 # References 
 The midi files were collected from the following websites: 
 * www.bitmidi.com
