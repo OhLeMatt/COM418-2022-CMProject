@@ -67,20 +67,26 @@ def draw_suggestions_settings_ui():
         with dpg.group(horizontal=True): 
             dpg.add_checkbox(label="Normalize Accuracy", callback=set_normalize, default_value=gc.NORMALIZE_ACCURACY)
             dpg.add_checkbox(label="Weighted by Beat Importance", callback=set_weighted, default_value=gc.WEIGHTED)
-        dpg.add_text("Compute suggestions over: ")
-        with dpg.group(horizontal=True): 
-            dpg.add_text("Bars: ")
-            dpg.add_button(arrow=True, direction=dpg.mvDir_Left, user_data=False, callback=set_num_bars)
-            dpg.add_text(str(gc.NUM_BARS), tag="num_bars")
-            dpg.add_button(arrow=True, direction=dpg.mvDir_Right, user_data=True, callback=set_num_bars)
-            dpg.add_text(label="WindowText", default_value="", tag="WindowText")            
-            dpg.add_button(label="Entire Window Suggestions", callback=set_entire_window)
-        with dpg.group():
             dpg.add_slider_float(label="Accuracy Threshold", 
                                 max_value=1.0, 
                                 format="threshold = %.3f", 
                                 callback=set_threshold, 
-                                default_value=gc.THRESHOLD)
+                                default_value=gc.THRESHOLD, width=150)
+        
+        with dpg.group(horizontal=True): 
+            dpg.add_text("Compute suggestions over: ")
+            dpg.add_button(arrow=True, direction=dpg.mvDir_Left, user_data=False, callback=set_num_bars)
+            dpg.add_text(str(gc.NUM_BARS), tag="num_bars")
+            dpg.add_button(arrow=True, direction=dpg.mvDir_Right, user_data=True, callback=set_num_bars)
+            dpg.add_text("Bars or")
+            dpg.add_text(label="WindowText", default_value="", tag="WindowText")            
+            dpg.add_button(label="Entire Window Suggestions", callback=set_entire_window)
+        # with dpg.group():
+        #     dpg.add_slider_float(label="Accuracy Threshold", 
+        #                         max_value=1.0, 
+        #                         format="threshold = %.3f", 
+        #                         callback=set_threshold, 
+        #                         default_value=gc.THRESHOLD)
  
 def draw_suggestions_ui():
     with dpg.child_window(label="Suggestions", tag="suggestion_tab", menubar=True, autosize_x=True, autosize_y=True):
