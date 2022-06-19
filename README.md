@@ -1,6 +1,6 @@
-# COM418-2022-CMProject - Improvisation Helper Tool
+# COM418-2022-CMProject - Improvisation Guidance Tool
 
-In the context of the Computers & Music (COM-418) course at EPFL, we implemented an Improvisation Helper Tool. We analyse midi files to extract corresponding scales and suggest chords or notes to play along. 
+In the context of the Computers & Music (COM-418) course at EPFL, we implemented an Improvisation Guidance Tool. We analyse midi files to extract corresponding scales and suggest chords or notes to play along. 
 
 We offer the following functionalities:
 * Midi file selection 
@@ -8,6 +8,15 @@ We offer the following functionalities:
 * Midi visualiser
 * Personalisable scale suggestions
 * Parametrisable chord & note suggestions
+
+The repository contains the following elements: 
+* [improvisation_guidance_tool.py](#improvisation-guidance-tool) : the GUI for our tool
+* gui : contains utility files for the GUI 
+* MIDI_Files : contains midi files with which to test (and play around with) the tool 
+* music_tools : contains utility files for manipulating midi files and deriving musical information from the latter
+* scale_researches : contains files relative to our research on scales
+* TMP_Files : contains stored temporary files as a cache
+* images : contains the wonderful images presented in this README
 
 ## Run Instructions
 First you need to install all of the requirements using the following command:
@@ -20,12 +29,13 @@ Then you can launch the GUI :
 python3 ./improvisation_guidance_tool.py 
 ```
 
-## Midi Player
+## Improvisation Guidance Tool 
+### Midi Player
 To begin the user must select a midi file. This can either be done using the `File Selector` button or the `Random` button which selects a midi file at random from the `MIDI_Files` folder. 
 
 The midi player allows user to play, pause or stop the midi. The user can also control the volume directly from the interface. 
 
-## Midi Visualiser
+### Midi Visualiser
 
 The selected midi file will be displayed with notes along the x-axis. The y-axis can be displayed either in ticks, bartime or time (in seconds). The visualiser is colour-coded according to notes (independently of the octave). 
 
@@ -37,9 +47,9 @@ You can see an example of the visualisation for a midi of Eleanor Rigby by the B
 
 ![colour code](images/midiviz_beatles.png)
 
-## Scale Suggestion
+### Scale Suggestion
 
-### Parameters
+#### Parameters
 The scale suggestion can be personalised under the following parameters:
 * Normalize accuracy: TODO explain this
 * Weighted by Beat Importance: idem
@@ -49,10 +59,12 @@ The scale suggestion can be personalised under the following parameters:
 * Accuracy threshold: this threshold determines the accuracy with which the user would like the scales to be suggested (i.e. to filter out bad suggestions).
 * Amount of notes: the user can select how many notes they would like the scale suggestions to have. 
 
-### Result
+#### Result
 The resulting suggestions are displayed under a table which shows the scale name, the accuracy of the suggestion, the amount of notes in the scale and alternate names for the scale if any. 
 
-### Methodology
+#### Methodology
+
+
 
 # References 
 The midi files were collected from the following websites: 
