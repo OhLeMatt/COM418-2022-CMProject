@@ -36,6 +36,9 @@ To begin the user must select a midi file. This can either be done using the `Fi
 ![fileselect](images/fileselect.gif)
 
 The midi player allows user to play, pause or stop the midi. The user can also control the volume directly from the interface. 
+
+![playpause](images/playpause.gif)
+
 ### Midi Visualiser
 
 The selected midi file will be displayed with notes along the x-axis. The y-axis can be displayed either in ticks, bartime or time (in seconds). 
