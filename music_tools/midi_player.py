@@ -106,7 +106,7 @@ class MidiPlayer:
                       metric="idx", 
                       on_cursor_callback=True, 
                       on_window_call_back=True):
-        if cursor <= 0:
+        if cursor <= 0 or cursor > len(self.audio_data)*1.02:
             for k in self.cursor:
                 self.cursor[k] = 0
         elif metric == "idx" and cursor != self.cursor["idx"]:
