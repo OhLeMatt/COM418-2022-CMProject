@@ -9,6 +9,17 @@ We offer the following functionalities:
 * Personalisable scale suggestions
 * Parametrisable chord & note suggestions
 
+## Run Instructions
+First you need to install all of the requirements using the following command:
+```
+pip install -r requirements.txt
+```
+
+Then you can launch the GUI :
+```
+python3 ./improvisation_guidance_tool.py 
+```
+
 ## Midi Player
 To begin the user must select a midi file. This can either be done using the `File Selector` button or the `Random` button which selects a midi file at random from the `MIDI_Files` folder. 
 
