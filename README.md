@@ -59,7 +59,7 @@ The user can also make the display follow the cursor (i.e. the visualisation mov
 ### Scale Navigation
 The Scale Navigation window allows users to select the scale for which they will receive chord suggestions. We have 170 scales to choose from in total. The user can select the tonic of the scale. Scales can be filtered by the amount of notes they contain. We also show the rotations of this scale (i.e. other scales that have the exact same notes), children scales (whose notes are a subset of the selected scale) and parent scales (whose notes are a superset of the selected scale). 
 
-![Scale navigation](images/scalenav.gif)
+![Scale navigation](images/scale_navigation.gif)
 
 #### Scale Suggestion
 The scale suggestions are displayed under a table which shows the scale name, the accuracy of the suggestion, the amount of notes in the scale and alternate names for the scale if any. Suggestions can be tuned using the parameters explained hereafter. 
@@ -67,11 +67,22 @@ The scale suggestions are displayed under a table which shows the scale name, th
 #### Parameters
 The scale suggestion can be personalised under the following parameters:
 * Normalize accuracy: TODO explain this
+
+![normalize accuracy demo](images/normacc_small.gif)
+
 * Weighted by Beat Importance: idem
+
+![weighted](images/weighted.gif)
+
 * Computation window (2 modes)
     * Bars: under this mode the suggestion will be computed over the displayed grey area on the visualiser. The user can choose the size of this window in bars. 
     * Entire window: under this mode the suggestion will be computed over the entire midi file. 
+
+![window](images/window.gif)
+
 * Accuracy threshold: this threshold determines the accuracy with which the user would like the scales to be suggested (i.e. to filter out bad suggestions).
+
+![threshold](images/threshold.gif)
 
 #### Methodology
 
@@ -84,7 +95,11 @@ The chord suggestion tool suggests chords that are harmonious with the input MID
 The chord suggestions can be personalised by the user via the following parameters in the "Chord Suggestions Settings" window:
 * Chord Beat Weighted: TODO
 
-![weighted](images/beatimportance_chords.gif)
+![weighted](images/beatimportance.gif)
+
+* Note Count: TODO
+
+![notecount](images/notecount_chord.gif)
 
 * Similarity Factor: TODO
 
