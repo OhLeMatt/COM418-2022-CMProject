@@ -83,8 +83,6 @@ The scale suggestion can be personalised under the following parameters:
 
 ![threshold](images/threshold.gif)
 
-#### Methodology
-
 ### Chord Suggestions
 
 The chord suggestion tool suggests chords that are harmonious with the input MIDI file. The suggestions are highlighted in colour on the chromas and piano representations detailed below. 
