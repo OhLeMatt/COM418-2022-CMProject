@@ -2,6 +2,7 @@ import dearpygui.dearpygui as dpg
 
 import gui.context as gc
 import music_tools.midi_utils as mu
+from gui.visualizations import colour_piano, colour_scale
 
 def _log(sender, app_data, user_data):
     print(f"sender: {sender}, \t app_data: {app_data}, \t user_data: {user_data}")
@@ -24,28 +25,22 @@ def update_ui_window(midiplayer):
 def update_ui_suggestions(midiplayer):
     # To avoid circular dep:
     from gui.setter_callbacks import set_scale_from_suggestions
-    suggestions = midiplayer.get_suggestions()
-
-    dpg.delete_item("suggestion_content")
-
-    with dpg.table(header_row=False, tag="suggestion_content", parent="suggestion_tab", 
-                   scrollY=True, height=100):
-        # use add_table_column to add columns to the table,
-        # table columns use slot 0
-        dpg.add_table_column(width=gc.TABLE_SCALE_NAME_WIDTH)
-        dpg.add_table_column(width=gc.TABLE_ACCURACY_WIDTH)
-        dpg.add_table_column(width=gc.TABLE_NOTECOUNT_WIDTH)
-        dpg.add_table_column(width=gc.TABLE_ALTNAMES_WIDTH)
+    suggestions = []
+    if midiplayer is not None:
+        suggestions = midiplayer.get_suggestions()
         
-        for scale, tonic, accuracy in suggestions:
-            with dpg.table_row(parent="suggestion_content"):
-                dpg.add_selectable(label=repr(scale)+ " in " + mu.CHROMA_NAMES[tonic], 
-                                   callback=set_scale_from_suggestions, 
-                                   user_data=(scale, tonic))
-                dpg.add_text(f"{int(accuracy * 100)}%")
-                dpg.add_text(scale.note_count)
-                dpg.add_text(scale.name)
-
+    dpg.delete_item("suggestion_content", children_only=True, slot=1)
+        
+    for i, (scale, tonic, accuracy) in enumerate(suggestions):
+        with dpg.table_row(parent="suggestion_content"):
+            dpg.add_selectable(label=repr(scale)+ " in " + mu.CHROMA_NAMES[tonic], 
+                                callback=set_scale_from_suggestions, 
+                                user_data=(scale, tonic))
+            dpg.add_text(f"{int(accuracy * 100)}%")
+            dpg.add_text(scale.note_count)
+            dpg.add_text(scale.name)    
+            if accuracy == 1.0:
+                dpg.highlight_table_row("suggestion_content", i, [10, 0, 50, 100])
 
 def play_midi(sender, app_data, user_data):
     if gc.MIDIPLAYER is not None:
@@ -53,13 +48,13 @@ def play_midi(sender, app_data, user_data):
         if user_data:
             if gc.MIDIPLAYER.playing:
                 gc.MIDIPLAYER.pause()
-                dpg.set_item_label("PlayButton", "Play")
+                dpg.configure_item("PlayButton", texture_tag="play")
             else:
                 gc.MIDIPLAYER.play()
-                dpg.set_item_label("PlayButton", "Pause")
+                dpg.configure_item("PlayButton", texture_tag="pause")
         else:
             gc.MIDIPLAYER.stop()
-            dpg.set_item_label("PlayButton", "Play")
+            dpg.configure_item("PlayButton", texture_tag="play")
 
 def display(sender, app_data, user_data):
     print(gc.MIDIPLAYER)
@@ -76,18 +71,15 @@ def display(sender, app_data, user_data):
                     
             if len(gc.MIDIPLAYER.df) > 0:
                 metric_release = gc.METRIC + "_release"
-                df_copy = gc.MIDIPLAYER.df[[gc.METRIC, "note", metric_release, "weight"]]
-                
+                df_copy = gc.MIDIPLAYER.df.loc[:,[gc.METRIC, "note", metric_release, "weight"]]
+                if not gc.WEIGHTED:
+                    df_copy.weight = 1
                 for i, x in df_copy.iterrows():
-                    tint = gc.get_note_colour(x.note)
-                    if gc.WEIGHTED:
-                        tint[0] *= x.weight
-                        tint[1] *= x.weight
-                        tint[2] *= x.weight
-                    
+                    tint = gc.get_note_colour(x.note, x.weight)
+                                        
                     dpg.add_image_series("Texture_C", 
                                          [x[gc.METRIC], x.note - 0.5], [x[metric_release], x.note + 0.5], 
-                                         label="C", tag=f"MidiNote{i}", parent="imgy", tint_color=tuple(tint))
+                                         label="C", tag=f"MidiNote{i}", parent="imgy", tint_color=tint)
                 dpg.fit_axis_data("imgx")
 
 def compute_suggestions(sender, app_data, user_data):
@@ -105,4 +97,7 @@ def update_selected_scale():
     dpg.configure_item("scale_parents_list", items=gc.PARENTS_SCALES)
     dpg.configure_item("scale_children_list", items=gc.CHILDREN_SCALES)
     dpg.configure_item("scale_alternative_names", default_value=gc.SELECTED_SCALE.name) 
+    colour_scale(gc.SELECTED_SCALE.chromas)
+    colour_piano(gc.SELECTED_SCALE.chromas)
+    colour_piano(gc.SELECTED_SCALE.chromas, prefix="+")
     

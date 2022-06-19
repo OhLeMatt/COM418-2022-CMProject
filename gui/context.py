@@ -1,6 +1,7 @@
 from os import listdir
 from os.path import isfile, join
 
+import numpy as np
 import music_tools.scales as scales
 import music_tools.midi_utils as mu
 
@@ -36,23 +37,26 @@ ROTATIONS_SCALES = SELECTED_SCALE.rotated_scales()
 CHILDREN_SCALES = SELECTED_SCALE.child_scales()
 PARENTS_SCALES = SELECTED_SCALE.parent_scales()
 
-NOTE_COLORS = [
-        [255,0,0], # C
-        [255,127,0],  # C#
-        [255,255,0],  # D
-        [0,127,0], # D#
-        [0,255,0],  # E
-        [0,255,147],  # F
-        [0,255,255], # F#
-        [0,127,255],  # G
-        [0,0,255], # G#
-        [127,0,255], # A 
-        [255,0,255], # A#
-        [255,0,127] # B
-    ]
+EN_NOTES_DISPLAY = mu.CHROMA_SHARP_NAMES
+FR_NOTES_DISPLAY = mu.name_to_alt_name(EN_NOTES_DISPLAY)
+
+NOTE_COLORS = np.array([
+        [217, 31, 28], # C
+        [217, 97, 28],  # C#
+        [217, 151, 28],  # D
+        [179, 217, 28], # D#
+        [47, 217, 28],  # E
+        [28, 217, 132],  # F
+        [28, 208, 217], # F#
+        [28, 126, 217],  # G
+        [28, 47, 217], # G#
+        [141, 28, 217], # A 
+        [208, 28, 217], # A#
+        [217, 28, 135] # B
+    ])
 # Get colour texture for each note (in progress)
-def get_note_colour(note):
-    return NOTE_COLORS[int(note) % 12].copy()
+def get_note_colour(note, weight=1.0):
+    return tuple(NOTE_COLORS[int(note) % 12]*weight)
 
 def combo_getter(item, list):
     for x in list:

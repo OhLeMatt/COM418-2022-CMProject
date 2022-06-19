@@ -486,7 +486,7 @@ def suggest_scales(music_chromas,
             accuracy = accuracies[scale_index, tonic_index]
             if accuracies[scale_index, tonic_index] >= threshold:
                 suggestions.append((general_scale, tonic_chroma, accuracy))
-    return sorted(suggestions, key=lambda kv: (-kv[2], general_scale.names[0]))
+    return sorted(suggestions, key=lambda kv: (-kv[2], general_scale))
     # return suggestions
 
 # def windowed_suggest_scales(music_dataframe, 

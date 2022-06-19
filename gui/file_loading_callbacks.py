@@ -40,9 +40,9 @@ def load_midi(midi_file, path, name):
 
     dpg.set_value("PlayText", "Selected: " + name.replace(".mid", "").replace("_", " "))
     dpg.set_item_label("PlayButton", "Play")
-    print(gc.MIDIPLAYER)
+    
     display(None, None, None)
-    print(gc.MIDIPLAYER)
+    
     
 def random_midi(sender, app_data, user_data):
     midi_name = random.choice(gc.MIDIFILES)

@@ -7,6 +7,7 @@ import matplotlib.patches as patches
 
 from music_tools.temporal_converters import TicksBartimeConverter, TicksTimeConverter
 
+
 MIDI_IDS = np.arange(128)
 
 def to_chroma(midi_id):
@@ -18,10 +19,19 @@ def to_octave(midi_id):
 ALT_NAME_MAP = {"C": "DO", "D": "RE", "E": "MI", "F": "FA", "G": "SOL", "A": "LA", "B":"SI"} 
 
 def name_to_alt_name(name):
-    new_name = ""
-    for c in name:
-        new_name += ALT_NAME_MAP.get(c, c)
-    return new_name
+    if type(name) is str:
+        new_name = ""
+        for c in name:
+            new_name += ALT_NAME_MAP.get(c, c)
+        return new_name
+    else:
+        new_names = []
+        for n in name:
+            new_name = ""
+            for c in n:
+                new_name += ALT_NAME_MAP.get(c, c)
+            new_names.append(new_name)
+        return new_names
 
 # Midi ids refer here to what people call chroma pitches indices, although we also want to do an analysis being irrelevant of the octave, thus 
 # we will also use the "chroma" keyword to designate the 12 different chromatic pitches.
@@ -39,23 +49,13 @@ NOTES = {"C": 0, "DO": 0,
           "A#": 10, "LA#": 10, "Bb": 10, "SIb": 10, "A#/Bb":10,
           "B": 11, "SI": 11}
 
-
-
 CHROMA_IDS = np.arange(12)
 CHROMA_SHARP_NAMES = np.array(["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"])
 CHROMA_FLAT_NAMES = np.array(["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"])
 CHROMA_NAMES = np.array([(sharp_name + "/" + flat_name) if sharp_name != flat_name else sharp_name 
                             for sharp_name, flat_name in zip(CHROMA_SHARP_NAMES, CHROMA_FLAT_NAMES)])
-class NoteToChroma:
-    def __init__(self, chroma):
-        self.chroma = chroma % 12
-    
-    def __repr__(self):
-        return CHROMA_NAMES[self.chroma]
-    
-SIMPLIFIED_NOTES = [NoteToChroma(c) for c in CHROMA_IDS]
 
-CHROMA_ALT_NAMES = np.array([name_to_alt_name(name) for name in CHROMA_NAMES])
+CHROMA_ALT_NAMES = np.array(name_to_alt_name(CHROMA_NAMES))
 
 MIDI_SHARP_NAMES = np.array([CHROMA_SHARP_NAMES[to_chroma(midi_id)] + np.str_(to_octave(midi_id)) if midi_id >= 12 else "" 
                                 for midi_id in MIDI_IDS])
@@ -64,7 +64,7 @@ MIDI_FLAT_NAMES = np.array([CHROMA_FLAT_NAMES[to_chroma(midi_id)] + np.str_(to_o
 MIDI_NAMES = np.array([(sharp_name + "/" + flat_name) if sharp_name != flat_name else sharp_name 
                             for sharp_name, flat_name in zip(MIDI_SHARP_NAMES, MIDI_FLAT_NAMES)])
 
-MIDI_ALT_NAMES = np.array([name_to_alt_name(name) for name in MIDI_NAMES])
+MIDI_ALT_NAMES = np.array(name_to_alt_name(MIDI_NAMES))
 
 def name_to_midi_id(name):
     octave = -1

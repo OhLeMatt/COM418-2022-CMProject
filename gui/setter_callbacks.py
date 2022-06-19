@@ -1,7 +1,8 @@
 import dearpygui.dearpygui as dpg
 
-import music_tools.scales as scales
 import gui.context as gc
+import music_tools.midi_utils as mu
+import music_tools.scales as scales
 from gui.interactive_callbacks import display, update_selected_scale
             
 def set_channels(sender, app_data, user_data):
@@ -66,7 +67,7 @@ def set_num_bars(sender, app_data, user_data):
 
 def set_volume(sender, app_data, user_data):
     if gc.MIDIPLAYER is not None: 
-        gc.MIDIPLAYER.set_volume(app_data)
+        gc.MIDIPLAYER.set_volume(app_data/100)
 
 def set_follow_cursor(sender, app_data, user_data):
     gc.FOLLOW_CURSOR = app_data
@@ -100,7 +101,7 @@ def set_general_scale_from_all(sender, app_data, user_data):
     update_selected_scale()
 
 def set_tonic_chroma_from_all(sender, app_data, user_data):
-    gc.SELECTED_TONIC_CHROMA = mu.NOTES[combo_getter(app_data, mu.CHROMA_NAMES[gc.TONIC_CHROMA_SUBSET])] #type:ignore
+    gc.SELECTED_TONIC_CHROMA = mu.NOTES[gc.combo_getter(app_data, mu.CHROMA_NAMES[gc.TONIC_CHROMA_SUBSET])] #type:ignore
     update_selected_scale()
 
 def set_scale_from_navigation(sender, app_data, user_data):

@@ -5,6 +5,8 @@ dpg.create_context()
 dpg.create_viewport(title='Custom Title', width=600, height=600)
 
 demo.show_demo()
+print(dpg.mvThemeCol_WindowBg)
+
 
 dpg.setup_dearpygui()
 dpg.show_viewport()
