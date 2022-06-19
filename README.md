@@ -75,7 +75,7 @@ The scale suggestion can be personalised under the following parameters:
 
 ![normalize accuracy demo](images/normacc_small.gif)
 
-* Weighted by Beat Importance: weight the suggestion by beat importance. For example in 4/4 time, the importance is as such: **ONE** two **three** four where the one has the highest importance, the three slightly less, and the two and four have about the same, lesser importance.
+* Weighted by Beat Importance: weight the suggestion by beat importance. For example in 4/4 time, the importance is as such: **ONE** two **three** four,  where the one has the highest importance, the three slightly less, and the two and four have about the same, lesser importance.
 
 ![weighted](images/weighted.gif)
 
