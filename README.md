@@ -57,7 +57,7 @@ The user can also make the display follow the cursor (i.e. the visualisation mov
 ![Follow Cursor](images/followcursor.gif)
 
 ### Scale Navigation
-The Scale Navigation window allows users to select the scale for which they will receive chord suggestions. We have 170 scales to choose from in total. The user can select the tonic of the scale. We also show the rotations of this scale (i.e. other scales that have the exact same notes), children scales (whose notes are a subset of the selected scale) and parent scales (whose notes are a superset of the selected scale). 
+The Scale Navigation window allows users to select the scale for which they will receive chord suggestions. We have 170 scales to choose from in total. The user can select the tonic of the scale. Scales can be filtered by the amount of notes they contain. We also show the rotations of this scale (i.e. other scales that have the exact same notes), children scales (whose notes are a subset of the selected scale) and parent scales (whose notes are a superset of the selected scale). 
 
 ![Scale navigation](images/scalenav.gif)
 
@@ -72,8 +72,6 @@ The scale suggestion can be personalised under the following parameters:
     * Bars: under this mode the suggestion will be computed over the displayed grey area on the visualiser. The user can choose the size of this window in bars. 
     * Entire window: under this mode the suggestion will be computed over the entire midi file. 
 * Accuracy threshold: this threshold determines the accuracy with which the user would like the scales to be suggested (i.e. to filter out bad suggestions).
-* Amount of notes: the user can select how many notes they would like the scale suggestions to have. 
-
 
 #### Methodology
 
