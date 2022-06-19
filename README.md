@@ -3,11 +3,11 @@
 In the context of the Computers & Music (COM-418) course at EPFL, we implemented an Improvisation Guidance Tool. We analyse midi files to extract corresponding scales and suggest chords or notes to play along. 
 
 We offer the following functionalities:
-* Midi file selection 
-* Midi player 
-* Midi visualiser
-* Personalisable scale suggestions
-* Parametrisable chord suggestions
+* [Midi file selection](#midi-player) 
+* [Midi player](#midi-player) 
+* [Midi visualiser](#midi-visualiser)
+* [Personalisable scale suggestions](#scale-navigation)
+* [Parametrisable chord suggestions](#chord-suggestions)
 
 The repository contains the following elements: 
 * [improvisation_guidance_tool.py](#improvisation-guidance-tool) : the GUI for our tool
@@ -68,11 +68,10 @@ The scale suggestions are displayed under a table which shows the scale name, th
 
 #### Parameters
 The scale suggestion can be personalised under the following parameters:
-* Normalize accuracy: TODO explain this
-
+* Normalize accuracy: normalizes the accuracy of the scale suggestions (best becomes 100%, worst 0%).
 ![normalize accuracy demo](images/normacc_small.gif)
 
-* Weighted by Beat Importance: idem
+* Weighted by Beat Importance: weight the suggestion by beat importance. For example in 4/4 time, the importance is as such: **ONE** two **three** four where the one has the highest importance, the three slightly less, and the two and four have about the same, lesser importance.
 
 ![weighted](images/weighted.gif)
 
@@ -86,20 +85,18 @@ The scale suggestion can be personalised under the following parameters:
 
 ![threshold](images/threshold.gif)
 
-#### Methodology
-
-### Chord Suggestion
+### Chord Suggestions
 
 The chord suggestion tool suggests chords that are harmonious with the input MIDI file. The suggestions are highlighted in colour on the chromas and piano representations detailed below. 
 
 ### Parameters
 
 The chord suggestions can be personalised by the user via the following parameters in the "Chord Suggestions Settings" window:
-* Chord Beat Weighted: TODO
+* Chord Beat Weighted: weight the suggestions by beat importance. 
 
 ![weighted](images/beatimportance.gif)
 
-* Note Count: TODO
+* Note Count: the amount of notes in the chord.
 
 ![notecount](images/notecount_chord.gif)
 
@@ -154,9 +151,11 @@ The scale and chord suggestions gained a lot from the following ressources:
 * https://ianring.com/musictheory/scales/
 * http://allthescales.org/index.php
 * https://www.sciencedirect.com/science/article/abs/pii/S0020025518307163?via%3Dihub#fig0001
+* https://music.stackexchange.com/
 
 And finally the following ressources came in handy for playing around with midi files (notably the Mido and PrettyMidi libraries):
 * https://mido.readthedocs.io
 * https://www.twilio.com/blog/working-with-midi-data-in-python-using-mido
 * https://craffel.github.io/pretty-midi/
 * https://notebook.community/craffel/pretty-midi/Tutorial
+* https://stackoverflow.com/
