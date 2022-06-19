@@ -42,3 +42,15 @@ The scale suggestion can be personalised under the following parameters:
 The resulting suggestions are displayed under a table which shows the scale name, the accuracy of the suggestion, the amount of notes in the scale and alternate names for the scale if any. 
 
 ### Methodology
+
+# References 
+The midi files were collected from the following websites: 
+* bitmidi.com
+* midiworld.com
+* feelyoursound.com
+* www.mutopiaproject.org
+* www.hooktheory.com
+
+The GUI is based on the DearPyGUI library.
+
+TODO: add research references
