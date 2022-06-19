@@ -6,7 +6,7 @@ We offer the following functionalities:
 * [Midi file selection](#midi-player) 
 * [Midi player](#midi-player) 
 * [Midi visualiser](#midi-visualiser)
-* [Personalisable scale suggestions](#scale-savigation)
+* [Personalisable scale suggestions](#scale-navigation)
 * [Parametrisable chord suggestions](#chord-suggestions)
 
 The repository contains the following elements: 
