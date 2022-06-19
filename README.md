@@ -72,6 +72,7 @@ The scale suggestions are displayed under a table which shows the scale name, th
 #### Parameters
 The scale suggestion can be personalised under the following parameters:
 * Normalize accuracy: normalizes the accuracy of the scale suggestions (best becomes 100%, worst 0%).
+
 ![normalize accuracy demo](images/normacc_small.gif)
 
 * Weighted by Beat Importance: weight the suggestion by beat importance. For example in 4/4 time, the importance is as such: **ONE** two **three** four where the one has the highest importance, the three slightly less, and the two and four have about the same, lesser importance.
@@ -79,8 +80,8 @@ The scale suggestion can be personalised under the following parameters:
 ![weighted](images/weighted.gif)
 
 * Computation window (2 modes)
-    * Bars: under this mode the suggestion will be computed over the displayed grey area on the visualiser. The user can choose the size of this window in bars. 
-    * Entire window: under this mode the suggestion will be computed over the entire midi file. 
+    * **Bars**: under this mode the suggestion will be computed over the displayed grey area on the visualiser. The user can choose the size of this window in bars. 
+    * **Entire window**: under this mode the suggestion will be computed over the entire midi file. 
 
 ![window](images/window.gif)
 
@@ -115,7 +116,7 @@ The chord suggestions can be personalised by the user via the following paramete
 
 ![consonance](images/consonance.gif)
 
-Just like for the scale suggestions, the chord suggestions can be computed for a specific region of the MIDI file delimited by the cursor, or for the whole file. This parameter is the same for all suggestions, and is therefore modifiable via the Scale Suggestion Settings.
+Just like for the scale suggestions, the chord suggestions can be computed for a specific region of the MIDI file delimited by the cursor, or for the whole file. This parameter is the same for all suggestions, and is therefore modifiable via the [Scale Suggestion Settings](#parameters).
 
 ### Chromas
 
