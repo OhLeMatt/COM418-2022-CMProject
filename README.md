@@ -33,6 +33,8 @@ python3 ./improvisation_guidance_tool.py
 ### Midi Player
 To begin the user must select a midi file. This can either be done using the `File Selector` button or the `Random` button which selects a midi file at random from the `MIDI_Files` folder. 
 
+![fileselect](images/fileselect.gif)
+
 The midi player allows user to play, pause or stop the midi. The user can also control the volume directly from the interface. 
 ### Midi Visualiser
 
