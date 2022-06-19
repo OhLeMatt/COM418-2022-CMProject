@@ -133,10 +133,9 @@ The GUI is based on the DearPyGUI library, for which we used the following resso
 * https://github.com/hoffstadt/DearPyGui/blob/master/DearPyGui/dearpygui/demo.py
 * https://github.com/hoffstadt/DearPyGui/wiki/Dear-PyGui-Showcase#dearbagplayer
 
-The scale and chord suggestions gained a lot from the following ressources:
+The scale and chord suggestions gained from the following ressources:
 * https://ianring.com/musictheory/scales/
 * http://allthescales.org/index.php
-* https://www.sciencedirect.com/science/article/abs/pii/S0020025518307163?via%3Dihub#fig0001
 
 And finally the following ressources came in handy for playing around with midi files (notably the Mido and PrettyMidi libraries):
 * https://mido.readthedocs.io

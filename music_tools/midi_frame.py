@@ -376,5 +376,6 @@ class MidiFrame:
         for track_frame in self.track_frames:
             if not track_frame.meta_only:
                 self.music_track_count += 1
+        self.track_count = self.music_track_count + 1
 
             

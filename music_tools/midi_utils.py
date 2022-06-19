@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 from music_tools.temporal_converters import TicksBartimeConverter, TicksTimeConverter
-
+pd.options.mode.chained_assignment = None  # default='warn'
 
 MIDI_IDS = np.arange(128)
 
