@@ -1,4 +1,4 @@
-# COM418-2022-CMProject - Extemporaneous, an Improvisation Guidance Tool
+# Extemporaneous, an Improvisation Guidance Tool
 
 In the context of the Computers & Music (COM-418) course at EPFL, we created Extemporaneous, an Improvisation Guidance Tool. We analyse midi files to extract corresponding scales and suggest chords or notes to play along. 
 
