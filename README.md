@@ -3,11 +3,11 @@
 In the context of the Computers & Music (COM-418) course at EPFL, we implemented an Improvisation Guidance Tool. We analyse midi files to extract corresponding scales and suggest chords or notes to play along. 
 
 We offer the following functionalities:
-* Midi file selection 
-* Midi player 
-* Midi visualiser
-* Personalisable scale suggestions
-* Parametrisable chord suggestions
+* [Midi file selection](#midi-player) 
+* [Midi player](#midi-player) 
+* [Midi visualiser](#midi-visualiser)
+* [Personalisable scale suggestions](#scale-navigation)
+* [Parametrisable chord suggestions](#chord-suggestions)
 
 The repository contains the following elements: 
 * [improvisation_guidance_tool.py](#improvisation-guidance-tool) : the GUI for our tool
@@ -33,7 +33,12 @@ python3 ./improvisation_guidance_tool.py
 ### Midi Player
 To begin the user must select a midi file. This can either be done using the `File Selector` button or the `Random` button which selects a midi file at random from the `MIDI_Files` folder. 
 
+![fileselect](images/fileselect.gif)
+
 The midi player allows user to play, pause or stop the midi. The user can also control the volume directly from the interface. 
+
+![playpause](images/playpause.gif)
+
 ### Midi Visualiser
 
 The selected midi file will be displayed with notes along the x-axis. The y-axis can be displayed either in ticks, bartime or time (in seconds). 
@@ -44,7 +49,7 @@ The visualiser is colour-coded according to notes (independently of the octave).
 
 ![colour code](images/colour_code.png)
 
-The user can also select which of the 12 midi file channels to display.
+The user can also select which of the 12 midi file channels to display (only non-empty channels are shown).
 
 ![Channel selection](images/channels.gif)
 
@@ -59,46 +64,59 @@ The user can also make the display follow the cursor (i.e. the visualisation mov
 ### Scale Navigation
 The Scale Navigation window allows users to select the scale for which they will receive chord suggestions. We have 170 scales to choose from in total. The user can select the tonic of the scale. Scales can be filtered by the amount of notes they contain. We also show the rotations of this scale (i.e. other scales that have the exact same notes), children scales (whose notes are a subset of the selected scale) and parent scales (whose notes are a superset of the selected scale). 
 
-![Scale navigation](images/scalenav.gif)
+![Scale navigation](images/scale_navigation.gif)
 
 #### Scale Suggestion
 The scale suggestions are displayed under a table which shows the scale name, the accuracy of the suggestion, the amount of notes in the scale and alternate names for the scale if any. Suggestions can be tuned using the parameters explained hereafter. 
 
 #### Parameters
 The scale suggestion can be personalised under the following parameters:
-* Normalize accuracy: TODO explain this
-* Weighted by Beat Importance: idem
+* Normalize accuracy: normalizes the accuracy of the scale suggestions (best becomes 100%, worst 0%).
+
+![normalize accuracy demo](images/normacc_small.gif)
+
+* Weighted by Beat Importance: weight the suggestion by beat importance. For example in 4/4 time, the importance is as such: **ONE** two **three** four,  where the one has the highest importance, the three slightly less, and the two and four have about the same, lesser importance.
+
+![weighted](images/weighted.gif)
+
 * Computation window (2 modes)
-    * Bars: under this mode the suggestion will be computed over the displayed grey area on the visualiser. The user can choose the size of this window in bars. 
-    * Entire window: under this mode the suggestion will be computed over the entire midi file. 
+    * **Bars**: under this mode the suggestion will be computed over the displayed grey area on the visualiser. The user can choose the size of this window in bars. 
+    * **Entire window**: under this mode the suggestion will be computed over the entire midi file. 
+
+![window](images/window.gif)
+
 * Accuracy threshold: this threshold determines the accuracy with which the user would like the scales to be suggested (i.e. to filter out bad suggestions).
 
-#### Methodology
+![threshold](images/threshold.gif)
 
-### Chord Suggestion
+### Chord Suggestions
 
 The chord suggestion tool suggests chords that are harmonious with the input MIDI file. The suggestions are highlighted in colour on the chromas and piano representations detailed below. 
 
 ### Parameters
 
 The chord suggestions can be personalised by the user via the following parameters in the "Chord Suggestions Settings" window:
-* Chord Beat Weighted: TODO
+* Chord Beat Weighted: weight the suggestions by beat importance. 
 
-![weighted](images/beatimportance_chords.gif)
+![weighted](images/beatimportance.gif)
 
-* Similarity Factor: TODO
+* Note Count: the amount of notes in the chord.
+
+![notecount](images/notecount_chord.gif)
+
+* Similarity Factor: tune how similar the suggested chords will be to the midi window.
 
 ![similarity](images/similarity.gif)
 
-* Harmony Factor: TODO
+* Harmony Factor: a high harmonic factor will select chords that have notes which are musically similar to the tonic (i.e. the tonic itself, major/minor third, dominant,...). 
 
 ![harmony](images/harmony.gif)
 
-* Consonance Factor: TODO
+* Consonance Factor: tune the consonance of the chords (the impression of stability and repose). This is determined by the spacing of the notes. Perfect consonances (unisons, octaves, perfect fourths and perfect fifths) will have a higher weight over imperfect consonances (major seconds, minor sevenths, major thirds, minor sixths, minor thirds and major sixths). 
 
 ![consonance](images/consonance.gif)
 
-Just like for the scale suggestions, the chord suggestions can be computed for a specific region of the MIDI file delimited by the cursor, or for the whole file. This parameter is the same for all suggestions, and is therefore modifiable via the Scale Suggestion Settings.
+Just like for the scale suggestions, the chord suggestions can be computed for a specific region of the MIDI file delimited by the cursor, or for the whole file. This parameter is the same for all suggestions, and is therefore modifiable via the [Scale Suggestion Settings](#parameters).
 
 ### Chromas
 
@@ -130,15 +148,16 @@ The midi files were collected from the following websites:
 
 The GUI is based on the DearPyGUI library, for which we used the following ressources:
 * https://dearpygui.readthedocs.io
-* https://github.com/hoffstadt/DearPyGui/blob/master/DearPyGui/dearpygui/demo.py
-* https://github.com/hoffstadt/DearPyGui/wiki/Dear-PyGui-Showcase#dearbagplayer
+* https://github.com/hoffstadt/DearPyGui/
 
 The scale and chord suggestions gained from the following ressources:
 * https://ianring.com/musictheory/scales/
 * http://allthescales.org/index.php
+* https://music.stackexchange.com/
 
 And finally the following ressources came in handy for playing around with midi files (notably the Mido and PrettyMidi libraries):
 * https://mido.readthedocs.io
 * https://www.twilio.com/blog/working-with-midi-data-in-python-using-mido
 * https://craffel.github.io/pretty-midi/
 * https://notebook.community/craffel/pretty-midi/Tutorial
+* https://stackoverflow.com/

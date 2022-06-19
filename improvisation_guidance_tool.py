@@ -260,6 +260,7 @@ update_selected_scale()
 try:
     load_midi(MidiFrame.EXPORT_DEFAULT_FILEPATH, "TMP_Files", "Last played")
 except:
+    dpg.hide_item("loading_indicator")
     pass
 
 dpg.create_viewport(title='Improvisation Guidance Tool', width=1200, height=800)
