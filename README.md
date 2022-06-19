@@ -77,6 +77,37 @@ The scale suggestion can be personalised under the following parameters:
 
 ### Chord Suggestion
 
+The chord suggestion tool suggests chords that are harmonious with the input MIDI file. The suggestions are highlighted in colour on the chromas and piano representations detailed below. 
+
+### Parameters
+
+The chord suggestions can be personalised by the user via the following parameters in the "Chord Suggestions Settings" window:
+* Chord Beat Weighted: TODO
+* Similarity Factor: TODO
+* Harmony Factor: TODO
+* Consonance Factor: TODO
+
+Just like for the scale suggestions, the chord suggestions can be computed for a specific region of the MIDI file delimited by the cursor, or for the whole file. This parameter is the same for all suggestions, and is therefore modifiable via the Scale Suggestion Settings.
+
+### Chromas
+
+The first representation of the suggested chords is a simple chromatic scale from C to B. The main scale represents the overall suggested notes:
+
+![Suggested scale](images/sugg_scale.png)
+
+The secondary scales represent four suggested chords:
+
+![Suggested chords](images/sugg_chords.png)
+
+It uses the same colour scheme as the Midi Player.
+
+### Piano
+
+The suggested chords are also represented as piano tiles. As above, the main piano represents the overall suggested notes and the secondary pianos represent four suggested chords:
+sugg
+![Suggested piano tiles](images/piano_tiles.png)
+
+![Suggested piano chords](images/piano_chords.png)
 
 # References 
 The midi files were collected from the following websites: 
